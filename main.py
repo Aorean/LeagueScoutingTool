@@ -1,3 +1,4 @@
+#hahalololl
 from itertools import count
 
 from dotenv import load_dotenv
@@ -75,7 +76,7 @@ match = get_match(region, matchId, api_key)
 
 match1 = get_match(region, matchId, api_key)
 
-# print(len(matchhistory))
+print(len(matchhistory))
 
 #######################################################################################################################
 
@@ -124,7 +125,7 @@ for player in participant_dto:
 
 #######################################################################################################################
 
-print(vision_score)
+print(game_version)
 
 """
 for game in matchhistory:
