@@ -94,12 +94,17 @@ game_version = info["gameVersion"]  # wird später noch als "Patch" eingepflegt
 tournament_code = info["tournamentCode"]
 teams = info["teams"]
 
-# Match > InfoDto > ParticipantDto
+# Match > InfoDto > ParticipantDt#    riot_id_game_name.append(player["riotIdGameName"])
 participant_dto = info["participants"]
+player_info = dict()
+riot_id_game_name = []
+
 
 for player in participant_dto:
-    riot_id_game_name = player["riotIdGameName"]
+    player_info[player["riotIdGameName"]] = player["win"],player["kills"],player["assists"],player["deaths"]
+    riot_id_game_name.append(player["riotIdGameName"])
     riot_id_tagline = player["riotIdTagline"]
+    print(riot_id_tagline)
     win = player["win"]
     kills = player["kills"]
     assists = player["assists"]
@@ -121,10 +126,14 @@ for player in participant_dto:
     summoner2_id = player["summoner2Id"]
     # Match >InfoDto > ParicipantDto > PerksDto > PerksStatsDto
     perks_dto = player["perks"]
-
 #######################################################################################################################
 
-print(vision_score)
+print(player_info)
+print(player_info["Moris "])
+print(len(player_info))
+
+##for player in participant_dto: 
+    ##print(riot_id_game_name)
 
 """
 for game in matchhistory:
