@@ -121,22 +121,23 @@ for player in participant_dto:
     total_dmg_taken = player["totalDamageTaken"]
     summoner1_id = player["summoner1Id"]
     summoner2_id = player["summoner2Id"]
-    if summoner1_id == 1:
-        summoner1_id = "Cleanse"
-    if summoner1_id == 3:
-        summoner1_id = "Exhaust"
-    if summoner1_id == 4:
-        summoner1_id = "Flash"
-    if summoner1_id == 6:
-        summoner1_id = "Ghost"
-    if summoner1_id == 7:
-        summoner1_id = "Heal"
-    if summoner1_id == 11:
-        summoner1_id = "Smite"
-    if summoner1_id == 12:
-        summoner1_id = "Teleport"
-    else:
-        summoner1_id = summoner1_id
+    match player["summoner1Id"]:
+        case "1":
+            summoner1_id = "Cleanse"
+        case "3":
+            summoner1_id = "Exhaust"
+        case "4":
+            summoner1_id = "Flash"
+        case "6":
+            summoner1_id = "Ghost"
+        case "7":
+            summoner1_id = "Heal"
+        case "11":
+            summoner1_id = "Smite"
+        case "12":
+            summoner1_id =  "Teleport"
+        case _:
+            summoner1_id = summoner1_id
 
     if summoner2_id == 1:
         summoner2_id = "Cleanse"
