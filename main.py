@@ -1,10 +1,12 @@
 #hahalololl
 from itertools import count
+from operator import index
 
 from dotenv import load_dotenv
 import os
 import requests
 import pandas as pd
+from numpy.ma.core import append
 from pandas import period_range
 
 load_dotenv()
@@ -16,7 +18,6 @@ summoner_name = riot_id_list[0]
 tag_line = riot_id_list[1]
 api_key = os.environ.get("api_key")
 region = "europe"
-
 
 #######################################################################################################################
 
@@ -76,10 +77,7 @@ match = get_match(region, matchId, api_key)
 
 match1 = get_match(region, matchId, api_key)
 
-print(len(matchhistory))
-
 #######################################################################################################################
-
 
 # accessing the Dtos to process data into smaller packages
 # Match > MetadataDto
@@ -100,23 +98,21 @@ participant_dto = info["participants"]
 player_info = dict()
 riot_id_game_name = []
 
-
 for player in participant_dto:
     player_info[player["riotIdGameName"]] = player["win"],player["kills"],player["assists"],player["deaths"]
     riot_id_game_name.append(player["riotIdGameName"])
     riot_id_tagline = player["riotIdTagline"]
-    print(riot_id_tagline)
+    champ_name = player["championName"]
     win = player["win"]
     kills = player["kills"]
-    assists = player["assists"]
     deaths = player["deaths"]
+    assists = player["assists"]
     neutral_minions_killed = player["neutralMinionsKilled"]
-    # total_minions_killed = player["total_Minions_Killed"]
+    #total_minions_killed = player["total_Minions_Killed"]
     champ_exp = player["champExperience"]
     champ_lvl = player["champLevel"]
     gold_earned = player["goldEarned"]
     # champ_id = player["champId"]
-    champ_name = player["championName"]
     vision_score = player["visionScore"]
     detectorwards_placed = player["detectorWardsPlaced"]
     dragon_kills = player["dragonKills"]
@@ -125,15 +121,103 @@ for player in participant_dto:
     total_dmg_taken = player["totalDamageTaken"]
     summoner1_id = player["summoner1Id"]
     summoner2_id = player["summoner2Id"]
+    if summoner1_id == 1:
+        summoner1_id = "Cleanse"
+    if summoner1_id == 3:
+        summoner1_id = "Exhaust"
+    if summoner1_id == 4:
+        summoner1_id = "Flash"
+    if summoner1_id == 6:
+        summoner1_id = "Ghost"
+    if summoner1_id == 7:
+        summoner1_id = "Heal"
+    if summoner1_id == 11:
+        summoner1_id = "Smite"
+    if summoner1_id == 12:
+        summoner1_id = "Teleport"
+    else:
+        summoner1_id = summoner1_id
+
+    if summoner2_id == 1:
+        summoner2_id = "Cleanse"
+    if summoner2_id == 3:
+        summoner2_id = "Exhaust"
+    if summoner2_id == 4:
+        summoner2_id = "Flash"
+    if summoner2_id == 6:
+        summoner2_id = "Ghost"
+    if summoner2_id == 7:
+        summoner2_id = "Heal"
+    if summoner2_id == 11:
+        summoner2_id = "Smite"
+    if summoner2_id == 12:
+        summoner2_id = "Teleport"
+    else:
+        summoner2_id = summoner2_id
     # Match >InfoDto > ParicipantDto > PerksDto > PerksStatsDto
-    perks_dto = player["perks"]
+    print(champ_name , "Summoner 1: " , summoner1_id , "     " , "Summoner 2: " , summoner2_id)
 
+
+
+
+# Match > InfoDto > TeamDto > BanDto
+#banns red/blue + championId und pickTurn
+# [0] blueside [1] redside
+banns_total_red = []
+banns_total_blue = []
+
+teaminfo_blue = teams[0]
+teaminfo_red = teams[1]
+banns_blue = teaminfo_blue["bans"]
+banns_total_red.append(banns_blue)
+banns_red = teaminfo_red["bans"]
+banns_total_red.append(banns_red)
+print(banns_total_blue + banns_total_red)
+
+
+obj_blue = []
+obj_red = []
+obj_total = [obj_blue , obj_red]
+
+obj_blue_dict = teaminfo_blue["objectives"]
+obj_blue.append(obj_blue_dict)
+obj_red_dict = teaminfo_red["objectives"]
+obj_red.append(obj_red_dict)
+
+
+
+#following doesnt work
+"""
+#atakhan = obj_blue["atakhan"]
+#obj_total.append(atakhan)
+baron = obj_blue["baron"]
+obj_total.append(baron)
+champion_kills = obj_blue["champion"]
+obj_total.append(champion_kills)
+dragon = obj_blue["dragon"]
+obj_total.append(dragon)
+grubs = obj_blue["horde"]
+obj_total.append(grubs)
+inhibitors = obj_blue["inhibitor"]
+obj_total.append(inhibitors)
+rift_herald = obj_blue["riftHerald"]
+obj_total.append(rift_herald)
+tower = obj_blue["tower"]
+obj_total.append(tower)
+"""
+
+print(obj_total)
+# [0] blueside [1] redside
+
+#"atakhan", "baron", "champion", "dragon", "horde", "inhibitor", "riftHerald", "tower", "win"
+#print(teams)
+#print(ban_id)
 #######################################################################################################################
-
+"""
 print(player_info)
 print(player_info["Moris "])
 print(len(player_info))
-
+"""
 ##for player in participant_dto:
     ##print(riot_id_game_name)
 
@@ -175,3 +259,4 @@ for game in matchhistory:
 # player = puuid
 
 #################################################
+print(match)
