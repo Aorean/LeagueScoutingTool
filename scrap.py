@@ -1,4 +1,4 @@
-#hahalololl
+# hahalololl
 from itertools import count
 from operator import index
 
@@ -13,7 +13,7 @@ from pandas import period_range
 
 load_dotenv()
 
-#vorbereitung auf google sheets
+# vorbereitung auf google sheets
 """
 import pygsheets
 service_acc = pygsheets.authorize(service_account_file="json//spreadsheet-automator-449612-b3a5d5ca0942.json")
@@ -48,7 +48,7 @@ get_matchhistory(region, puuid, api_key, startTime=20250108)
 #######################################################################################################################
 
 matchhistory = get_matchhistory(region, puuid, api_key, startTime=20250108)
-matchId = matchhistory[0]
+matchId = matchhistory
 
 #######################################################################################################################
 
@@ -114,129 +114,3 @@ for matchId in matchhistory:
 
 #######################################################################################################################
 
-"""
-
-# Match > InfoDto > TeamDto > BanDto
-#banns red/blue + championId und pickTurn
-# [0] blueside [1] redside
-banns_total_red = []
-banns_total_blue = []
-
-teaminfo_blue = teams[0]
-teaminfo_red = teams[1]
-banns_blue = teaminfo_blue["bans"]
-banns_total_red.append(banns_blue)
-banns_red = teaminfo_red["bans"]
-banns_total_red.append(banns_red)
-print(banns_total_blue + banns_total_red)
-
-
-obj_blue = []
-obj_red = []
-obj_total = [obj_blue , obj_red]
-
-obj_blue_dict = teaminfo_blue["objectives"]
-obj_blue.append(obj_blue_dict)
-obj_red_dict = teaminfo_red["objectives"]
-obj_red.append(obj_red_dict)
-
-
-
-#following doesnt work
-
-#atakhan = obj_blue["atakhan"]
-#obj_total.append(atakhan)
-baron = obj_blue["baron"]
-obj_total.append(baron)
-champion_kills = obj_blue["champion"]
-obj_total.append(champion_kills)
-dragon = obj_blue["dragon"]
-obj_total.append(dragon)
-grubs = obj_blue["horde"]
-obj_total.append(grubs)
-inhibitors = obj_blue["inhibitor"]
-obj_total.append(inhibitors)
-rift_herald = obj_blue["riftHerald"]
-obj_total.append(rift_herald)
-tower = obj_blue["tower"]
-obj_total.append(tower)
-
-
-print(obj_total)
-# [0] blueside [1] redside
-
-#"atakhan", "baron", "champion", "dragon", "horde", "inhibitor", "riftHerald", "tower", "win"
-#print(teams)
-#print(ban_id)
-
-
-match_data = match["info"]
-player_data = match_data["participants"]
-
-print(len(player_data))
-for player in match_data["participants"]:
-    perks = player["perks"]
-    primary_perk = perks["styles"]
-    dgiapdjng = primary_perk[0]
-    print("!!!!!!!!" , dgiapdjng["selections"])
-
-#    primary_tree = primary_perk["perk"] , primary_perk["var1"] , primary_perk["var2"] , primary_perk["var3"]
-#    secondary_tree = secondary_perk["var1"] , secondary_perk["var2"]
-
-
-
-
-
-
-
-
-#######################################################################################################################
-
-print(player_info)
-print(player_info["Moris "])
-print(len(player_info))
-
-##for player in participant_dto:
-    ##print(riot_id_game_name)
-
-
-for game in matchhistory:
-    get_match(region, matchId, api_key)
-    match = get_match(region, matchId, api_key)
-    print(champions)
-
-
-
-    match_df = pd.DataFrame(match)
-    champions_played = match["InfoDto"]["ParticipantDto"]["championName"]
-    print(match_df)
-    print(champions_played)
-
-
-# match_df1 = pd.DataFrame(match1)
-
-
-###############################################
-
-# print(puuid)
-
-################################################
-
-# print(matchhistory)
-
-#################################################
-
-#print(match1)
-
-#################################################
-
-# print(match_df1)
-
-#################################################
-
-# player = puuid
-
-#################################################
-
-#print(match)
-"""
