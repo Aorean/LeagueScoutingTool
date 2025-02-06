@@ -52,6 +52,8 @@ matchId = matchhistory[0]
 
 #######################################################################################################################
 
+
+
 def player_data_matchhistory():
     for player in participant_dto:
         if puuid == player["puuid"]:
@@ -65,6 +67,7 @@ def player_data_matchhistory():
             summoner_spell.append(player["summoner2Id"])
 
             # getting stats from json
+            player_scouting["team"] = player["teamId"]
             player_scouting["name"] = ign
             player_scouting["champ"] = player["championName"]
             player_scouting["kills"] = player["kills"]
@@ -77,12 +80,18 @@ def player_data_matchhistory():
             player_scouting["total dmg to champ"] = player["totalDamageDealtToChampions"]
             player_scouting["win"] = player["win"]
 
-            # print one match
-            print(player_scouting)
+            return player_scouting
+
+
 
 #######################################################################################################################
 
-match1 = get_match(region, matchId, api_key)
+matchdata_20_games = []
+#list and dict for context
+total_objectives_20_games = []
+objectives_team ={}
+total_data_20_games = [matchdata_20_games + total_objectives_20_games]
+
 
 for matchId in matchhistory:
     match = get_match(region, matchId, api_key)
@@ -110,9 +119,55 @@ for matchId in matchhistory:
     gamename_a_tagline = []
     summoner_spell = []
 
-    player_data_matchhistory()
+    matchdata_20_games.append(player_data_matchhistory())
+
+    # checking each objective
+    for team in teams:
+        # list where every objective per team gets saved
+        list_objectives = []
+        # dict to save objective with keyword
+        objectives = {}
+
+
+        side = team["teamId"]
+
+        objs = team["objectives"]
+        objectives["baron"] = objs["baron"]
+        objectives["dragon"] = objs["dragon"]
+        objectives["grubs"] = objs["horde"]
+        objectives["rift_herald"] = objs["riftHerald"]
+        objectives["tower"] = objs["tower"]
+        objectives["inhibitor"] = objs["inhibitor"]
+
+        # using dict above to create a connection between "side" and objectives "objectives_team"
+        # putting that list into a list of the last 20 games "total_objectives_20_games"
+        list_objectives.append(objectives)
+        objectives_team[side] = list_objectives
+        total_objectives_20_games.append(objectives_team)
+
+df_matchdata = pd.DataFrame(matchdata_20_games)
+df_objectivedata = pd.DataFrame(total_objectives_20_games)
+
+print(df_matchdata)
+print(df_objectivedata)
+
+# i would like to get objectives from the 2 lists printed in altering order, but idk how yet
+"""
+for element in total_data_20_games:
+    for player_stat in matchdata_20_games:
+        print(player_stat)
+        break
+
+    for obj_stat in total_objectives_20_games:
+        print(obj_stat)
+        break
+"""
 
 #######################################################################################################################
+
+
+
+
 
 """
 
