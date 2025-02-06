@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import os
 import requests
 from function_api import get_puuid, get_matchhistory, get_match
-
+import pygsheets
 import pandas as pd
 from numpy.ma.core import append
 from pandas import period_range
@@ -14,16 +14,7 @@ from pandas import period_range
 load_dotenv()
 
 #vorbereitung auf google sheets
-"""
-import pygsheets
-service_acc = pygsheets.authorize(service_account_file="json//spreadsheet-automator-449612-b3a5d5ca0942.json")
 
-sheet =service_acc.open_by_url("https://docs.google.com/spreadsheets/d/1iHweQST_7PNmN-PbfCDlZFUAhQzesQLrw60-WgrNK1I/edit?usp=sharing")
-
-test1 = sheet.worksheet("title", "Metadata")
-
-test1_df = test1.get_as_df()
-"""
 
 riot_id = input("Riot ID: ")
 riot_id_list = riot_id.split("#")
@@ -67,6 +58,7 @@ def player_data_matchhistory():
             summoner_spell.append(player["summoner2Id"])
 
             # getting stats from json
+            player_scouting["game_id"] = info["gameId"]
             player_scouting["team"] = player["teamId"]
             player_scouting["name"] = ign
             player_scouting["champ"] = player["championName"]
@@ -88,9 +80,8 @@ def player_data_matchhistory():
 
 matchdata_20_games = []
 #list and dict for context
-total_objectives_20_games = []
-objectives_team ={}
-total_data_20_games = [matchdata_20_games + total_objectives_20_games]
+objectives_team = []
+
 
 
 for matchId in matchhistory:
@@ -103,6 +94,7 @@ for matchId in matchhistory:
 
     # Match > InfoDto
     info = match["info"]
+    game_id = info["gameId"]
     game_creation = info["gameCreation"]
     game_duration = info["gameDuration"]
     game_mode = info["gameMode"]
@@ -130,23 +122,45 @@ for matchId in matchhistory:
 
 
         side = team["teamId"]
-
         objs = team["objectives"]
-        objectives["baron"] = objs["baron"]
-        objectives["dragon"] = objs["dragon"]
-        objectives["grubs"] = objs["horde"]
-        objectives["rift_herald"] = objs["riftHerald"]
-        objectives["tower"] = objs["tower"]
-        objectives["inhibitor"] = objs["inhibitor"]
+        objectives["game_id"] = info["gameId"]
+        objectives["side"] = side
+        #objectives["baron"] = objs["baron"]
+        objectives["baronkills"] = objs["baron"]["kills"]
+        objectives["baronfirst"] = objs["baron"]["first"]
+
+        #objectives["dragon"] = objs["dragon"]
+        objectives["dragonkills"] = objs["dragon"]["kills"]
+        objectives["dragonfirst"] = objs["dragon"]["first"]
+
+        #objectives["grubs"] = objs["horde"]
+        objectives["grubskills"] = objs["horde"]["kills"]
+        objectives["grubsfirst"] = objs["horde"]["first"]
+
+        #objectives["rift_herald"] = objs["riftHerald"]
+        objectives["rift_heraldkills"] = objs["riftHerald"]["kills"]
+        objectives["rift_heraldfirst"] = objs["riftHerald"]["first"]
+
+        #objectives["tower"] = objs["tower"]
+        objectives["towerkills"] = objs["tower"]["kills"]
+        objectives["towerfirst"] = objs["tower"]["first"]
+
+        #objectives["inhibitor"] = objs["inhibitor"]
+        objectives["inhibitorkills"] = objs["inhibitor"]["kills"]
+        objectives["inhibitorfirst"] = objs["inhibitor"]["first"]
+
 
         # using dict above to create a connection between "side" and objectives "objectives_team"
         # putting that list into a list of the last 20 games "total_objectives_20_games"
-        list_objectives.append(objectives)
-        objectives_team[side] = list_objectives
-        total_objectives_20_games.append(objectives_team)
+
+        objectives_team.append(objectives)
+
 
 df_matchdata = pd.DataFrame(matchdata_20_games)
-df_objectivedata = pd.DataFrame(total_objectives_20_games)
+df_objectivedata = pd.DataFrame(objectives_team)
+
+print(objectives_team)
+print(matchdata_20_games)
 
 print(df_matchdata)
 print(df_objectivedata)
@@ -165,9 +179,19 @@ for element in total_data_20_games:
 
 #######################################################################################################################
 
+#adding the data into the google sheet (some stuff needs to be fixed (obj, kda)
+service_acc = pygsheets.authorize(service_account_file="json//spreadsheet-automator-449612-b3a5d5ca0942.json")
+
+sheet =service_acc.open_by_url("https://docs.google.com/spreadsheets/d/1iHweQST_7PNmN-PbfCDlZFUAhQzesQLrw60-WgrNK1I/edit?usp=sharing")
+
+google_sheet = sheet.worksheet("title", "Metadata")
+
+google_sheet.set_dataframe(df_matchdata , "A1")
+google_sheet.set_dataframe(df_objectivedata , "P1")
 
 
 
+#######################################################################################################################
 
 """
 
