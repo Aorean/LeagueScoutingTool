@@ -1,29 +1,17 @@
 # hahalololl
-from itertools import count
-from operator import index
+
 
 from dotenv import load_dotenv
 import os
 import requests
 from function_api import get_puuid, get_matchhistory, get_match
-
+import pygsheets
 import pandas as pd
-from numpy.ma.core import append
-from pandas import period_range
 
 load_dotenv()
 
 # vorbereitung auf google sheets
-"""
-import pygsheets
-service_acc = pygsheets.authorize(service_account_file="json//spreadsheet-automator-449612-b3a5d5ca0942.json")
 
-sheet =service_acc.open_by_url("https://docs.google.com/spreadsheets/d/1iHweQST_7PNmN-PbfCDlZFUAhQzesQLrw60-WgrNK1I/edit?usp=sharing")
-
-test1 = sheet.worksheet("title", "Metadata")
-
-test1_df = test1.get_as_df()
-"""
 
 riot_id = input("Riot ID: ")
 riot_id_list = riot_id.split("#")
@@ -48,11 +36,9 @@ get_matchhistory(region, puuid, api_key, startTime=20250108)
 #######################################################################################################################
 
 matchhistory = get_matchhistory(region, puuid, api_key, startTime=20250108)
-matchId = matchhistory
+
 
 #######################################################################################################################
-
-matchdata_20_games = []
 
 def player_data_matchhistory():
     for player in participant_dto:
@@ -67,6 +53,7 @@ def player_data_matchhistory():
             summoner_spell.append(player["summoner2Id"])
 
             # getting stats from json
+            player_scouting["game_id"] = info["gameId"]
             player_scouting["team"] = player["teamId"]
             player_scouting["name"] = ign
             player_scouting["champ"] = player["championName"]
@@ -80,25 +67,60 @@ def player_data_matchhistory():
             player_scouting["total dmg to champ"] = player["totalDamageDealtToChampions"]
             player_scouting["win"] = player["win"]
 
+    return player_scouting
 
 
 
+def role_opponent_data_matchhistory():
+    for opponent in participant_dto:
+        if (player_scouting["position"] == opponent["teamPosition"] and player_scouting["team"] != opponent["teamId"]):
+            # merging riotId and riotTagLine
+            # prev player_scouting
 
-            # print one match
-            print(player_scouting)
-            return player_scouting
+            opponent_gamename_a_tagline = []
+            opponent_summoner_spell = []
 
+            opponent_gamename_a_tagline.append(opponent["riotIdGameName"])
+            opponent_gamename_a_tagline.append(opponent["riotIdTagline"])
+            opponent_ign = opponent_gamename_a_tagline[0] + "#" + opponent_gamename_a_tagline[1]
 
+            # merging summonerspells into a list
+            opponent_summoner_spell.append(opponent["summoner1Id"])
+            opponent_summoner_spell.append(opponent["summoner2Id"])
+
+            #getting matchdata from role opponent
+            role_opponent["game_id"] = info["gameId"]
+            role_opponent["team"] = opponent["teamId"]
+            role_opponent["name"] = opponent_ign
+            role_opponent["champ"] = opponent["championName"]
+            role_opponent["kills"] = opponent["kills"]
+            role_opponent["deaths"] = opponent["deaths"]
+            role_opponent["assists"] = opponent["assists"]
+            role_opponent["cs"] = opponent["totalMinionsKilled"]
+            role_opponent["position"] = opponent["teamPosition"]
+            role_opponent["kda"] = opponent["challenges"]["kda"]
+            role_opponent["summonerspells"] = summoner_spell
+            role_opponent["total dmg to champ"] = opponent["totalDamageDealtToChampions"]
+            role_opponent["win"] = opponent["win"]
+
+    return role_opponent
 
 
 #######################################################################################################################
-
-#list and dict for context
-total_objectives_20_games = []
-objectives_team ={}
+# test
+"""
+player_data_matchhistory()
+print(player_scouting())
+#
+"""
+matchdata_20_games = []
+# list and dict for context
+objectives_team = []
 
 for matchId in matchhistory:
     match = get_match(region, matchId, api_key)
+    player_scouting = {}
+    role_opponent = {}
 
     # accessing the Dtos to process data into smaller packages
     # Match > MetadataDto
@@ -107,6 +129,7 @@ for matchId in matchhistory:
 
     # Match > InfoDto
     info = match["info"]
+    game_id = info["gameId"]
     game_creation = info["gameCreation"]
     game_duration = info["gameDuration"]
     game_mode = info["gameMode"]
@@ -119,73 +142,269 @@ for matchId in matchhistory:
     riot_id_game_name = []
     detail_player = {}
 
-    player_scouting = {}
     gamename_a_tagline = []
     summoner_spell = []
 
-    #checking each objective
+    player_data_matchhistory()
+    role_opponent_data_matchhistory()
+
+    if player_scouting["team"] == 100:
+        player_scouting["team"] = "Blue"
+        role_opponent["team"] = "Red"
+        matchdata_20_games.append(player_scouting)
+        matchdata_20_games.append(role_opponent)
+    if player_scouting["team"] == 200:
+        role_opponent["team"] = "Blue"
+        player_scouting["team"] = "Red"
+        matchdata_20_games.append(role_opponent)
+        matchdata_20_games.append(player_scouting)
+
+
+
+
+    # checking each objective
     for team in teams:
-        #list where every objective per team gets saved
+        # list where every objective per team gets saved
         list_objectives = []
-        #dict to save objective with keyword
+        # dict to save objective with keyword
         objectives = {}
 
         side = team["teamId"]
-
-
         objs = team["objectives"]
-        objectives["baron"] = objs["baron"]
-        objectives["dragon"] = objs["dragon"]
-        objectives["grubs"] = objs["horde"]
-        objectives["rift_herald"] = objs["riftHerald"]
-        objectives["tower"] = objs["tower"]
-        objectives["inhibitor"] = objs["inhibitor"]
+        objectives["game_id"] = info["gameId"]
+        objectives["side"] = side
+        # objectives["baron"] = objs["baron"]
+        objectives["baronkills"] = objs["baron"]["kills"]
+        objectives["baronfirst"] = objs["baron"]["first"]
 
-        #using dict above to create a connection between "side" and objectives "objectives_team"
-        #putting that list into a list of the last 20 games "total_objectives_20_games"
-        list_objectives.append(objectives)
-        objectives_team[side] = list_objectives
-        total_objectives_20_games.append(objectives_team)
+        # objectives["dragon"] = objs["dragon"]
+        objectives["dragonkills"] = objs["dragon"]["kills"]
+        objectives["dragonfirst"] = objs["dragon"]["first"]
 
+        # objectives["grubs"] = objs["horde"]
+        objectives["grubskills"] = objs["horde"]["kills"]
+        objectives["grubsfirst"] = objs["horde"]["first"]
 
-    matchdata_20_games.append(player_data_matchhistory())
+        # objectives["rift_herald"] = objs["riftHerald"]
+        objectives["rift_heraldkills"] = objs["riftHerald"]["kills"]
+        objectives["rift_heraldfirst"] = objs["riftHerald"]["first"]
 
-print(total_objectives_20_games)
-#######################################################################################################################
+        # objectives["tower"] = objs["tower"]
+        objectives["towerkills"] = objs["tower"]["kills"]
+        objectives["towerfirst"] = objs["tower"]["first"]
 
-#getting average from last 20 games
+        # objectives["inhibitor"] = objs["inhibitor"]
+        objectives["inhibitorkills"] = objs["inhibitor"]["kills"]
+        objectives["inhibitorfirst"] = objs["inhibitor"]["first"]
 
-kills_total = 0
-deaths_total = 0
-assists_total = 0
+        # using dict above to create a connection between "side" and objectives "objectives_team"
+        # putting that list into a list of the last 20 games "total_objectives_20_games"
 
-wins = 0
-lose = 0
+        objectives_team.append(objectives)
 
-for single_game in matchdata_20_games:
-    kills_total = single_game["kills"] + kills_total
+        # appending alternating teams for better view in gsheet
 
-    if single_game["win"] == True:
-        wins += 1
-    if single_game["win"] == False:
-        lose += 1
-
-winrate = wins / len(matchdata_20_games)
-kills_avrg = kills_total / len(matchdata_20_games)
-
-print(kills_total)
-print(kills_avrg)
-print(wins)
-print(lose)
-print(winrate)
-
-#######################################################################################################################
-
-#check if tournamentcode
-#????
-
-# looking for tournament code
 """
-if " " not in info["tournamentCode"]:
-    print("Primeleaguegame", info["tournamentCode"])
+
+    ##################################################################################################
+
+
+    role_opponent = {}
+
+    # prev riot_id_game_name
+    opponent_riot_id_game_name = []
+
+    # prev detail_player
+    is_this_needed = {}
+
+    # prev gamename_a_tagline
+    opponent_gamename_a_tagline = []
+
+    # prev summoner_spell
+    opponent_summoner_spell = []
+
+    opponent_matchdata_20_games.append(role_opponent)
+
+    if player_scouting["team"] == 100:
+        player_scouting["team"] = "Blue"
+        role_opponent["team"] = "Red"
+        matchdata_20_games.append(player_data_matchhistory())
+        matchdata_20_games.append(role_opponent_data_matchhistory())
+    if player_scouting["team"] == 200:
+        role_opponent["team"] = "Blue"
+        player_scouting["team"] = "Red"
+        matchdata_20_games.append(role_opponent_data_matchhistory())
+        matchdata_20_games.append(player_data_matchhistory())
+        if role_opponent["team"] == 100:
+            role_opponent["team"] = "Blue"
+            player_scouting["team"] = "Red"
+            matchdata_20_games.append(role_opponent_data_matchhistory())
+            matchdata_20_games.append(player_data_matchhistory())
+        if role_opponent["team"] == 200:
+            matchdata_20_games.append(player_data_matchhistory())
+            matchdata_20_games.append(role_opponent_data_matchhistory())
+"""
+df_matchdata = pd.DataFrame(matchdata_20_games)
+df_objectivedata = pd.DataFrame(objectives_team)
+
+print(df_matchdata)
+print(df_objectivedata)
+
+# i would like to get objectives from the 2 lists printed in altering order, but idk how yet
+"""
+for element in total_data_20_games:
+    for player_stat in matchdata_20_games:
+        print(player_stat)
+        break
+
+    for obj_stat in total_objectives_20_games:
+        print(obj_stat)
+        break
+"""
+#######################################################################################################################
+# role opponent data processing
+
+# needs to be in a for loop
+
+
+#######################################################################################################################
+
+# adding the data into the google sheet (some stuff needs to be fixed (obj, kda)
+service_acc = pygsheets.authorize(service_account_file="json//spreadsheet-automator-449612-b3a5d5ca0942.json")
+
+sheet = service_acc.open_by_url(
+    "https://docs.google.com/spreadsheets/d/1iHweQST_7PNmN-PbfCDlZFUAhQzesQLrw60-WgrNK1I/edit?usp=sharing")
+
+google_sheet = sheet.worksheet("title", "Metadata")
+
+google_sheet.set_dataframe(df_matchdata, "A1")
+google_sheet.set_dataframe(df_objectivedata, "P1")
+
+#######################################################################################################################
+
+"""
+
+# Match > InfoDto > TeamDto > BanDto
+#banns red/blue + championId und pickTurn
+# [0] blueside [1] redside
+banns_total_red = []
+banns_total_blue = []
+
+teaminfo_blue = teams[0]
+teaminfo_red = teams[1]
+banns_blue = teaminfo_blue["bans"]
+banns_total_red.append(banns_blue)
+banns_red = teaminfo_red["bans"]
+banns_total_red.append(banns_red)
+print(banns_total_blue + banns_total_red)
+
+
+obj_blue = []
+obj_red = []
+obj_total = [obj_blue , obj_red]
+
+obj_blue_dict = teaminfo_blue["objectives"]
+obj_blue.append(obj_blue_dict)
+obj_red_dict = teaminfo_red["objectives"]
+obj_red.append(obj_red_dict)
+
+
+
+#following doesnt work
+
+#atakhan = obj_blue["atakhan"]
+#obj_total.append(atakhan)
+baron = obj_blue["baron"]
+obj_total.append(baron)
+champion_kills = obj_blue["champion"]
+obj_total.append(champion_kills)
+dragon = obj_blue["dragon"]
+obj_total.append(dragon)
+grubs = obj_blue["horde"]
+obj_total.append(grubs)
+inhibitors = obj_blue["inhibitor"]
+obj_total.append(inhibitors)
+rift_herald = obj_blue["riftHerald"]
+obj_total.append(rift_herald)
+tower = obj_blue["tower"]
+obj_total.append(tower)
+
+
+print(obj_total)
+# [0] blueside [1] redside
+
+#"atakhan", "baron", "champion", "dragon", "horde", "inhibitor", "riftHerald", "tower", "win"
+#print(teams)
+#print(ban_id)
+
+
+match_data = match["info"]
+player_data = match_data["participants"]
+
+print(len(player_data))
+for player in match_data["participants"]:
+    perks = player["perks"]
+    primary_perk = perks["styles"]
+    dgiapdjng = primary_perk[0]
+    print("!!!!!!!!" , dgiapdjng["selections"])
+
+#    primary_tree = primary_perk["perk"] , primary_perk["var1"] , primary_perk["var2"] , primary_perk["var3"]
+#    secondary_tree = secondary_perk["var1"] , secondary_perk["var2"]
+
+
+
+
+
+
+
+
+#######################################################################################################################
+
+print(player_info)
+print(player_info["Moris "])
+print(len(player_info))
+
+##for player in participant_dto:
+    ##print(riot_id_game_name)
+
+
+for game in matchhistory:
+    get_match(region, matchId, api_key)
+    match = get_match(region, matchId, api_key)
+    print(champions)
+
+
+
+    match_df = pd.DataFrame(match)
+    champions_played = match["InfoDto"]["ParticipantDto"]["championName"]
+    print(match_df)
+    print(champions_played)
+
+
+# match_df1 = pd.DataFrame(match1)
+
+
+###############################################
+
+# print(puuid)
+
+################################################
+
+# print(matchhistory)
+
+#################################################
+
+#print(match1)
+
+#################################################
+
+# print(match_df1)
+
+#################################################
+
+# player = puuid
+
+#################################################
+
+#print(match)
 """
