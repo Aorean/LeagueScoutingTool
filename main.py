@@ -58,6 +58,7 @@ def player_data_matchhistory():
             player_scouting["gamertag"] = player["riotIdGameName"]
             player_scouting["tagline"] = player["riotIdTagline"]
             player_scouting["game_id"] = info["gameId"]
+            player_scouting["gamemode"] = info["gameMode"]
             player_scouting["team"] = player["teamId"]
             player_scouting["name"] = ign
             player_scouting["champ"] = player["championName"]
@@ -89,17 +90,22 @@ def player_data_matchhistory():
             player_scouting["controlwards_placed"] = player["detectorWardsPlaced"]
             player_scouting["cs"] = player["totalMinionsKilled"]
             player_scouting["position"] = player["teamPosition"]
-            player_scouting["kda"] = round(player["challenges"]["kda"], 2)
             player_scouting["summonerspells"] = summoner_spell
-            player_scouting["dmg%"] = round(player["challenges"]["teamDamagePercentage"], 2)
             player_scouting["total dmg to champ"] = player["totalDamageDealtToChampions"]
-            player_scouting["dmg_taken%"] = round(player["challenges"]["damageTakenOnTeamPercentage"], 2)
             player_scouting["total_dmg_taken"] = player["totalDamageTaken"]
             player_scouting["game_start_timestamp"] = info["gameStartTimestamp"]
             player_scouting["game_end_timestamp"] = info["gameEndTimestamp"]
             player_scouting["game_duration"] = info["gameDuration"]
             player_scouting["tournament_code"] = info["tournamentCode"]
             player_scouting["win"] = player["win"]
+
+            if "challenges" in player:
+                player_scouting["dmg_taken%"] = round(player["challenges"]["damageTakenOnTeamPercentage"], 2)
+                player_scouting["dmg%"] = round(player["challenges"]["teamDamagePercentage"], 2)
+                player_scouting["kda"] = round(player["challenges"]["kda"], 2)
+            else:
+                continue
+
 
     return player_scouting
 
@@ -125,6 +131,7 @@ def role_opponent_data_matchhistory():
             #getting matchdata from role opponent
             role_opponent["puuid"] = opponent["puuid"]
             role_opponent["game_id"] = info["gameId"]
+            role_opponent["gamemode"] = info["gameMode"]
             role_opponent["team"] = opponent["teamId"]
             role_opponent["name"] = opponent_ign
             role_opponent["champ"] = opponent["championName"]
@@ -156,17 +163,19 @@ def role_opponent_data_matchhistory():
             role_opponent["controlwards_placed"] = opponent["detectorWardsPlaced"]
             role_opponent["cs"] = opponent["totalMinionsKilled"]
             role_opponent["position"] = opponent["teamPosition"]
-            role_opponent["kda"] = round(opponent["challenges"]["kda"], 2)
             role_opponent["summonerspells"] = opponent_summoner_spell
-            role_opponent["dmg%"] = round(opponent["challenges"]["teamDamagePercentage"], 2)
             role_opponent["total dmg to champ"] = opponent["totalDamageDealtToChampions"]
-            role_opponent["dmg_taken%"] = round(opponent["challenges"]["damageTakenOnTeamPercentage"], 2)
             role_opponent["total_dmg_taken"] = opponent["totalDamageTaken"]
             role_opponent["game_start_timestamp"] = info["gameStartTimestamp"]
             role_opponent["game_end_timestamp"] = info["gameEndTimestamp"]
             role_opponent["game_duration"] = info["gameDuration"]
             role_opponent["tournament_code"] = info["tournamentCode"]
             role_opponent["win"] = opponent["win"]
+
+            if "challenges" in opponent:
+                role_opponent["kda"] = round(opponent["challenges"]["kda"], 2)
+                role_opponent["dmg%"] = round(opponent["challenges"]["teamDamagePercentage"], 2)
+                role_opponent["dmg_taken%"] = round(opponent["challenges"]["damageTakenOnTeamPercentage"], 2)
 
     return role_opponent
 
@@ -225,8 +234,6 @@ for matchId in matchhistory:
         matchdata_20_games.append(role_opponent)
         matchdata_20_games.append(player_scouting)
 
-    print(player_scouting["kda"])
-
     # checking each objective
     for team in teams:
         # list where every objective per team gets saved
@@ -238,6 +245,14 @@ for matchId in matchhistory:
         objs = team["objectives"]
         objectives["game_id"] = info["gameId"]
         objectives["side"] = side
+
+        # atakhan
+        if "atakhan" in objs:
+            objectives["atakhankills"] = objs["atakhan"]["kills"]
+            objectives["atakhanfirst"] = objs["atakhan"]["first"]
+        else:
+            continue
+
         # objectives["baron"] = objs["baron"]
         objectives["baronkills"] = objs["baron"]["kills"]
         objectives["baronfirst"] = objs["baron"]["first"]
@@ -275,30 +290,43 @@ for matchId in matchhistory:
 player_df = pd.DataFrame()
 playerinfo_df = pd.DataFrame()
 
-for  in matchdata_20_games:
+
+
+for match_info in matchdata_20_games:
+
     # player_df
-    player_create_df = pd.DataFrame({
-        "puuid" : [match_info["puuid"]],
-        "gamertag" : [match_info["gamertag"]],
-        "tagline" : [match_info["tagline"]],
-    })
-    player_df = pd.concat([player_df, player_create_df])
-
-    # playerinfo_df
-    playerinfo_create_df = pd.Dataframe({
-        "puuid": [match_info["puuid"]],
-        "gamertag": [match_info["gamertag"]],  # necessary?
-        "tagline": [match_info["tagline"]],  # necessary?
-        # Elo
-        # Winrate
-        # Blue/Red Winrate
-        # Stats vs Opponent
-        "kda" : [match_info[""]]
-
-    })
+    if puuid == match_info["puuid"]:
 
 
 
+        #following needs to be once per player, not for all players, for function =useless
+        player_create_df = pd.DataFrame({
+            "puuid" : [match_info["puuid"]],
+            "name" : [match_info["name"]],
+            "tagline" : [match_info["tagline"]],
+        })
+        player_df = pd.concat([player_df, player_create_df])
+
+        # queue typ: ranked solo/duo
+        if match_info["gamemode"] == "classic":
+            # playerinfo_df
+            playerinfo_create_df = pd.DataFrame({
+                "puuid": [match_info["puuid"]],
+                "matchhistory" : matchhistory,
+                "name": [match_info["name"]],  # necessary?
+                "tagline": [match_info["tagline"]],  # necessary?
+                # Elo
+                # Winrate
+                # Blue/Red Winrate
+                # Stats vs Opponent
+                "kda" : [match_info["kda"]]
+            })
+            playerinfo_df = pd.concat([playerinfo_df, playerinfo_create_df])
+
+
+print(player_df)
+
+"""
 player_df = pd.DataFrame()
 for match_id in matchhistory:
     game = get_match(region , matchId = match_id , api_key = api_key)
@@ -313,13 +341,13 @@ player_info_df = pd.DataFrame({
 
 
 })
-
+"""
 
 
 ###########################################################################################
 
 
-print(player_df)
+
 
 
 
@@ -365,12 +393,12 @@ df_matchdata = pd.DataFrame(matchdata_20_games)
 df_objectivedata = pd.DataFrame(objectives_team)
 
 df_matchdata.replace(perk_dict)
-
+"""
 print(perk_dict)
 
 print(df_matchdata)
 print(df_objectivedata)
-
+"""
 
 #######################################################################################################################
 # role opponent data processing
