@@ -1,6 +1,7 @@
 # Try classes
 # get a SQL Databank schema (break my data apart into smaller chunks)
-#
+# add functions, for better overview
+
 from numpy.ma.core import append
 
 import json
@@ -12,8 +13,6 @@ from function_api import get_puuid, get_matchhistory, get_match, get_summoner_id
 import pygsheets
 import pandas as pd
 
-
-
 load_dotenv()
 
 region = "europe"                                                   #input("Region: ")
@@ -21,7 +20,7 @@ region = "europe"                                                   #input("Regi
 api_key = os.environ.get("api_key")
 
 print("For multiple Accounts put a ',' between the Riot IDs!")
-riot_id = "Aorean#1311,Moris#EUW,QaQ#00000"                      #input("Riot ID: ")
+riot_id = "Aorean#1311,Moris#25933,QaQ#00000"                      #input("Riot ID: ")
 
 #split gamertag, tagline
 riot_ids = riot_id.split(",")
@@ -55,7 +54,7 @@ Dataframe_Match = pd.DataFrame()
 #Assists, Visionscore, Controlwards, Objectives, Result(W/L)
 Dataframe_Opponent = pd.DataFrame()
 
-#Objecives
+#Objecives              DONE
 #MatchID, Puuid, Team, Tower, Grubs, Drake, Herald, Atakhan, Baron, Inhibitor
 Dataframe_Objectives = pd.DataFrame()
 
@@ -63,7 +62,6 @@ Dataframe_Objectives = pd.DataFrame()
 #Puuid, Gamertag, Tagline, Champion, Winrate, KDA, Avrg. Kills/Deaths/Assists, Winrate/Champion, KDA/Champion,
 # CS/D/Champion, Leveldiff/Champion, Avrg. dmg%, Avrg. dmg taken%, Mastery, Role, Amount of Games
 Dataframe_Championpool = pd.DataFrame()
-
 
 for id in riot_ids:
     gamename_tagline = id.split("#")
@@ -103,6 +101,7 @@ for account in riot_gamenames_gametags:
 
 matchhistories = {}
 puuid_match = {}
+puuid_champpool = {}
 
 
 # get matchhistories
@@ -142,11 +141,36 @@ for puuid in matchhistories:
     level_d = []
     visionscore_d = []
 
+
+    # Dataframe
+    # Champpool
+    unique_champ_pool = {}
+    stats_unique_champ_pool = {}
+
+    all_champs = []
+
     for match in match_history_for_matchdata:
         player_scouting = {}
         role_opponent = {}
 
         stats_compare = {}
+
+        # Dataframe
+        # Champpool
+        champ_wr = []
+        champ_kda = []
+        champ_kills = []
+        champ_deaths = []
+        champ_assists = []
+        champ_visionscore = []
+
+        champ_visionscore_d = []
+        champ_exp_d = []
+        champ_gold_d = []
+        champ_cs_d = []
+
+        champ_dmg_p = []
+        champ_dmgtaken_p = []
 
         matchdata = get_match(region, match, api_key)
         # accessing the Dtos to process data into smaller packages
@@ -169,8 +193,6 @@ for puuid in matchhistories:
 
         # Match > InfoDto > ParticipantDt#    riot_id_game_name.append(player["riotIdGameName"])
         participant_dto = info["participants"]
-
-
 
         for player in participant_dto:
             if puuid == player["puuid"]:
@@ -236,22 +258,18 @@ for puuid in matchhistories:
                     player_scouting["dmg%"] = round(player["challenges"]["teamDamagePercentage"], 2)
                     player_scouting["kda"] = round(player["challenges"]["kda"], 2)
                 else:
-                    continue
-                """
-                stats_player["cs"] = player_scouting["cs"]
-                stats_player["champ_level"] = player_scouting["champ_level"]
-                stats_player["exp"] = player_scouting["exp"]
-                stats_player["gold_earned"] = player_scouting["gold_earned"]
-                stats_player["visionscore"] = player_scouting["visionscore"]
-                """
-                #getting a dict with lists in with stats to get average for 20 games
+                    player_scouting["dmg_taken%"] = "NaN"
+                    player_scouting["dmg%"] = "NaN"
+                    player_scouting["kda"] = "NaN"
 
+                #getting a dict with lists in with stats to get average for 20 games
                 cs.append(player_scouting["cs"])
                 level.append(player_scouting["champ_level"])
                 exp.append(player_scouting["exp"])
                 gold.append(player_scouting["gold_earned"])
                 visionscore.append(player_scouting["visionscore"])
 
+                all_champs.append(player_scouting["champ"])
 
         for player in participant_dto:
             if (player_scouting["position"] == player["teamPosition"] and player_scouting["team"] != player[
@@ -307,6 +325,15 @@ for puuid in matchhistories:
 
                 puuid_opponent.append(role_opponent["puuid"])
 
+                if "challenges" in player:
+                    role_opponent["dmg_taken%"] = round(player["challenges"]["damageTakenOnTeamPercentage"], 2)
+                    role_opponent["dmg%"] = round(player["challenges"]["teamDamagePercentage"], 2)
+                    role_opponent["kda"] = round(player["challenges"]["kda"], 2)
+                else:
+                    role_opponent["dmg_taken%"] = "NaN"
+                    role_opponent["dmg%"] = "NaN"
+                    role_opponent["kda"] = "NaN"
+
                 cs_d.append(role_opponent["cs"])
                 gold_d.append(role_opponent["champ_level"])
                 exp_d.append(role_opponent["exp"])
@@ -331,9 +358,6 @@ for puuid in matchhistories:
 
         #Dataframes
         #Match
-
-
-
         Dataframe_Match_temp = pd.DataFrame({
             "PUUID": [puuid],
             "Match_ID": [game_id],
@@ -348,28 +372,21 @@ for puuid in matchhistories:
             "Level" : [player_scouting["champ_level"]],
             "Position" : player_scouting["position"],
 
+            "KDA": player_scouting["kda"],
             "Kills": player_scouting["kills"],
             "Deaths": player_scouting["deaths"],
             "Assists": player_scouting["assists"],
             "Controlwards_Placed": player_scouting["controlwards_placed"],
+            "Dmg%": player_scouting["dmg%"],
+            "Dmgtaken%": player_scouting["dmg_taken%"],
             #"Objectives": player_scouting["objectives"], create a list for objectives
             "Win/Lose": player_scouting["win"],
         })
 
         Dataframe_Match = pd.concat([Dataframe_Match, Dataframe_Match_temp])
 
-        #create a new df for that, if data is in the dict, merge them into the main df
-        """        
-        if "kda" in player_scouting:
-            "KDA": player_scouting["kda"],
-            "Dmg%":
-            "Dmgtaken%":
-        """
-
-
         #Dataframe
         #Opponent
-
         Dataframe_Opponent_temp = pd.DataFrame({
             "PUUID": role_opponent["puuid"],
             "Match_ID": [game_id],
@@ -384,24 +401,154 @@ for puuid in matchhistories:
             "Level" : [role_opponent["champ_level"]],
             "Position" : role_opponent["position"],
 
+            "KDA": role_opponent["kda"],
             "Kills": role_opponent["kills"],
             "Deaths": role_opponent["deaths"],
             "Assists": role_opponent["assists"],
             "Controlwards_Placed": role_opponent["controlwards_placed"],
+            "Dmg%": role_opponent["dmg%"],
+            "Dmgtaken%": role_opponent["dmg_taken%"],
             #"Objectives": player_scouting["objectives"], create a list for objectives
             "Win/Lose": role_opponent["win"],
         })
 
         Dataframe_Opponent = pd.concat([Dataframe_Opponent, Dataframe_Opponent_temp])
 
-        #create a new df for that, if data is in the dict, merge them into the main df
-        """        
-        if "kda" in player_scouting:
-            "KDA": player_scouting["kda"],
-            "Dmg%":
-            "Dmgtaken%":
-        """
-    #getting average per player
+        # Objectives per team per Match ID
+        for team in teams:
+            # list where every objective per team gets saved
+            list_objectives = []
+            # dict to save objective with keyword
+            objectives = {}
+
+            side = team["teamId"]
+            objs = team["objectives"]
+            objectives["game_id"] = info["gameId"]
+            objectives["side"] = side
+
+            if player_scouting["team"] == team["teamId"]:
+                objectives["puuid"] = player_scouting["puuid"]
+            if role_opponent["team"] == team["teamId"]:
+                objectives["puuid"] = role_opponent["puuid"]
+
+
+            # atakhan
+            if "atakhan" in objs:
+                objectives["atakhankills"] = objs["atakhan"]["kills"]
+                objectives["atakhanfirst"] = objs["atakhan"]["first"]
+            else:
+                objectives["atakhankills"] = "NaN"
+                objectives["atakhanfirst"] = "NaN"
+
+            # objectives["baron"] = objs["baron"]
+            objectives["baronkills"] = objs["baron"]["kills"]
+            objectives["baronfirst"] = objs["baron"]["first"]
+
+            # objectives["dragon"] = objs["dragon"]
+            objectives["dragonkills"] = objs["dragon"]["kills"]
+            objectives["dragonfirst"] = objs["dragon"]["first"]
+
+            # objectives["grubs"] = objs["horde"]
+            objectives["grubskills"] = objs["horde"]["kills"]
+            objectives["grubsfirst"] = objs["horde"]["first"]
+
+            # objectives["rift_herald"] = objs["riftHerald"]
+            objectives["rift_heraldkills"] = objs["riftHerald"]["kills"]
+            objectives["rift_heraldfirst"] = objs["riftHerald"]["first"]
+
+            # objectives["tower"] = objs["tower"]
+            objectives["towerkills"] = objs["tower"]["kills"]
+            objectives["towerfirst"] = objs["tower"]["first"]
+
+            # objectives["inhibitor"] = objs["inhibitor"]
+            objectives["inhibitorkills"] = objs["inhibitor"]["kills"]
+            objectives["inhibitorfirst"] = objs["inhibitor"]["first"]
+
+            Dataframe_Objectives_temp = pd.DataFrame({
+                "PUUID" : [objectives["puuid"]],
+                "Match_ID": [game_id],
+                "Team": [side],
+                "Atakhankills" : [objectives["atakhankills"]],
+                "Atakhanfirst" : [objectives["atakhanfirst"]],
+                "Baronkills": [objectives["baronkills"]],
+                "Baronfirst": [objectives["baronfirst"]],
+                "Dragonkills": [objectives["dragonkills"]],
+                "Dragonfirst": [objectives["dragonfirst"]],
+                "Grubskills": [objectives["grubskills"]],
+                "Grubsfirst": [objectives["grubsfirst"]],
+                "Rift_Heraldkills": [objectives["rift_heraldkills"]],
+                "Rift_Heraldfirst": [objectives["rift_heraldfirst"]],
+                "Towerkills": [objectives["towerkills"]],
+                "Towerfirst": [objectives["towerfirst"]],
+                "Inhibitorkills": [objectives["inhibitorkills"]],
+                "Inhibitorfirst": [objectives["inhibitorfirst"]],
+            })
+            Dataframe_Objectives = pd.concat([Dataframe_Objectives, Dataframe_Objectives_temp])
+
+        # Dateframes
+        # Champpool
+        if game_mode == "CLASSIC":
+            champ_wr.append(player_scouting["win"])
+            champ_kda.append(player_scouting["kda"])
+            champ_kills.append(player_scouting["kills"])
+            champ_deaths.append(player_scouting["deaths"])
+            champ_assists.append(player_scouting["assists"])
+            champ_visionscore.append(player_scouting["visionscore"])
+
+            champ_visionscore_d.append((player_scouting["visionscore"] - role_opponent["visionscore"]))
+            champ_exp_d.append((player_scouting["exp"] - role_opponent["exp"]))
+            champ_gold_d.append((player_scouting["gold_earned"] - role_opponent["gold_earned"]))
+            champ_cs_d.append((player_scouting["cs"] - role_opponent["cs"]))
+
+            champ_dmg_p.append(player_scouting["dmg%"])
+            champ_dmgtaken_p.append(player_scouting["dmg_taken%"])
+
+            stats_unique_champ = {}
+
+            #stats_unique_champ["puuid"] = puuid
+            stats_unique_champ["champ"] = player_scouting["champ"]
+            stats_unique_champ["win"] = champ_wr
+            stats_unique_champ["champ_kda"] = champ_kda
+            stats_unique_champ["champ_kills"] = champ_kills
+            stats_unique_champ["champ_deaths"] = champ_deaths
+            stats_unique_champ["champ_assists"] = champ_assists
+            stats_unique_champ["champ_visionscore"] = champ_visionscore
+
+            stats_unique_champ["champ_visionscore_d"] = champ_visionscore_d
+            stats_unique_champ["champ_exp_d"] = champ_exp_d
+            stats_unique_champ["champ_gold_d"] = champ_gold_d
+            stats_unique_champ["champ_cs_d"] = champ_cs_d
+
+            stats_unique_champ["champ_dmg_p"] = champ_dmg_p
+            stats_unique_champ["champ_dmgtaken_p"] = champ_dmgtaken_p
+
+            stats_champ = {}
+
+            if player_scouting["champ"] in stats_unique_champ_pool:
+                champ_played = stats_unique_champ_pool[player_scouting["champ"]]
+                champ_played["champ"] = player_scouting["champ"]
+                champ_played["win"].extend(champ_wr)
+                champ_played["champ_kda"].extend(champ_kda)
+                champ_played["champ_kills"].extend(champ_kills)
+                champ_played["champ_deaths"].extend(champ_deaths)
+                champ_played["champ_assists"].extend(champ_assists)
+                champ_played["champ_visionscore"].extend(champ_visionscore)
+
+                champ_played["champ_visionscore_d"].extend(champ_visionscore_d)
+                champ_played["champ_exp_d"].extend(champ_exp_d)
+                champ_played["champ_gold_d"].extend(champ_gold_d)
+                champ_played["champ_cs_d"].extend(champ_cs_d)
+
+                champ_played["champ_dmg_p"].extend(champ_dmg_p)
+                champ_played["champ_dmgtaken_p"].extend(champ_dmgtaken_p)
+
+            if player_scouting["champ"] not in stats_unique_champ_pool:
+                stats_unique_champ_pool[player_scouting["champ"]] = stats_unique_champ
+
+
+            puuid_champpool[puuid] = []
+            puuid_champpool[puuid].append(stats_unique_champ_pool)
+
     # Dateframes
     # Player_Info
     # Avrg CS, Avrg Level, Avrg exp, Avrg Gold, Avrg Visionscore, CS diff., Level diff., Gold diff., Visionscore diff
@@ -449,9 +596,73 @@ for puuid in matchhistories:
     puuid_match[puuid] = matches
     puuid_match[puuid_opponent[0]] = opponent_matches
 
-Dataframe_Player_Info = pd.merge(Dataframe_Player_Info, Dataframe_average_stats, on="PUUID")
 
-print("Dataframe_Match" , Dataframe_Match)
+
+with open("puuid_match" , "w") as f:
+    f.write(json.dumps(puuid_champpool, indent=4))
+
+# Dataframe
+# Champpool
+# getting unique champs per player
+avrg_stats_dict = {}
+for puuid_player in puuid_champpool:
+    key_champpool = puuid_champpool[puuid_player]
+    for championpool in key_champpool:
+            for key_champion in championpool:
+                champion = championpool[key_champion]
+                avrg_stats_dict["puuid"] = puuid_player
+                avrg_stats_dict["champ"] = champion["champ"]
+                wins = 0
+                for game_outcome in champion["win"]:
+
+                    if game_outcome == True:
+                        wins += 1
+                    if game_outcome == False:
+                        wins += 0
+                    if wins == 0:
+                        avrg_stats_dict["winrate"] = 0
+                    if wins > 0:
+                        avrg_stats_dict["winrate"] = round(wins / len(champion["win"]))
+
+                avrg_stats_dict["amount_games"] = len(champion["win"])
+                avrg_stats_dict["kda"] = round(sum(champion["champ_kda"]) / len(champion["champ_kda"]) , 2)
+                avrg_stats_dict["kills"] = round(sum(champion["champ_kills"]) / len(champion["champ_kills"]) , 2)
+                avrg_stats_dict["deaths"] = round(sum(champion["champ_deaths"]) / len(champion["champ_deaths"]) , 2)
+                avrg_stats_dict["assists"] = round(sum(champion["champ_assists"]) / len(champion["champ_assists"]) , 2)
+                avrg_stats_dict["visionscore"] = round(sum(champion["champ_visionscore"]) / len(champion["champ_visionscore"]) , 2)
+
+                avrg_stats_dict["visionscore_diff"] = round(sum(champion["champ_visionscore_d"]) / len(champion["champ_visionscore_d"]) , 2)
+                avrg_stats_dict["gold_diff"] = round(sum(champion["champ_gold_d"]) / len(champion["champ_gold_d"]) , 2)
+                avrg_stats_dict["cs_diff"] = round(sum(champion["champ_cs_d"]) / len(champion["champ_cs_d"]) , 2)
+
+                avrg_stats_dict["dmg_p"] = round(sum(champion["champ_dmg_p"]) / len(champion["champ_dmg_p"]) , 2)
+                avrg_stats_dict["dmg_taken_p"] = round(sum(champion["champ_dmgtaken_p"]) / len(champion["champ_dmgtaken_p"]) , 2)
+
+                print(avrg_stats_dict)
+
+                temp_Dataframe_Champpool = pd.DataFrame({
+                    "PUUID" : [puuid_player],
+                    "champ" : [avrg_stats_dict["champ"]],
+                    "kda": [avrg_stats_dict["kda"]],
+                    "winrate" : [avrg_stats_dict["winrate"]],
+                    "amount_games" : [avrg_stats_dict["amount_games"]],
+                    "kills" : [avrg_stats_dict["kills"]],
+                    "deaths": [avrg_stats_dict["deaths"]],
+                    "assists": [avrg_stats_dict["assists"]],
+                    "visionscore": [avrg_stats_dict["visionscore"]],
+
+                    "visionscore_diff": [avrg_stats_dict["visionscore_diff"]],
+                    "gold_diff": [avrg_stats_dict["gold_diff"]],
+                    "cs_diff": [avrg_stats_dict["cs_diff"]],
+
+                    "dmg_p": [avrg_stats_dict["dmg_p"]],
+                    "dmg_taken_p": [avrg_stats_dict["dmg_taken_p"]]
+                })
+
+                Dataframe_Championpool = pd.concat([Dataframe_Championpool, temp_Dataframe_Champpool])
+
+
+Dataframe_Player_Info = pd.merge(Dataframe_Player_Info, Dataframe_average_stats, on="PUUID")
 
 #getting Dataframes for all matches and appending them, so they are in 1 Dataframe
 full_match_info_df = pd.DataFrame()
@@ -462,22 +673,11 @@ for game_puuid in puuid_match:
 
     full_match_info_df = pd.concat([full_match_info_df , match_info_df])
 
-with open("puuid_match" , "w") as f:
-    f.write(json.dumps(puuid_match, indent=4))
-
-df_puuid_match = pd.DataFrame(puuid_match)
-
-print(df_puuid_match)
-
 # adding the data into the google sheet (some stuff needs to be fixed (obj, kda)
 service_acc = pygsheets.authorize(service_account_file="json//spreadsheet-automator-449612-b3a5d5ca0942.json")
 
 sheet = service_acc.open_by_url(
     "https://docs.google.com/spreadsheets/d/1iHweQST_7PNmN-PbfCDlZFUAhQzesQLrw60-WgrNK1I/edit?usp=sharing")
-
-#inactive
-"""google_sheet = sheet.worksheet("title", "Diagramme/Layouts")
-google_sheet.set_dataframe(full_match_info_df, "A1")"""
 
 google_sheet_test = sheet.worksheet("title", "DF_PLAYER")
 google_sheet_test.set_dataframe(Dataframe_Player, "A1")
@@ -493,56 +693,16 @@ google_sheet_test.set_dataframe(Dataframe_Match, "A1")
 
 #for side by side
 google_sheet_test = sheet.worksheet("title", "DF_Match")
-google_sheet_test.set_dataframe(Dataframe_Opponent, "S1")
+google_sheet_test.set_dataframe(Dataframe_Opponent, "AC1")
 
 google_sheet_test = sheet.worksheet("title", "DF_Opponent")
 google_sheet_test.set_dataframe(Dataframe_Opponent, "A1")
 
-#for future DFs
-"""google_sheet_test = sheet.worksheet("title", "Tabellenblatt3")
-google_sheet_test.set_dataframe(Dataframe_Opponent, "A1")
 
-google_sheet_test = sheet.worksheet("title", "Tabellenblatt3")
-google_sheet_test.set_dataframe(Dataframe_Opponent, "A1")"""
+google_sheet_test = sheet.worksheet("title", "DF_Objectives")
+google_sheet_test.set_dataframe(Dataframe_Objectives, "A1")
 
-
-    #result:
-    # puuid_match =
-    # {puuid1 :
-    # [
-    # matchid1 : match.json1 ,
-    # matchid2 : match.json2 ,
-    # ...
-    # ]
-    # puuid2 :
-    # [
-    # matchid1 : match.json1 ,
-    # matchid2 : match.json2 ,
-    # ...
-    # ]
-    # }
-
-
-
-
-
-
-
-
-
-
-# {puuid1 :
-# [
-# matchid1 : match.json1 ,
-# matchid2 : match.json2 ,
-# ...
-# ]
-# puuid2 :
-# [
-# matchid1 : match.json1 ,
-# matchid2 : match.json2 ,
-# ...
-# ]
-# }
+google_sheet_test = sheet.worksheet("title", "DF_Champpool")
+google_sheet_test.set_dataframe(Dataframe_Championpool, "A1")
 
 
