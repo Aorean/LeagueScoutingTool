@@ -2,8 +2,6 @@
 # get a SQL Databank schema (break my data apart into smaller chunks)
 # add functions, for better overview
 
-from numpy.ma.core import append
-
 import json
 
 from dotenv import load_dotenv
@@ -13,14 +11,28 @@ from function_api import get_puuid, get_matchhistory, get_match, get_summoner_id
 import pygsheets
 import pandas as pd
 
+from pangres import upsert
+from sqlalchemy import text, create_engine
+from sqlalchemy.engine import  URL
+import psycopg2
+
 load_dotenv()
+
+#Login for Database
+db_username = os.environ.get("db_username")
+db_host = os.environ.get("db_host")
+db_port = os.environ.get("db_port")
+db_name = os.environ.get("db_name")
+db_password = os.environ.get("db_password")
+
+
 
 region = "europe"                                                   #input("Region: ")
 
 api_key = os.environ.get("api_key")
 
 print("For multiple Accounts put a ',' between the Riot IDs!")
-riot_id = "Aorean#1311,Moris#25933,QaQ#00000"                      #input("Riot ID: ")
+riot_id = "Aorean#1311,Moris#25933,QaQ#00000,iHateThisNerd#EUW"                      #input("Riot ID: ")
 
 #split gamertag, tagline
 riot_ids = riot_id.split(",")
@@ -345,7 +357,9 @@ for puuid in matchhistories:
 
         #Dataframes
         #Matchhistory
+        KEY_PUUID_MATCH_ID_MATCHHISTORY = puuid , game_id
         Dataframe_Matchhistory_temp = pd.DataFrame({
+            "KEY_PUUID_MATCH_ID": [KEY_PUUID_MATCH_ID_MATCHHISTORY],
             "PUUID" : [puuid],
             "Match_ID" : [game_id],
             "Participants" : [players],
@@ -358,7 +372,9 @@ for puuid in matchhistories:
 
         #Dataframes
         #Match
+        KEY_PUUID_MATCH_ID_MATCH = puuid , game_id
         Dataframe_Match_temp = pd.DataFrame({
+            "KEY_PUUID_MATCH_ID" : [KEY_PUUID_MATCH_ID_MATCH],
             "PUUID": [puuid],
             "Match_ID": [game_id],
             "Gamestart": [game_start],
@@ -377,8 +393,8 @@ for puuid in matchhistories:
             "Deaths": player_scouting["deaths"],
             "Assists": player_scouting["assists"],
             "Controlwards_Placed": player_scouting["controlwards_placed"],
-            "Dmg%": player_scouting["dmg%"],
-            "Dmgtaken%": player_scouting["dmg_taken%"],
+            "Dmg_percent": player_scouting["dmg%"],
+            "Dmgtaken_percent": player_scouting["dmg_taken%"],
             #"Objectives": player_scouting["objectives"], create a list for objectives
             "Win/Lose": player_scouting["win"],
         })
@@ -387,32 +403,35 @@ for puuid in matchhistories:
 
         #Dataframe
         #Opponent
-        Dataframe_Opponent_temp = pd.DataFrame({
-            "PUUID": role_opponent["puuid"],
-            "Match_ID": [game_id],
-            "Gamestart": [game_start],
-            "Gameend": [game_end],
-            "Gameduration": [game_duration],
-            "Tournamentcode": [tournament_code],
-            "Queuetyp" : [game_mode],
-            "Ign" : [role_opponent["name"]],
-            "Team" : [role_opponent["team"]],
-            "Champ" : [role_opponent["champ"]],
-            "Level" : [role_opponent["champ_level"]],
-            "Position" : role_opponent["position"],
+        if game_mode == "CLASSIC":
+            KEY_PUUID_MATCH_ID_ROLEOPPONENT = role_opponent["puuid"] , game_id
+            Dataframe_Opponent_temp = pd.DataFrame({
+                "KEY_PUUID_MATCH_ID" : [KEY_PUUID_MATCH_ID_ROLEOPPONENT],
+                "Roleopponent_PUUID": role_opponent["puuid"],
+                "Match_ID": [game_id],
+                "Gamestart": [game_start],
+                "Gameend": [game_end],
+                "Gameduration": [game_duration],
+                "Tournamentcode": [tournament_code],
+                "Queuetyp" : [game_mode],
+                "Ign" : [role_opponent["name"]],
+                "Team" : [role_opponent["team"]],
+                "Champ" : [role_opponent["champ"]],
+                "Level" : [role_opponent["champ_level"]],
+                "Position" : role_opponent["position"],
 
-            "KDA": role_opponent["kda"],
-            "Kills": role_opponent["kills"],
-            "Deaths": role_opponent["deaths"],
-            "Assists": role_opponent["assists"],
-            "Controlwards_Placed": role_opponent["controlwards_placed"],
-            "Dmg%": role_opponent["dmg%"],
-            "Dmgtaken%": role_opponent["dmg_taken%"],
-            #"Objectives": player_scouting["objectives"], create a list for objectives
-            "Win/Lose": role_opponent["win"],
-        })
+                "KDA": role_opponent["kda"],
+                "Kills": role_opponent["kills"],
+                "Deaths": role_opponent["deaths"],
+                "Assists": role_opponent["assists"],
+                "Controlwards_Placed": role_opponent["controlwards_placed"],
+                "Dmg_percent": role_opponent["dmg%"],
+                "Dmgtaken_percent": role_opponent["dmg_taken%"],
+                #"Objectives": player_scouting["objectives"], create a list for objectives
+                "Win/Lose": role_opponent["win"],
+            })
 
-        Dataframe_Opponent = pd.concat([Dataframe_Opponent, Dataframe_Opponent_temp])
+            Dataframe_Opponent = pd.concat([Dataframe_Opponent, Dataframe_Opponent_temp])
 
         # Objectives per team per Match ID
         for team in teams:
@@ -437,8 +456,8 @@ for puuid in matchhistories:
                 objectives["atakhankills"] = objs["atakhan"]["kills"]
                 objectives["atakhanfirst"] = objs["atakhan"]["first"]
             else:
-                objectives["atakhankills"] = "NaN"
-                objectives["atakhanfirst"] = "NaN"
+                objectives["atakhankills"] = 0
+                objectives["atakhanfirst"] = 0
 
             # objectives["baron"] = objs["baron"]
             objectives["baronkills"] = objs["baron"]["kills"]
@@ -463,27 +482,29 @@ for puuid in matchhistories:
             # objectives["inhibitor"] = objs["inhibitor"]
             objectives["inhibitorkills"] = objs["inhibitor"]["kills"]
             objectives["inhibitorfirst"] = objs["inhibitor"]["first"]
-
-            Dataframe_Objectives_temp = pd.DataFrame({
-                "PUUID" : [objectives["puuid"]],
-                "Match_ID": [game_id],
-                "Team": [side],
-                "Atakhankills" : [objectives["atakhankills"]],
-                "Atakhanfirst" : [objectives["atakhanfirst"]],
-                "Baronkills": [objectives["baronkills"]],
-                "Baronfirst": [objectives["baronfirst"]],
-                "Dragonkills": [objectives["dragonkills"]],
-                "Dragonfirst": [objectives["dragonfirst"]],
-                "Grubskills": [objectives["grubskills"]],
-                "Grubsfirst": [objectives["grubsfirst"]],
-                "Rift_Heraldkills": [objectives["rift_heraldkills"]],
-                "Rift_Heraldfirst": [objectives["rift_heraldfirst"]],
-                "Towerkills": [objectives["towerkills"]],
-                "Towerfirst": [objectives["towerfirst"]],
-                "Inhibitorkills": [objectives["inhibitorkills"]],
-                "Inhibitorfirst": [objectives["inhibitorfirst"]],
-            })
-            Dataframe_Objectives = pd.concat([Dataframe_Objectives, Dataframe_Objectives_temp])
+            KEY_PUUID_MATCH_ID_TEAM = objectives["puuid"] , game_id , side
+            if game_mode == "CLASSIC":
+                Dataframe_Objectives_temp = pd.DataFrame({
+                    "KEY_PUUID_MATCH_ID_TEAM" : [KEY_PUUID_MATCH_ID_TEAM],
+                    "PUUID" : [objectives["puuid"]],
+                    "Match_ID": [game_id],
+                    "Team": [side],
+                    "Atakhankills" : [objectives["atakhankills"]],
+                    "Atakhanfirst" : [objectives["atakhanfirst"]],
+                    "Baronkills": [objectives["baronkills"]],
+                    "Baronfirst": [objectives["baronfirst"]],
+                    "Dragonkills": [objectives["dragonkills"]],
+                    "Dragonfirst": [objectives["dragonfirst"]],
+                    "Grubskills": [objectives["grubskills"]],
+                    "Grubsfirst": [objectives["grubsfirst"]],
+                    "Rift_Heraldkills": [objectives["rift_heraldkills"]],
+                    "Rift_Heraldfirst": [objectives["rift_heraldfirst"]],
+                    "Towerkills": [objectives["towerkills"]],
+                    "Towerfirst": [objectives["towerfirst"]],
+                    "Inhibitorkills": [objectives["inhibitorkills"]],
+                    "Inhibitorfirst": [objectives["inhibitorfirst"]],
+                })
+                Dataframe_Objectives = pd.concat([Dataframe_Objectives, Dataframe_Objectives_temp])
 
         # Dateframes
         # Champpool
@@ -639,8 +660,9 @@ for puuid_player in puuid_champpool:
                 avrg_stats_dict["dmg_taken_p"] = round(sum(champion["champ_dmgtaken_p"]) / len(champion["champ_dmgtaken_p"]) , 2)
 
                 print(avrg_stats_dict)
-
+                KEY_PUUID_CHAMP = puuid_player + avrg_stats_dict["champ"]
                 temp_Dataframe_Champpool = pd.DataFrame({
+                    "KEY_PUUID_CHAMP" : [KEY_PUUID_CHAMP],
                     "PUUID" : [puuid_player],
                     "champ" : [avrg_stats_dict["champ"]],
                     "kda": [avrg_stats_dict["kda"]],
@@ -706,3 +728,93 @@ google_sheet_test = sheet.worksheet("title", "DF_Champpool")
 google_sheet_test.set_dataframe(Dataframe_Championpool, "A1")
 
 
+#storing Dataframes into SQL
+#connection to postgrsql
+
+Dataframe_Player = Dataframe_Player.reset_index(drop=True)
+Dataframe_Player_Info = Dataframe_Player_Info.reset_index(drop=True)
+Dataframe_Matchhistory = Dataframe_Matchhistory.reset_index(drop=True)
+Dataframe_Match = Dataframe_Match.reset_index(drop=True)
+Dataframe_Opponent = Dataframe_Opponent.reset_index(drop=True)
+Dataframe_Objectives = Dataframe_Objectives.reset_index(drop=True)
+Dataframe_Championpool = Dataframe_Championpool.reset_index(drop=True)
+
+print(Dataframe_Opponent)
+
+Dataframe_Player = Dataframe_Player.set_index("PUUID")
+Dataframe_Player_Info = Dataframe_Player_Info.set_index("PUUID")
+Dataframe_Matchhistory = Dataframe_Matchhistory.set_index("KEY_PUUID_MATCH_ID")
+Dataframe_Match = Dataframe_Match.set_index(["KEY_PUUID_MATCH_ID"])
+Dataframe_Opponent = Dataframe_Opponent.set_index(["KEY_PUUID_MATCH_ID"])
+Dataframe_Objectives = Dataframe_Objectives.set_index(["KEY_PUUID_MATCH_ID_TEAM"])
+Dataframe_Championpool = Dataframe_Championpool.set_index("KEY_PUUID_CHAMP")
+
+print(Dataframe_Opponent)
+
+def create_db_connection_string(db_username, db_password, db_host, db_port, db_name):
+    connection_url = "postgresql+psycopg2://" + db_username + ":" + db_password + "@" + db_host + ":" + db_port + "/" + db_name
+    return connection_url
+
+conn_url = create_db_connection_string(db_username, db_password, db_host, db_port, db_name)
+db_engine = create_engine(conn_url, pool_recycle=3600)
+
+connection = db_engine.connect()
+
+# SQL Dataframe_Player
+
+
+upsert(
+    con=connection, df=Dataframe_Player, schema="playerdata", table_name="Player", create_table=True,
+    create_schema=True, if_row_exists="update"
+)
+
+# SQL Dataframe_Player_Info
+
+
+upsert(
+    con=connection, df=Dataframe_Player_Info, schema="playerdata", table_name="Player_Info", create_table=True,
+    create_schema=True, if_row_exists="update"
+)
+
+# SQL Dataframe_Matchhistory
+
+
+upsert(
+    con=connection, df=Dataframe_Matchhistory, schema="playerdata", table_name="Matchhistory", create_table=True,
+    create_schema=True, if_row_exists="update"
+)
+
+# SQL Dataframe_Match                              does this work?
+
+
+upsert(
+    con=connection, df=Dataframe_Match, schema="playerdata", table_name="Matchdata", create_table=True,
+    create_schema=True, if_row_exists="update"
+)
+
+
+# SQL Dataframe_Opponent                                does this work?
+
+#Dataframe_Opponent = Dataframe_Opponent.index[Dataframe_Opponent.index.duplicated(keep=False)]
+
+upsert(
+    con=connection, df=Dataframe_Opponent, schema="playerdata", table_name="Opponent", create_table=True,
+    create_schema=True, if_row_exists="update")
+
+# SQL Dataframe_Objecives                                does this work?
+
+
+upsert(
+    con=connection, df=Dataframe_Objectives, schema="playerdata", table_name="Objecives", create_table=True,
+    create_schema=True, if_row_exists="update"
+)
+
+# SQL Dataframe_Championpool
+
+
+upsert(
+    con=connection, df=Dataframe_Championpool, schema="playerdata", table_name="Championpool", create_table=True,
+    create_schema=True, if_row_exists="update"
+)
+
+connection.commit()

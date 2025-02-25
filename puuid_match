@@ -697,5 +697,579 @@
                 ]
             }
         }
+    ],
+    "ek0dhNeVRlc3lIr1Q1kQjIHynYXAilhf_d1wubhtuNTLgLBnBd-ICUTwiYSXpsrACkrPnFfFcNMApg": [
+        {
+            "Aatrox": {
+                "champ": "Aatrox",
+                "win": [
+                    true
+                ],
+                "champ_kda": [
+                    0.91
+                ],
+                "champ_kills": [
+                    2
+                ],
+                "champ_deaths": [
+                    11
+                ],
+                "champ_assists": [
+                    8
+                ],
+                "champ_visionscore": [
+                    14
+                ],
+                "champ_visionscore_d": [
+                    -5
+                ],
+                "champ_exp_d": [
+                    -2934
+                ],
+                "champ_gold_d": [
+                    -4429
+                ],
+                "champ_cs_d": [
+                    -46
+                ],
+                "champ_dmg_p": [
+                    0.15
+                ],
+                "champ_dmgtaken_p": [
+                    0.25
+                ]
+            },
+            "Yasuo": {
+                "champ": "Yasuo",
+                "win": [
+                    false
+                ],
+                "champ_kda": [
+                    1.4
+                ],
+                "champ_kills": [
+                    3
+                ],
+                "champ_deaths": [
+                    5
+                ],
+                "champ_assists": [
+                    4
+                ],
+                "champ_visionscore": [
+                    12
+                ],
+                "champ_visionscore_d": [
+                    5
+                ],
+                "champ_exp_d": [
+                    1981
+                ],
+                "champ_gold_d": [
+                    1684
+                ],
+                "champ_cs_d": [
+                    34
+                ],
+                "champ_dmg_p": [
+                    0.3
+                ],
+                "champ_dmgtaken_p": [
+                    0.24
+                ]
+            },
+            "Amumu": {
+                "champ": "Amumu",
+                "win": [
+                    true
+                ],
+                "champ_kda": [
+                    4.6
+                ],
+                "champ_kills": [
+                    6
+                ],
+                "champ_deaths": [
+                    5
+                ],
+                "champ_assists": [
+                    17
+                ],
+                "champ_visionscore": [
+                    14
+                ],
+                "champ_visionscore_d": [
+                    -6
+                ],
+                "champ_exp_d": [
+                    753
+                ],
+                "champ_gold_d": [
+                    1132
+                ],
+                "champ_cs_d": [
+                    -11
+                ],
+                "champ_dmg_p": [
+                    0.18
+                ],
+                "champ_dmgtaken_p": [
+                    0.26
+                ]
+            },
+            "Swain": {
+                "champ": "Swain",
+                "win": [
+                    false
+                ],
+                "champ_kda": [
+                    2.4
+                ],
+                "champ_kills": [
+                    16
+                ],
+                "champ_deaths": [
+                    10
+                ],
+                "champ_assists": [
+                    8
+                ],
+                "champ_visionscore": [
+                    13
+                ],
+                "champ_visionscore_d": [
+                    -10
+                ],
+                "champ_exp_d": [
+                    798
+                ],
+                "champ_gold_d": [
+                    441
+                ],
+                "champ_cs_d": [
+                    -39
+                ],
+                "champ_dmg_p": [
+                    0.29
+                ],
+                "champ_dmgtaken_p": [
+                    0.28
+                ]
+            },
+            "Sylas": {
+                "champ": "Sylas",
+                "win": [
+                    false
+                ],
+                "champ_kda": [
+                    0.91
+                ],
+                "champ_kills": [
+                    7
+                ],
+                "champ_deaths": [
+                    11
+                ],
+                "champ_assists": [
+                    3
+                ],
+                "champ_visionscore": [
+                    18
+                ],
+                "champ_visionscore_d": [
+                    -5
+                ],
+                "champ_exp_d": [
+                    -1044
+                ],
+                "champ_gold_d": [
+                    1037
+                ],
+                "champ_cs_d": [
+                    9
+                ],
+                "champ_dmg_p": [
+                    0.25
+                ],
+                "champ_dmgtaken_p": [
+                    0.28
+                ]
+            },
+            "MonkeyKing": {
+                "champ": "MonkeyKing",
+                "win": [
+                    true,
+                    true
+                ],
+                "champ_kda": [
+                    2.44,
+                    1.9
+                ],
+                "champ_kills": [
+                    10,
+                    6
+                ],
+                "champ_deaths": [
+                    9,
+                    10
+                ],
+                "champ_assists": [
+                    12,
+                    13
+                ],
+                "champ_visionscore": [
+                    32,
+                    61
+                ],
+                "champ_visionscore_d": [
+                    -7,
+                    31
+                ],
+                "champ_exp_d": [
+                    2941,
+                    -5327
+                ],
+                "champ_gold_d": [
+                    2363,
+                    -4405
+                ],
+                "champ_cs_d": [
+                    3,
+                    -28
+                ],
+                "champ_dmg_p": [
+                    0.17,
+                    0.13
+                ],
+                "champ_dmgtaken_p": [
+                    0.29,
+                    0.24
+                ]
+            },
+            "Vi": {
+                "champ": "Vi",
+                "win": [
+                    true,
+                    false
+                ],
+                "champ_kda": [
+                    6,
+                    2
+                ],
+                "champ_kills": [
+                    9,
+                    10
+                ],
+                "champ_deaths": [
+                    4,
+                    9
+                ],
+                "champ_assists": [
+                    15,
+                    8
+                ],
+                "champ_visionscore": [
+                    34,
+                    28
+                ],
+                "champ_visionscore_d": [
+                    2,
+                    -15
+                ],
+                "champ_exp_d": [
+                    4626,
+                    -4447
+                ],
+                "champ_gold_d": [
+                    2861,
+                    -1190
+                ],
+                "champ_cs_d": [
+                    -7,
+                    12
+                ],
+                "champ_dmg_p": [
+                    0.16,
+                    0.22
+                ],
+                "champ_dmgtaken_p": [
+                    0.29,
+                    0.33
+                ]
+            },
+            "Skarner": {
+                "champ": "Skarner",
+                "win": [
+                    false
+                ],
+                "champ_kda": [
+                    0.3
+                ],
+                "champ_kills": [
+                    0
+                ],
+                "champ_deaths": [
+                    10
+                ],
+                "champ_assists": [
+                    3
+                ],
+                "champ_visionscore": [
+                    24
+                ],
+                "champ_visionscore_d": [
+                    6
+                ],
+                "champ_exp_d": [
+                    -6215
+                ],
+                "champ_gold_d": [
+                    -5396
+                ],
+                "champ_cs_d": [
+                    -20
+                ],
+                "champ_dmg_p": [
+                    0.17
+                ],
+                "champ_dmgtaken_p": [
+                    0.33
+                ]
+            },
+            "JarvanIV": {
+                "champ": "JarvanIV",
+                "win": [
+                    false
+                ],
+                "champ_kda": [
+                    1.91
+                ],
+                "champ_kills": [
+                    6
+                ],
+                "champ_deaths": [
+                    11
+                ],
+                "champ_assists": [
+                    15
+                ],
+                "champ_visionscore": [
+                    26
+                ],
+                "champ_visionscore_d": [
+                    11
+                ],
+                "champ_exp_d": [
+                    -4311
+                ],
+                "champ_gold_d": [
+                    -1589
+                ],
+                "champ_cs_d": [
+                    -8
+                ],
+                "champ_dmg_p": [
+                    0.2
+                ],
+                "champ_dmgtaken_p": [
+                    0.31
+                ]
+            },
+            "Ashe": {
+                "champ": "Ashe",
+                "win": [
+                    true
+                ],
+                "champ_kda": [
+                    3.75
+                ],
+                "champ_kills": [
+                    11
+                ],
+                "champ_deaths": [
+                    4
+                ],
+                "champ_assists": [
+                    4
+                ],
+                "champ_visionscore": [
+                    14
+                ],
+                "champ_visionscore_d": [
+                    -16
+                ],
+                "champ_exp_d": [
+                    3356
+                ],
+                "champ_gold_d": [
+                    4463
+                ],
+                "champ_cs_d": [
+                    30
+                ],
+                "champ_dmg_p": [
+                    0.25
+                ],
+                "champ_dmgtaken_p": [
+                    0.16
+                ]
+            },
+            "Xayah": {
+                "champ": "Xayah",
+                "win": [
+                    false
+                ],
+                "champ_kda": [
+                    1
+                ],
+                "champ_kills": [
+                    4
+                ],
+                "champ_deaths": [
+                    10
+                ],
+                "champ_assists": [
+                    6
+                ],
+                "champ_visionscore": [
+                    13
+                ],
+                "champ_visionscore_d": [
+                    -14
+                ],
+                "champ_exp_d": [
+                    -1459
+                ],
+                "champ_gold_d": [
+                    -6593
+                ],
+                "champ_cs_d": [
+                    -34
+                ],
+                "champ_dmg_p": [
+                    0.26
+                ],
+                "champ_dmgtaken_p": [
+                    0.21
+                ]
+            },
+            "Azir": {
+                "champ": "Azir",
+                "win": [
+                    false
+                ],
+                "champ_kda": [
+                    0.2
+                ],
+                "champ_kills": [
+                    1
+                ],
+                "champ_deaths": [
+                    5
+                ],
+                "champ_assists": [
+                    0
+                ],
+                "champ_visionscore": [
+                    8
+                ],
+                "champ_visionscore_d": [
+                    1
+                ],
+                "champ_exp_d": [
+                    -2513
+                ],
+                "champ_gold_d": [
+                    -1756
+                ],
+                "champ_cs_d": [
+                    -34
+                ],
+                "champ_dmg_p": [
+                    0.31
+                ],
+                "champ_dmgtaken_p": [
+                    0.2
+                ]
+            },
+            "Leblanc": {
+                "champ": "Leblanc",
+                "win": [
+                    true
+                ],
+                "champ_kda": [
+                    2.5
+                ],
+                "champ_kills": [
+                    12
+                ],
+                "champ_deaths": [
+                    8
+                ],
+                "champ_assists": [
+                    8
+                ],
+                "champ_visionscore": [
+                    24
+                ],
+                "champ_visionscore_d": [
+                    -2
+                ],
+                "champ_exp_d": [
+                    -1202
+                ],
+                "champ_gold_d": [
+                    -497
+                ],
+                "champ_cs_d": [
+                    -26
+                ],
+                "champ_dmg_p": [
+                    0.23
+                ],
+                "champ_dmgtaken_p": [
+                    0.17
+                ]
+            },
+            "Ahri": {
+                "champ": "Ahri",
+                "win": [
+                    false
+                ],
+                "champ_kda": [
+                    3
+                ],
+                "champ_kills": [
+                    9
+                ],
+                "champ_deaths": [
+                    3
+                ],
+                "champ_assists": [
+                    0
+                ],
+                "champ_visionscore": [
+                    13
+                ],
+                "champ_visionscore_d": [
+                    -2
+                ],
+                "champ_exp_d": [
+                    573
+                ],
+                "champ_gold_d": [
+                    3252
+                ],
+                "champ_cs_d": [
+                    63
+                ],
+                "champ_dmg_p": [
+                    0.37
+                ],
+                "champ_dmgtaken_p": [
+                    0.14
+                ]
+            }
+        }
     ]
 }
