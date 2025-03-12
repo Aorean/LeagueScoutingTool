@@ -1,6 +1,6 @@
 from urllib3.util.ssl_match_hostname import match_hostname
 
-from function_api import get_puuid, get_match,  get_matchhistory, player_data_matchhistory
+from function_api import get_puuid, get_match,  get_matchhistory
 
 
 import os
