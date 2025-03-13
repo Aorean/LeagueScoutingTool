@@ -1,4 +1,90 @@
-import pandas as pd
+from dotenv import load_dotenv
+from def_classes.player import Player
+from def_classes.matchhistory import Matchhistory
+from def_classes.match import Match, Playerstats
+
+from function_api import *
+
+
+def process_userinput(user_input):
+    usernames = user_input[0].split(",")
+    region = user_input[1]
+
+    api_data = []
+    api_data.append(region)
+
+    accounts = []
+
+    for username in usernames:
+        split = username.split("#")
+        #strip trailing newline
+        strip = split[1].rstrip()
+        split[1] = strip
+        #append account to list
+        accounts.append(split)
+
+    #append accounts to return data
+    api_data.append(accounts)
+
+    return api_data
+
+def get_playerclass(riot_ids, region, api_key):
+    classes_player = []
+    for riot_id in riot_ids:
+        puuid = get_puuid(riot_id[0], riot_id[1], region, api_key)
+        class_player = Player( puuid, riot_id[0], riot_id[1])
+        classes_player.append(class_player)
+
+    return classes_player
+
+def get_matchhistoriesclass(classes_player, region, api_key):
+    classes_matchhistory = []
+    for class_player in classes_player:
+        puuid = class_player.puuid
+        matchhistory = get_matchhistory(region, puuid, api_key)
+        class_matchhistory = Matchhistory(puuid, matchhistory)
+        classes_matchhistory.append(class_matchhistory)
+
+    return classes_matchhistory
+
+def get_matchclass(classes_matchhistory, region, api_key):
+
+    full_matchinfo = {}
+    for class_matchhistory in classes_matchhistory:
+        matchids = class_matchhistory.matchhistory
+        for matchid in matchids:
+            single_match = get_match(region, matchid, api_key)
+            class_match = Match(class_matchhistory.puuid, matchid, single_match)
+
+            participants = single_match["info"]["participants"]
+            all_participants = []
+            for participant in participants:
+                class_playerstats = Playerstats(participant)
+                all_participants.append(class_playerstats)
+
+            matchinfo = [class_match, all_participants]
+            full_matchinfo.update({
+                matchid: matchinfo
+            })
+
+    return full_matchinfo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def get_playerscouting(player, info):
     player_scouting = {}
@@ -117,55 +203,3 @@ def get_roleopponent(player, info):
         role_opponent["kda"] = "NaN"
 
     return role_opponent
-
-
-
-def get_single_match(puuid , single_match):
-    single_match_matchhistory = {}
-    single_match_matchhistory["match_id"] = single_match["match_id"]
-    single_match_matchhistory["participants"] = single_match["participants"]
-    single_match_matchhistory["gamestart"] = single_match["gamestart"]
-    single_match_matchhistory["gameend"] = single_match["gameend"]
-    single_match_matchhistory["gameduration"] = single_match["gameduration"]
-    single_match_matchhistory["tournamentcode"] = single_match["tournamentcode"]
-    single_match_matchhistory["gamemode"] = single_match["gamemode"]
-
-    return single_match_matchhistory
-
-
-
-
-
-
-
-
-
-
-
-#Dataframes
-def get_df_player(puuid_player, account):
-    # Dateframes
-    # Player
-    # Puuid, Gamertag, Tagline
-    temp_Dataframe_Player = pd.DataFrame({
-        "PUUID" : [puuid_player],
-        "Gamertag" : [account[0]],
-        "Tagline" : [account[1]]
-    })
-    return temp_Dataframe_Player
-
-
-def get_df_playerinfo(player, matchhistories, rank_datas):
-    # Player_Info
-    # PUUID, Matchhistory, Elo, Wins, Losses, Total, Winrate
-    temp_Dataframe_Matchhistory = pd.DataFrame({
-        "PUUID" : [player],
-        "Matchhistory" : [matchhistories[player]],
-        "Elo" : rank_datas[player]["rank"],
-        "Wins" : rank_datas[player]["wins"],
-        "Losses": rank_datas[player]["losses"],
-        "games_total": rank_datas[player]["games_total"],
-        "winrate" : round((rank_datas[player]["wins"] / rank_datas[player]["games_total"] * 100), 2) #remove *100 later
-    })
-
-    return temp_Dataframe_Matchhistory
