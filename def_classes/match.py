@@ -3,19 +3,22 @@ class Match:
         metadata = single_match["metadata"]
         participants = metadata["participants"]
         info = single_match["info"]
+        self.PUUID_MATCHID = puuid + matchid
         self.puuid = puuid
         self.matchid = matchid
         self.participants = participants
-        self.gamestart = info["gameStartTimestamp"]
-        self.gameend = info["gameEndTimestamp"]
-        self.gameduration = info["gameDuration"]
+        self.gamestart = str(info["gameStartTimestamp"])
+        self.gameend = str(info["gameEndTimestamp"])
+        self.gameduration = str(info["gameDuration"])
         self.tournamentcode = info["tournamentCode"]
         self.gamemode = info["gameMode"]
 
 
 class Playerstats:
-    def __init__(self, participant):
+    def __init__(self, participant, matchid, puuid):
+        self.PUUID_MATCHID = puuid + matchid
         self.puuid = participant["puuid"]
+        self.matchid = matchid
         self.gamertag = participant["riotIdGameName"]
         self.tagline = participant["riotIdTagline"]
         self.team = participant["teamId"]
@@ -24,6 +27,7 @@ class Playerstats:
         self.kills = participant["kills"]
         self.deaths = participant["deaths"]
         self.assists = participant["assists"]
+        #set kda function
         self.cs = participant["totalMinionsKilled"]
         self.level = participant["champLevel"]
         self.exp = participant["champExperience"]

@@ -2,8 +2,10 @@ from dotenv import load_dotenv
 from def_classes.player import Player
 from def_classes.matchhistory import Matchhistory
 from def_classes.match import Match, Playerstats
+from def_classes.objectives import Objectives
 
 from function_api import *
+
 
 
 def process_userinput(user_input):
@@ -47,27 +49,98 @@ def get_matchhistoriesclass(classes_player, region, api_key):
 
     return classes_matchhistory
 
-def get_matchclass(classes_matchhistory, region, api_key):
+def process_matches(classes_matchhistory, region, api_key):
 
     full_matchinfo = {}
     for class_matchhistory in classes_matchhistory:
         matchids = class_matchhistory.matchhistory
         for matchid in matchids:
             single_match = get_match(region, matchid, api_key)
+
+            #generell matchdata
             class_match = Match(class_matchhistory.puuid, matchid, single_match)
+            #checking for gamemode with important stats (ranked (+flexq))
+            if class_match.gamemode == "CLASSIC":
+                #participant matchdata
+                participants = single_match["info"]["participants"]
+                all_participants = []
+                for participant in participants:
+                    class_playerstats = Playerstats(participant, matchid, participant["puuid"])
+                    all_participants.append(class_playerstats)
 
-            participants = single_match["info"]["participants"]
-            all_participants = []
-            for participant in participants:
-                class_playerstats = Playerstats(participant)
-                all_participants.append(class_playerstats)
+                #objectives matchdata
+                teams = single_match["info"]["teams"]
+                objective_teams =  {}
 
-            matchinfo = [class_match, all_participants]
-            full_matchinfo.update({
-                matchid: matchinfo
-            })
+                for team in teams:
+                    objective_team = Objectives(team=team, matchid=matchid)
+                    objective_teams[objective_team.teamid] = objective_team
+
+
+                matchinfo = [class_match, all_participants, objective_teams]
+                full_matchinfo.update({
+                    matchid: matchinfo
+                })
+
 
     return full_matchinfo
+
+def get_champpoolclasses(dict_matches, classes_player):
+    #CHANGE THIS, QUERY FROM SQL AND GET STATS FROM THERE
+
+    for class_player in classes_player:
+        dict_champ_stats = {
+
+        }
+        #stats in lists to get avrgs
+        kda = []
+        kills = []
+        deaths = []
+        assists = []
+        exp = []
+        level = []
+        visionscore = []
+
+        #stats roleopponent in list to get avrgs diff
+        opponent_kda = []
+        opponent_kills = []
+        opponent_deaths = []
+        opponent_assists = []
+        opponent_exp = []
+        opponent_level = []
+        opponent_visionscore = []
+
+        for matchid in dict_matches:
+            match = dict_matches[matchid]
+            #match[1] shows all participants from the match in classes
+            participants = match[1]
+
+            #role to get roleopponent
+            opponent_check = ""
+            for participant in participants:
+                if participant.puuid == class_player.puuid:
+
+                    #filling lists
+
+                    kills.append(participant.kills)
+                    deaths.append(participant.deaths)
+                    assists.append(participant.assists)
+                    exp.append(participant.exp)
+                    level.append(participant.level)
+                    visionscore.append(participant.visionscore)
+
+                    opponent_check = participant.role
+
+                if participant.role == opponent_check:
+
+                    #filling lists opponent
+
+                    opponent_kills.append(participant.kills)
+                    opponent_deaths.append(participant.deaths)
+                    opponent_assists.append(participant.assists)
+                    opponent_exp.append(participant.exp)
+                    opponent_level.append(participant.level)
+                    opponent_visionscore.append(participant.visionscore)
 
 
 

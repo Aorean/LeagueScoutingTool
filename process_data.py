@@ -1,5 +1,5 @@
 
-from def_func import process_userinput, get_playerclass, get_matchhistoriesclass, get_matchclass
+from def_func import process_userinput, get_playerclass, get_matchhistoriesclass, process_matches
 import os
 from dotenv import load_dotenv
 
@@ -28,28 +28,29 @@ classes_player = get_playerclass(riot_ids, region, api_key)
 classes_matchhistory = get_matchhistoriesclass(classes_player, region, api_key)
 
 #call riot api for single matches and saving it in a dict
-#key = matchid, value = list // list[0] = generall matchdata // list[1] = class stats all players
-dict_matches = get_matchclass(classes_matchhistory, region, api_key)
-
-
+#key = matchid, value = list // list[0] = generall matchdata // list[1] = class stats all players // list[2] = class objectives
+dict_matches = process_matches(classes_matchhistory, region, api_key)
+#how to extract the data from dict_matches:
 """
-for class_player in classes_player:
-    print(class_player.gamertag)
-
-for class_matchhistory in classes_matchhistory:
-    print(class_matchhistory.matchhistory)
-"""
-
-
 for matchid in dict_matches:
     match = dict_matches[matchid]
 
     class_match = match[0]
     participants = match[1]
+    objectives = match[2]
 
-    print(class_match.matchid + " " + class_match.gamemode)
+
+
+
     for participant in participants:
-        for player in classes_player:
-            if participant.puuid == player.puuid:
-                print(participant.gamertag + "#" + participant.tagline + " " + participant.champ)
+
+        playerteamobjectives = objectives[participant.team]
+        print(participant.gamertag + "#" + participant.tagline + " " + participant.champ)
+"""
+
+
+
+
+
+
 

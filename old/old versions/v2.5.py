@@ -53,7 +53,7 @@ import pandas as pd
 from pangres import upsert
 from sqlalchemy import text, create_engine
 
-from scrabs.thoams import matchid
+from old.thoams import matchid
 
 load_dotenv()
 

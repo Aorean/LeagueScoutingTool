@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-from scrabs import class_file as class_file
+from old import class_file as class_file
 
 from function_api import get_puuid
 
