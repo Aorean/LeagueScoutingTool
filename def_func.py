@@ -3,6 +3,7 @@ from def_classes.player import Player
 from def_classes.matchhistory import Matchhistory
 from def_classes.match import Match, Playerstats
 from def_classes.objectives import Objectives
+from c_dragon import *
 
 from function_api import *
 
@@ -66,6 +67,7 @@ def process_matches(classes_matchhistory, region, api_key):
                 all_participants = []
                 for participant in participants:
                     class_playerstats = Playerstats(participant, matchid, participant["puuid"])
+                    class_playerstats.translate_ids(dict_items, dict_summonerspells, dict_primary_runes)
                     all_participants.append(class_playerstats)
 
                 #objectives matchdata

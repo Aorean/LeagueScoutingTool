@@ -59,8 +59,7 @@ dict_matches = dict_matches
 
 
 #SELECT to check if UPDATE or INSERT
-#PLAYER
-list_select_player = SELECT_PK_PLAYER(db_connection)
+
 #MATCH
 list_select_match = SELECT_PK_MATCH(db_connection)
 #PLAYERSTATS
@@ -69,35 +68,8 @@ list_select_playerstats = SELECT_PK_PLAYERSTATS(db_connection)
 list_select_objectives = SELECT_PK_OBJECTIVES(db_connection)
 
 
-#upload player
-for class_player in classes_player:
-    # create sql class
-    new_player = PLAYER.from_player(class_player)
 
-    # does the class already exist?:
-    # YES it exists
-    # UPDATE the SQL Table with new content
-    if new_player.puuid in list_select_player:
-        # variables for get query
-        columns_and_values = f'"gamertag" = \'{new_player.gamertag}\', "tagline" = \'{new_player.tagline}\''
-        # get query
-        query_update = get_query("update", table='"playerdata"."player"',columns_and_values=columns_and_values ,key='"puuid"', keyvalue=new_player.puuid)
-        # execute query (UPDATE)
-        rows = execute_query(db_connection, query_update)
-
-    # NO it does not exist
-    # INSERT the new data
-    elif new_player.puuid not in list_select_player:
-        # variables for get query
-        tablename = '"playerdata"."player"("puuid", "gamertag", "tagline")'
-        values = f"'{new_player.puuid}', '{new_player.gamertag}', '{new_player.tagline}'"
-        # get query
-        query_insert = get_query("insert", tablename=tablename, values=values)
-        # append the primary key to the list of primary keys to prevent double input
-        list_select_player.append(new_player.puuid)
-        # execute query (INSERT)
-        rows = execute_query(db_connection, query_insert)
-
+insert_or_update_PLAYER(db_connection, classes_player)
 
 # upload match
 # look for sql injections!!!!!!!!!!!! ("?" instead of fstring)

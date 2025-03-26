@@ -1,4 +1,5 @@
 import psycopg2
+from sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, Base
 
 def create_db_connection_string(db_username, db_password, db_host, db_port, db_name):
     connection_url = "postgresql+psycopg2://" + db_username + ":" + db_password + "@" + db_host + ":" + db_port + "/" + db_name
@@ -122,3 +123,40 @@ def SELECT_PK_OBJECTIVES(db_connection):
         str_objectives = "".join(playerstats)
         list_select_objectives.append(str_objectives)
     return list_select_objectives
+
+def insert_or_update_PLAYER(db_connection, classes_player):
+    # SELECT to check if UPDATE or INSERT
+    list_select_player = SELECT_PK_PLAYER(db_connection)
+    for class_player in classes_player:
+        # create sql class
+        new_player = PLAYER.from_player(class_player)
+
+        # does the class already exist?:
+        # YES it exists
+        # UPDATE the SQL Table with new content
+        if new_player.puuid in list_select_player:
+            # variables for get query
+            columns_and_values = f'"gamertag" = \'{new_player.gamertag}\', "tagline" = \'{new_player.tagline}\''
+            # get query
+            query_update = get_query("update",
+                                     table='"playerdata"."player"',
+                                     columns_and_values=columns_and_values,
+                                     key='"puuid"',
+                                     keyvalue=new_player.puuid)
+            # execute query (UPDATE)
+            rows = execute_query(db_connection, query_update)
+
+        # NO it does not exist
+        # INSERT the new data
+        elif new_player.puuid not in list_select_player:
+            # variables for get query
+            tablename = '"playerdata"."player"("puuid", "gamertag", "tagline")'
+            values = f"'{new_player.puuid}', '{new_player.gamertag}', '{new_player.tagline}'"
+            # get query
+            query_insert = get_query("insert",
+                                     tablename=tablename,
+                                     values=values)
+            # append the primary key to the list of primary keys to prevent double input
+            list_select_player.append(new_player.puuid)
+            # execute query (INSERT)
+            rows = execute_query(db_connection, query_insert)

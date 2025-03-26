@@ -15,6 +15,7 @@ class Match:
 
 
 class Playerstats:
+
     def __init__(self, participant, matchid, puuid):
         self.PUUID_MATCHID = puuid + matchid
         self.puuid = participant["puuid"]
@@ -43,4 +44,57 @@ class Playerstats:
         self.item6 = participant["item5"]
         self.keyrune = participant["perks"]["styles"][0]["selections"][0]["perk"]
         self.win = participant["win"]
+
+
+    def translate_ids(self, dict_items, dict_summonerspells, dict_primary_rune):
+
+        i_id1 = self.item1
+        i_id2 = self.item2
+        i_id3 = self.item3
+        i_id4 = self.item4
+        i_id5 = self.item5
+        i_id6 = self.item6
+
+        if self.item1 == 0:
+            self.item1 = 0
+        else:
+            self.item1 = dict_items[i_id1]
+
+        if self.item2 == 0:
+            self.item2 = 0
+        else:
+            self.item2 = dict_items[i_id2]
+
+        if self.item3 == 0:
+            self.item3 = 0
+        else:
+            self.item3 = dict_items[i_id3]
+
+        if self.item4 == 0:
+            self.item4 = 0
+        else:
+            self.item4 = dict_items[i_id4]
+
+        if self.item5 == 0:
+            self.item5 = 0
+        else:
+            self.item5 = dict_items[i_id5]
+
+        if self.item6 == 0:
+            self.item6 = 0
+        else:
+            self.item6 = dict_items[i_id6]
+
+        s_id1 = self.summonerspell1
+        s_id2 = self.summonerspell2
+
+        self.summonerspell1 = dict_summonerspells[s_id1]
+        self.summonerspell2 = dict_summonerspells[s_id2]
+
+        pr_id1 = self.keyrune
+
+        self.keyrune = dict_primary_rune[pr_id1]
+
+
+
 
