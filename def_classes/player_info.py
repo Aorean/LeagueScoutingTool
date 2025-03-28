@@ -1,3 +1,14 @@
+class avrg_stats:
+    def __init__(self, avrg_data):
+        self.winrate =
+        self.winrate_blue =
+        self.winrate_red =
+        self.kda =
+        self.cs
+
+
+
+
 class Player_Info:
     def __init__(self,
                  puuid,
