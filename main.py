@@ -64,8 +64,6 @@ insert_or_update_player("match" ,db_connection, dict_matches=dict_matches)
 insert_or_update_player("playerstats" ,db_connection, dict_matches=dict_matches)
 insert_or_update_player("objectives" ,db_connection, dict_matches=dict_matches)
 
-#tests
-get_avrg_playerstats(db_connection)
 
 
 session.close()

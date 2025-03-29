@@ -323,21 +323,7 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
                     again_do_i_need_equal_2 = execute_query(db_connection, query_insert)
 
 
-def get_avrg_playerstats(db_connection):
-    query = get_query(querytype="select", selection="*", schema="playerdata", table="playerstats")
-    select_playerstats = execute_query(db_connection=db_connection, query=query)
-    #riot_ids from process_data.py
-    query_player = SELECT_PK_PLAYER(db_connection)
-    test = select_playerstats[0]
-    print(type(test))
-    print(test[0])
-    """
-    for puuid in query_player:
-        avrg_stats_player = []
-        for matchdata in select_playerstats:
-            match_puuid = matchdata[1]
-            if puuid == match_puuid:
-    """
+
 
 
 
