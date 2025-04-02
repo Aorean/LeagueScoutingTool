@@ -3,12 +3,125 @@
 # tables: player_arvg_stats, champpool_players
 from itertools import count
 
+
+
 from def_classes.champpool import stats_for_champpool, Champpool
 from main import db_connection
 from sql_functions import *
 
+def get_data_for_champpool(db_connection):
+    #get matches from "playerstats" table
+    query_playerstats = get_query(querytype="select", selection="*", schema="playerdata", table="playerstats")
+    select_playerstats = execute_query(db_connection=db_connection, query=query_playerstats)
+
+    #get "player" table
+    query_player = get_query(querytype="select", selection="puuid", schema="playerdata", table="player")
+    select_player = execute_query(db_connection=db_connection, query=query_player)
 
 
+    list_puuid = []
+
+    #cleanup "player" tuple (remove "(...,)"
+    for v in select_player:
+        list_puuid.append(v[0])
+
+    champpool_data = []
+    for puuid in list_puuid:
+
+        for matchdata in select_playerstats:
+
+
+            if puuid == matchdata[1]:
+                champpool_data.append([matchdata])
+
+    for gamedata in champpool_data:
+        for matchdata in select_playerstats:
+
+            if gamedata[0][2] == matchdata[2] and gamedata[0][7] == matchdata[7]:
+                if gamedata[0][1] != matchdata[1]:
+                    gamedata.append(matchdata)
+
+    to_process =[list_puuid, champpool_data]
+
+    return to_process
+
+def get_champpool(to_process):
+    amnt_players = len(to_process[1])
+
+    puuids = to_process[0]
+    game_datas = to_process[1]
+
+    print(game_datas)
+    for puuid in puuids:
+        #amount of champions
+        unique_champs = []
+        for game_data in game_datas:
+            player = list(game_data[0])
+            opponent = list(game_data[1])
+
+            #filling unique_champs
+            if puuid == player[1]:
+                if player[6] not in unique_champs:
+                    unique_champs.append(game_data[0][6])
+
+
+            #get kda
+            if player[9] > 0:
+                kda = round((player[8] + player[10])/player[9],2)
+                player.append(kda)
+            elif player[9] == 0:
+                kda =  player[8] + player[10]
+                player.append(kda)
+
+            #getting diff stats
+            #kills
+            kills_diff = player[8] - opponent[8]
+            player.append(kills_diff)
+            #deaths
+            deaths_diff = player[9] - opponent[9]
+            player.append(deaths_diff)
+            #assists
+            assists_diff = player[10] - opponent[10]
+            player.append(assists_diff)
+            #cs
+            cs_diff = player[11] - opponent[11]
+            player.append(cs_diff)
+            #level
+            level_diff = player[12] - opponent[12]
+            player.append(level_diff)
+            #exp
+            exp_diff = player[13] - opponent[13]
+            player.append(exp_diff)
+            #gold
+            gold_diff = player[14] - opponent[14]
+            player.append(gold_diff)
+            #visionscore
+            visionscore_diff = player[15] - opponent[15]
+            player.append(visionscore_diff)
+
+            print(player)
+            print(opponent)
+        list_champpool_classes = []
+
+
+
+        """
+        for game_data in game_datas:
+            if puuid == game_data[1]:
+                for champ in unique_champs:
+                    if champ == game_data[6]:
+                        if champ in list_champpool_classes:
+
+                        elif champ not in list_champpool_classes:
+                            champ_stats = Champpool(game_data)
+        """
+
+champpool_data = get_data_for_champpool(db_connection)
+
+get_champpool(champpool_data)
+
+
+"""
 def get_avrg_champpool(db_connection):
     query = get_query(querytype="select", selection="*", schema="playerdata", table="playerstats")
     select_playerstats = execute_query(db_connection=db_connection, query=query)
@@ -26,6 +139,7 @@ def get_avrg_champpool(db_connection):
 
 
         player_puuid = player[0]
+        print(player_puuid)
 
         for matchdata in select_playerstats:
 
@@ -131,7 +245,7 @@ def get_avrg_champpool(db_connection):
 
             for match in player:
                 if match.champ == champion:
-                    dict_champ["puuid"].append(match.puuid)
+                    dict_champ["puuid"].append(player[1])
                     dict_champ["champ"].append(match.champ)
                     dict_champ["games_played"].append(1)
                     dict_champ["kda"].append(match.kda)
@@ -218,11 +332,18 @@ def get_avrg_champpool(db_connection):
                     if dict_champ["win"][ind_red]:
                         red_win+=1
 
-            winrate_blue = round(blue_count/blue_win, 2)
-            winrate_red = round(red_count / red_win, 2)
+            if blue_win == 0:
+                winrate_blue = 0
+            elif blue_win > 0:
+                winrate_blue = round(blue_count/blue_win, 4)
+
+            if red_win == 0:
+                winrate_red = 0
+            elif red_win > 0:
+                winrate_red = round(red_count / red_win, 4)
 
 
-            winrate = round(dict_champ["games_played"] / win_count, 2)
+            winrate = round(dict_champ["games_played"] / win_count, 4)
 
             dict_champ["win"] = winrate
 
@@ -257,3 +378,4 @@ def get_avrg_champpool(db_connection):
 
 
 test = get_avrg_champpool(db_connection)
+"""

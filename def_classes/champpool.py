@@ -33,20 +33,21 @@ class stats_for_champpool:
 
 
 class Champpool:
-    def __init__(self, dict_champ):
+    def __init__(self, matchdata):
+        self.PUUIDCHAMP = matchdata[1] , matchdata[6]
 
         self.puuid = matchdata[1]
         self.champ = matchdata[6]
         self.games_played = 0
 
-        self.kda = []
-        self.kills = []
-        self.deaths = []
-        self.assists = []
-        self.exp = []
-        self.level = []
-        self.gold = []
-        self.visionscore = []
+        self.kda = [round(matchdata[8] + matchdata[9] / matchdata[10] , 0)]
+        self.kills = [matchdata[8]]
+        self.deaths = [matchdata[9]]
+        self.assists = [matchdata[10]]
+        self.exp = [matchdata[13]]
+        self.level = [matchdata[12]]
+        self.gold = [matchdata[14]]
+        self.visionscore = [matchdata[15]]
 
         self.exp_diff = []
         self.level_diff = []
