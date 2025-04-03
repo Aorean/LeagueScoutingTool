@@ -229,3 +229,80 @@ class OBJECTIVES(Base):
             inhibfirst=objectives.inhibfirst,
             inhibkills=objectives.inhibkills,
         )
+
+class CHAMPPOOL(Base):
+    __table_args__ = {"schema": "playerdata"}
+    __tablename__ = "champpool"
+
+
+    PUUID_CHAMP = Column(String, primary_key=True, index=True)
+
+    puuid = Column(String, nullable=False)
+    champ = Column(String, nullable=False)
+
+    name = Column(String, nullable=False)
+    tagline = Column(String, nullable=False)
+
+    games_played = Column(Integer, nullable=False)
+
+    kda = Column(Float, nullable=False)
+    kills = Column(Float, nullable=False)
+    deaths = Column(Float, nullable=False)
+    assists = Column(Float, nullable=False)
+    cs = Column(Float, nullable=False)
+    exp = Column(Float, nullable=False)
+    level = Column(Float, nullable=False)
+    gold = Column(Float, nullable=False)
+    visionscore = Column(Float, nullable=False)
+
+    cs_diff = Column(Float, nullable=False)
+    exp_diff = Column(Float, nullable=False)
+    level_diff = Column(Float, nullable=False)
+    gold_diff = Column(Float, nullable=False)
+    visionscore_diff = Column(Float, nullable=False)
+
+    summonerspell1 = Column(String, nullable=False)
+    summonerspell2 = Column(String, nullable=False)
+
+    fav_role = Column(String, nullable=False)
+
+
+
+    winrate = Column(Float, nullable=False)
+    win_blue = Column(Float, nullable=False)
+    win_red = Column(Float, nullable=False)
+
+    @classmethod
+    def from_champpool(cls, champpool):
+        return cls(
+            __table_args__= {"schema": "playerdata"},
+            __tablename__= "champpool",
+
+            PUUID_CHAMP=champpool.PUUID_CHAMP,
+            puuid=champpool.puuid,
+            champ=champpool.champ,
+            name=champpool.name,
+            tagline=champpool.tagline,
+            games_played=champpool.games_played,
+            kda=champpool.kda,
+            kills=champpool.kills,
+            deaths=champpool.deaths,
+            assists=champpool.assists,
+            cs=champpool.cs,
+            exp=champpool.exp,
+            level=champpool.level,
+            gold=champpool.gold,
+            visionscore=champpool.visionscore,
+            cs_diff=champpool.cs_diff,
+            exp_diff=champpool.exp_diff,
+            level_diff=champpool.level_diff,
+            gold_diff=champpool.gold_diff,
+            visionscore_diff=champpool.visionscore_diff,
+            summonerspell1=champpool.summonerspell1,
+            summonerspell2=champpool.summonerspell2,
+            fav_role=champpool.fav_role,
+
+            winrate=champpool.winrate,
+            win_blue=champpool.win_blue,
+            win_red=champpool.win_red
+        )

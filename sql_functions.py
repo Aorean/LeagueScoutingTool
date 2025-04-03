@@ -1,5 +1,5 @@
 import psycopg2
-from sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, Base
+from sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL ,Base
 
 def create_db_connection_string(db_username, db_password, db_host, db_port, db_name):
     connection_url = "postgresql+psycopg2://" + db_username + ":" + db_password + "@" + db_host + ":" + db_port + "/" + db_name
@@ -124,7 +124,19 @@ def SELECT_PK_OBJECTIVES(db_connection):
         list_select_objectives.append(str_objectives)
     return list_select_objectives
 
-def insert_or_update_player(input_type, db_connection, classes_player = None, dict_matches = None):
+def SELECT_PK_CHAMPPOOL(db_connection):
+    # get objectives table from database
+    query_select_champpool = get_query("select", '"PUUID_CHAMP"', "playerdata", "champpool")
+    select_champpool = execute_query(db_connection, query_select_champpool)
+
+    list_select_champpool = []
+    # list with str datatypes of primary key
+    for champpool in select_champpool:
+        str_champpool = "".join(champpool)
+        list_select_champpool.append(str_champpool)
+    return list_select_champpool
+
+def insert_or_update_player(input_type, db_connection, classes_player = None, dict_matches = None, classes_champpool = None):
     if input_type == "player":
         # SELECT to check if UPDATE or INSERT
         list_select_player = SELECT_PK_PLAYER(db_connection)
@@ -322,6 +334,59 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
                     list_select_objectives.append(new_team.MATCHID_TEAMID)
                     again_do_i_need_equal_2 = execute_query(db_connection, query_insert)
 
+    if input_type == "champpool":
+
+        list_select_champpool = SELECT_PK_CHAMPPOOL(db_connection)
+        for champpool in classes_champpool:
+            new_champpool = CHAMPPOOL.from_champpool(champpool)
+
+        
+            
+            if new_champpool.PUUID_CHAMP in list_select_champpool:
+                columns_and_values = \
+                                    (
+                                      f'"puuid" = \'{new_champpool.puuid}\', '
+                                      f'"champ" = \'{new_champpool.champ}\', '
+                                      f'"name" = \'{new_champpool.name}\', '
+                                      f'"tagline" = \'{new_champpool.tagline}\', '
+                                      f'"games_played" = {new_champpool.games_played}, '
+                                      f'"kda" = {new_champpool.kda}, '
+                                      f'"kills" = {new_champpool.kills}, '
+                                      f'"deaths" = {new_champpool.deaths}, '
+                                      f'"assists" = {new_champpool.assists}, '
+                                      f'"cs" = {new_champpool.cs}, '
+                                      f'"exp" = {new_champpool.exp}, '
+                                      f'"level" = {new_champpool.level}, '
+                                      f'"gold" = {new_champpool.gold}, '
+                                      f'"visionscore" = {new_champpool.visionscore}, '
+                                      f'"cs_diff" = {new_champpool.cs_diff}, '
+                                      f'"exp_diff" = {new_champpool.exp_diff}, '
+                                      f'"level_diff" = {new_champpool.level_diff}, '
+                                      f'"gold_diff" = {new_champpool.gold_diff}, '
+                                      f'"visionscore_diff" = {new_champpool.visionscore_diff}, '
+                                      f'"summonerspell1" = \'{new_champpool.summonerspell1}\', '
+                                      f'"summonerspell2" = \'{new_champpool.summonerspell2}\', '
+                                      f'"fav_role" = \'{new_champpool.fav_role}\', '
+                                      f'"winrate" = {new_champpool.winrate}, '
+                                      f'"win_blue" = {new_champpool.win_blue}, '
+                                      f'"win_red" = {new_champpool.win_red}'
+                                    )
+                query_update = get_query("update",
+                                         table='"playerdata"."champpool"',
+                                         columns_and_values=columns_and_values,
+                                         key='"PUUID_CHAMP"',
+                                         keyvalue=new_champpool.PUUID_CHAMP)
+                again_do_i_need_equal_2 = execute_query(db_connection, query_update)
+
+
+            if new_champpool.PUUID_CHAMP not in list_select_champpool:
+                tablename = '"playerdata"."champpool"("PUUID_CHAMP", "puuid", "champ","name","tagline","games_played","kda","kills","deaths","assists","cs","exp","level","gold","visionscore","cs_diff","exp_diff","level_diff","gold_diff","visionscore_diff","summonerspell1","summonerspell2","fav_role","winrate","win_blue","win_red")'
+                values = f'\'{new_champpool.PUUID_CHAMP}\', \'{new_champpool.puuid}\', \'{new_champpool.champ}\', \'{new_champpool.name}\', \'{new_champpool.tagline}\', {new_champpool.games_played}, {new_champpool.kda}, {new_champpool.kills}, {new_champpool.deaths}, {new_champpool.assists}, {new_champpool.cs}, {new_champpool.exp}, {new_champpool.level}, {new_champpool.gold}, {new_champpool.visionscore}, {new_champpool.cs_diff}, {new_champpool.exp_diff}, {new_champpool.level_diff}, {new_champpool.gold_diff}, {new_champpool.visionscore_diff}, \'{new_champpool.summonerspell1}\', \'{new_champpool.summonerspell2}\', \'{new_champpool.fav_role}\', {new_champpool.winrate}, {new_champpool.win_blue}, {new_champpool.win_red}'
+
+                query_insert = get_query("insert", tablename=tablename, values=values)
+
+                #list_select_champpool.append(new_champpool.PUUID_CHAMP)
+                again_do_i_need_equal_2 = execute_query(db_connection, query_insert)
 
 
 
