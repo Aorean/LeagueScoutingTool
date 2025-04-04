@@ -3,6 +3,8 @@ from def_func import process_userinput, get_playerclass, get_matchhistoriesclass
 import os
 from dotenv import load_dotenv
 
+from avrg_stats import *
+
 
 
 load_dotenv()
@@ -30,25 +32,11 @@ classes_matchhistory = get_matchhistoriesclass(classes_player, region, api_key)
 #call riot api for single matches and saving it in a dict
 #key = matchid, value = list // list[0] = generall matchdata // list[1] = class stats all players // list[2] = class objectives
 dict_matches = process_matches(classes_matchhistory, region, api_key)
-#how to extract the data from dict_matches:
-"""
-for matchid in dict_matches:
-    match = dict_matches[matchid]
 
-    class_match = match[0]
-    participants = match[1]
-    objectives = match[2]
-
-
-
-
-    for participant in participants:
-
-        playerteamobjectives = objectives[participant.team]
-        print(participant.gamertag + "#" + participant.tagline + " " + participant.champ)
-"""
-
-
+#process matchdata from playerstats to get important data for champpools
+champpool_data = get_data_for_champpool(db_connection)
+#taking the above data and processing it into classes, getting a list of classes
+list_champpools = get_champpool(champpool_data)
 
 
 

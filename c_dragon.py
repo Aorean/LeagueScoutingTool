@@ -26,6 +26,4 @@ dict_summonerspells = get_id_name(summonerspells_json)
 dict_primary_runes = get_id_name(primary_rune_json)
 
 
-print(dict_items)
-print(dict_summonerspells)
-print(dict_primary_runes)
+

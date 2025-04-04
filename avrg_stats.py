@@ -1,14 +1,14 @@
 # getting data from existing sql tables, processing them and inserting them into
 # classes for a new table in sql
 # tables: player_arvg_stats, champpool_players
-from itertools import count
 
-from c_dragon import primary_rune_json
+
+
 from def_classes.champpool import Champpool
 from config import db_connection
 from sql_functions import *
 
-def get_data_for_champpool(db_connection):
+def get_data_for_champpool(db):
     #get matches from "playerstats" table
     query_playerstats = get_query(querytype="select", selection="*", schema="playerdata", table="playerstats")
     select_playerstats = execute_query(db_connection=db_connection, query=query_playerstats)
@@ -50,7 +50,7 @@ def get_champpool(to_process):
     puuids = to_process[0]
     game_datas = to_process[1]
 
-    print(game_datas)
+
     for puuid in puuids:
 
 
@@ -69,12 +69,13 @@ def get_champpool(to_process):
 
 
             #get kda
-            if player[9] > 0:
-                kda = round((player[8] + player[10])/player[9],2)
+            try:
+                kda = round((player[8] + player[10]) / player[9], 2)
                 player.append(kda)
-            elif player[9] == 0:
-                kda =  player[8] + player[10]
+            except ZeroDivisionError as e:
+                kda = player[8] + player[10]
                 player.append(kda)
+
 
             #getting diff stats
             #kills
@@ -104,12 +105,11 @@ def get_champpool(to_process):
 
             matchdata_player.append(player)
 
-            print(player)
-            print(opponent)
+
         list_champpool_classes = []
 
         for champ in unique_champs:
-            single_champ = Champpool(champ, puuid, )
+            single_champ = Champpool(champ, puuid)
             list_champpool_classes.append(single_champ)
 
 
@@ -117,7 +117,7 @@ def get_champpool(to_process):
         for match_data in matchdata_player:
             for champ_class in list_champpool_classes:
 
-                if match_data[6] == champ_class.champ:
+                if match_data[6] == champ_class.champ and match_data[1] == champ_class.puuid:
                     champ_class.count()
                     champ_class.name = match_data[3]
                     champ_class.tagline = match_data[4]
@@ -148,12 +148,3 @@ def get_champpool(to_process):
             all_champpools.append(champ_class)
 
     return all_champpools
-
-
-
-
-champpool_data = get_data_for_champpool(db_connection)
-
-list_champpools = get_champpool(champpool_data)
-
-
