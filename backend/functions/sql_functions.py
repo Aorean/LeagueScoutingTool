@@ -1,5 +1,6 @@
 import psycopg2
-from sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL ,Base
+from backend.def_classes.sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL
+
 
 def create_db_connection_string(db_username, db_password, db_host, db_port, db_name):
     connection_url = "postgresql+psycopg2://" + db_username + ":" + db_password + "@" + db_host + ":" + db_port + "/" + db_name
@@ -177,7 +178,7 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
     if input_type == "match":
         # MATCH
         list_select_match = SELECT_PK_MATCH(db_connection)
-        # iteration from last 20 matches, insert the ones that are new, update the ones that are old
+        # iteration from last 20 matches, insert the ones that are new, update the ones that are _archive
         for key in dict_matches:
             #dependencies
             match = dict_matches[key]

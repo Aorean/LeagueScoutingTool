@@ -1,9 +1,8 @@
-from dotenv import load_dotenv
-from def_classes.player import Player
-from def_classes.matchhistory import Matchhistory
+from backend.def_classes.player import Player
+from backend.def_classes.matchhistory import Matchhistory
 from def_classes.match import Match, Playerstats
 from def_classes.objectives import Objectives
-from c_dragon import *
+from backend.process_data.c_dragon import *
 
 from function_api import *
 

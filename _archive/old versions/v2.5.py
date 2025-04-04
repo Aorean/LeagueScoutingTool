@@ -45,15 +45,9 @@ import json
 from dotenv import load_dotenv
 import os
 
-from def_func import get_roleopponent, get_playerscouting, get_df_playerinfo, get_df_player, get_single_match
-from function_api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
-import pygsheets
+from backend.functions.def_func import get_roleopponent, get_playerscouting, get_single_match
+from backend.functions.function_api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
 import pandas as pd
-
-from pangres import upsert
-from sqlalchemy import text, create_engine
-
-from old.thoams import matchid
 
 load_dotenv()
 

@@ -1,9 +1,7 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, insert
-from sqlalchemy.orm import sessionmaker, declarative_base
-import psycopg2
-from sql_functions import *
+from backend.functions.sql_functions import *
+import pygsheets
 
 load_dotenv()
 #Login for Database
@@ -23,4 +21,8 @@ db_connection = [
 
 conn_url = create_db_connection_string(db_username, db_password, db_host, db_port, db_name)
 
+#google sheets data
+service_acc = pygsheets.authorize(service_account_file="json/spreadsheet-automator-449612-b3a5d5ca0942.json")
 
+sheet = service_acc.open_by_url(
+    "https://docs.google.com/spreadsheets/d/1iHweQST_7PNmN-PbfCDlZFUAhQzesQLrw60-WgrNK1I/edit?usp=sharing")

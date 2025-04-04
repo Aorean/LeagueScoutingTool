@@ -7,14 +7,12 @@ import json
 from dotenv import load_dotenv
 import os
 
-from function_api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
+from backend.functions.function_api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
 import pygsheets
 import pandas as pd
 
 from pangres import upsert
-from sqlalchemy import text, create_engine
-from sqlalchemy.engine import  URL
-import psycopg2
+from sqlalchemy import create_engine
 
 load_dotenv()
 
@@ -698,7 +696,7 @@ for game_puuid in puuid_match:
     full_match_info_df = pd.concat([full_match_info_df , match_info_df])
 
 # adding the data into the google sheet (some stuff needs to be fixed (obj, kda)
-service_acc = pygsheets.authorize(service_account_file="../json/spreadsheet-automator-449612-b3a5d5ca0942.json")
+service_acc = pygsheets.authorize(service_account_file="../backend/json/spreadsheet-automator-449612-b3a5d5ca0942.json")
 
 sheet = service_acc.open_by_url(
     "https://docs.google.com/spreadsheets/d/1iHweQST_7PNmN-PbfCDlZFUAhQzesQLrw60-WgrNK1I/edit?usp=sharing")

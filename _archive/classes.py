@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
 import os
-from old import class_file as class_file
+from _archive import class_file as class_file
 
-from function_api import get_puuid
+from backend.functions.function_api import get_puuid
 
 region = "europe"                                                   #input("Region: ")
 load_dotenv()

@@ -7,14 +7,12 @@ import json
 from dotenv import load_dotenv
 import os
 
-from function_api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
+from backend.functions.function_api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
 import pygsheets
 import pandas as pd
 
 from pangres import upsert
-from sqlalchemy import text, create_engine
-from sqlalchemy.engine import  URL
-import psycopg2
+from sqlalchemy import create_engine
 
 load_dotenv()
 

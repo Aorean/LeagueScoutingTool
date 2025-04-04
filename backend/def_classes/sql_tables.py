@@ -1,8 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, ARRAY, Text
+from sqlalchemy import Column, Integer, String, Boolean, Float, Text
 from sqlalchemy.orm import declarative_base
 
-from def_classes.match import Match, Playerstats
-from def_classes.player import Player
 from def_classes.objectives import Objectives
 
 

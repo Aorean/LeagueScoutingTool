@@ -5,17 +5,14 @@
 #dict for every Dataframe
 #key is primary key for SQL
 
-import json
-
 from dotenv import load_dotenv
 import os
 
 #import api functions
-from function_api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
+from backend.functions.function_api import get_puuid, get_summoner_id, get_rank
 
 #import def_classes
-import def_classes
-from def_classes.player import Player
+from backend.def_classes.player import Player
 from def_classes.player_info import Player_Info
 
 

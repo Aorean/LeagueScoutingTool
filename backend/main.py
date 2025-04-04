@@ -9,8 +9,8 @@ from sqlalchemy.orm import sessionmaker
 
 
 #my stuff
-from process_data import classes_player, dict_matches, list_champpools
-from sql_functions import *
+from backend.process_data.process_data import classes_player, dict_matches, list_champpools
+from backend.functions.sql_functions import *
 
 
 

@@ -1,10 +1,9 @@
 
-from def_func import process_userinput, get_playerclass, get_matchhistoriesclass, process_matches
+from backend.functions.def_func import process_userinput, get_playerclass, get_matchhistoriesclass, process_matches
 import os
 from dotenv import load_dotenv
 
 from avrg_stats import *
-
 
 
 load_dotenv()
@@ -12,11 +11,9 @@ api_key = os.environ.get("api_key")
 
 #read user_input
 user_input = []
-with open("user_input", "r") as f:
+with open("../user_input", "r") as f:
     for line in f:
         user_input.append(line)
-
-
 
 #use function to get data for API
 api_data = process_userinput(user_input)
