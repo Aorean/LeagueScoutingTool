@@ -2,9 +2,9 @@
 # classes for a new table in sql
 # tables: player_arvg_stats, champpool_players
 
-from backend.def_classes.champpool import Champpool
-from backend.config import db_connection
-from backend.functions.sql_functions import *
+from def_classes.champpool import Champpool
+from config_data import db_connection
+from functions.sql_functions import *
 
 def get_data_for_champpool(db):
     #get matches from "playerstats" table

@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float, Text
-from sqlalchemy.orm import declarative_base
+from db_base import Base
 
 from def_classes.objectives import Objectives
 
 
-Base = declarative_base()
+
 #Table for Player (=PLAYER)
 class PLAYER(Base):
     __table_args__ = {"schema": "playerdata"}
@@ -303,4 +303,33 @@ class CHAMPPOOL(Base):
             winrate=champpool.winrate,
             win_blue=champpool.win_blue,
             win_red=champpool.win_red
+        )
+
+class PLAYERINFO(Base):
+    __table_args__ = {"schema": "playerdata"}
+    __tablename__ = "playerinfo"
+
+    puuid = Column(String, primary_key=True, index=True)
+    summonerlevel = Column(Integer, nullable=False)
+    profile_icon = Column(Integer, nullable=False)
+    division = Column(String, nullable=False)
+    rank = Column(String, nullable=False)
+    wins_total = Column(Integer, nullable=False)
+    losses_total = Column(Integer, nullable=False)
+    stuck = Column(Boolean, nullable=False)
+
+    @classmethod
+    def from_playerinfo(cls, playerinfo):
+        return cls(            
+            __table_args__= {"schema": "playerdata"},
+            __tablename__= "playerinfo",
+
+            puuid = playerinfo.puuid,
+            summonerlevel = playerinfo.summonerlevel,
+            profile_icon = playerinfo.profile_icon,
+            division = playerinfo.division,
+            rank = playerinfo.rank,
+            wins_total = playerinfo.wins_total,
+            losses_total = playerinfo.losses_total,
+            stuck = playerinfo.stuck
         )

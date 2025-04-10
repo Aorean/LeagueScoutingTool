@@ -1,5 +1,5 @@
 import psycopg2
-from backend.def_classes.sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL
+from def_classes.sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL, PLAYERINFO
 
 
 def create_db_connection_string(db_username, db_password, db_host, db_port, db_name):
@@ -137,7 +137,19 @@ def SELECT_PK_CHAMPPOOL(db_connection):
         list_select_champpool.append(str_champpool)
     return list_select_champpool
 
-def insert_or_update_player(input_type, db_connection, classes_player = None, dict_matches = None, classes_champpool = None):
+def SELECT_PK_PLAYERINFO(db_connection):
+    # get objectives table from database
+    query_select_playerinfo = get_query("select", '"puuid"', "playerdata", "playerinfo")
+    select_playerinfo = execute_query(db_connection, query_select_playerinfo)
+
+    list_select_playerinfo = []
+    # list with str datatypes of primary key
+    for playerinfo in select_playerinfo:
+        str_playerinfo = "".join(playerinfo)
+        list_select_playerinfo.append(str_playerinfo)
+    return list_select_playerinfo
+
+def insert_or_update_player(input_type, db_connection, classes_player = None, dict_matches = None, classes_champpool = None, classes_playerinfo = None):
     if input_type == "player":
         # SELECT to check if UPDATE or INSERT
         list_select_player = SELECT_PK_PLAYER(db_connection)
@@ -282,6 +294,45 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
                     list_select_playerstats.append(new_participant.PUUID_MATCHID)
                     again_do_i_need_equal = execute_query(db_connection, query_insert)
 
+    if input_type == "playerinfo":
+        # PLAYERSTATS
+        list_select_playerinfo = SELECT_PK_PLAYERINFO(db_connection)
+        #upload participants
+
+
+        for playerinfo in classes_playerinfo:
+            new_playerinfo = PLAYERINFO.from_playerinfo(playerinfo)
+            
+            if new_playerinfo.puuid in list_select_playerinfo:
+                columns_and_values = \
+                                    (
+                                        f'"puuid" = \'{new_playerinfo.puuid}\', '
+                                        f'"summonerlevel" = {new_playerinfo.summonerlevel}, '
+                                        f'"profile_icon" = {new_playerinfo.profile_icon}, '
+                                        f'"division" = \'{new_playerinfo.division}\', '
+                                        f'"rank" = \'{new_playerinfo.rank}\', '
+                                        f'"wins_total" = {new_playerinfo.wins_total}, '
+                                        f'"losses_total" = {new_playerinfo.losses_total}, '
+                                        f'"stuck" = {new_playerinfo.stuck}'
+                                    )
+                query_update = get_query("update",
+                                            table='"playerdata"."playerinfo"',
+                                            columns_and_values=columns_and_values,
+                                            key='"puuid"',
+                                            keyvalue=new_playerinfo.puuid
+                                            )
+
+                again_do_i_need_equal = execute_query(db_connection,query_update)
+            
+            elif new_playerinfo.puuid not in list_select_playerinfo:
+                tablename = '"playerdata"."playerinfo"("puuid","summonerlevel","profile_icon","division","rank","wins_total","losses_total","stuck")'
+
+                values = f'\'{new_playerinfo.puuid}\', {new_playerinfo.summonerlevel}, {new_playerinfo.profile_icon}, \'{new_playerinfo.division}\', \'{new_playerinfo.rank}\', {new_playerinfo.wins_total}, {new_playerinfo.losses_total}, {new_playerinfo.stuck}'
+
+                query_insert = get_query("insert", tablename=tablename, values=values)
+
+                #list_select_playerinfo.append(new_playerinfo.PUUID_MATCHID)
+                again_do_i_need_equal = execute_query(db_connection, query_insert)
 
 
     if input_type == "objectives":

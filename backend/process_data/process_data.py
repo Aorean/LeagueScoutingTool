@@ -1,9 +1,9 @@
 
-from backend.functions.def_func import process_userinput, get_playerclass, get_matchhistoriesclass, process_matches
+from functions.def_func import process_userinput, get_playerclass, get_matchhistoriesclass, process_matches
 import os
 from dotenv import load_dotenv
 
-from avrg_stats import *
+from process_data.avrg_stats import *
 
 
 load_dotenv()
@@ -11,7 +11,7 @@ api_key = os.environ.get("api_key")
 
 #read user_input
 user_input = []
-with open("../user_input", "r") as f:
+with open("C:\\Users\\joels\\Desktop\\LeagueScoutingTool\\backend\\user_input", "r") as f:
     for line in f:
         user_input.append(line)
 
@@ -19,6 +19,10 @@ with open("../user_input", "r") as f:
 api_data = process_userinput(user_input)
 region = api_data[0]
 riot_ids = api_data[1]
+
+
+
+
 
 #call riot api for puuids and save it in a list of classes "classes_player"
 classes_player = get_playerclass(riot_ids, region, api_key)

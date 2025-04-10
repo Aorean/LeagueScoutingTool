@@ -1,10 +1,10 @@
-from backend.def_classes.player import Player
-from backend.def_classes.matchhistory import Matchhistory
+from def_classes.player import Player
+from def_classes.matchhistory import Matchhistory
 from def_classes.match import Match, Playerstats
 from def_classes.objectives import Objectives
-from backend.process_data.c_dragon import *
+from process_data.c_dragon import *
 
-from function_api import *
+from functions.function_api import *
 
 
 
@@ -12,8 +12,12 @@ def process_userinput(user_input):
     usernames = user_input[0].split(",")
     region = user_input[1]
 
+
+
+
     api_data = []
     api_data.append(region)
+    
 
     accounts = []
 
