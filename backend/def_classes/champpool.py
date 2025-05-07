@@ -2,6 +2,7 @@ class Champpool:
     def __init__(self, champ, puuid, matchdata=None):
         self.PUUID_CHAMP = puuid + champ
 
+
         self.puuid = puuid
         self.champ = champ
 

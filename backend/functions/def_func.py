@@ -3,7 +3,7 @@ from def_classes.matchhistory import Matchhistory
 from def_classes.match import Match, Playerstats
 from def_classes.objectives import Objectives
 from process_data.c_dragon import *
-
+from functions.sql_functions import get_query,execute_query, filter_matchhistory
 from functions.function_api import *
 
 
@@ -47,45 +47,84 @@ def get_matchhistoriesclass(classes_player, region, api_key):
     classes_matchhistory = []
     for class_player in classes_player:
         puuid = class_player.puuid
-        matchhistory = get_matchhistory(region, puuid, api_key)
-        class_matchhistory = Matchhistory(puuid, matchhistory)
+
+        #looping get matchhistory, so it gets more data until 
+        #return from api is empty
+
+        full_matchhistory = []
+        startindex = 0
+        while True:
+            matchhistory = get_matchhistory(region, puuid, api_key, startindex)
+            print(f"Matchhistory added {startindex}")
+            startindex+=100
+            
+            if not matchhistory:
+                break
+
+            for match in matchhistory:
+                full_matchhistory.append(match)
+        #add check if match is already in sql
+        #query_matchid = get_query(selection="matchid",schema="playerstats", table="match")
+        
+        class_matchhistory = Matchhistory(puuid, full_matchhistory)
         classes_matchhistory.append(class_matchhistory)
 
     return classes_matchhistory
 
-def process_matches(classes_matchhistory, region, api_key):
+def process_matches(classes_matchhistory, region, api_key, db_connection):
 
     full_matchinfo = {}
     for class_matchhistory in classes_matchhistory:
         matchids = class_matchhistory.matchhistory
-        for matchid in matchids:
+        filtered_matchhistory = filter_matchhistory(db_connection, matchids)
+        with open("matchhistory.txt", "w") as f:
+            for line in filtered_matchhistory:
+                f.write(line + "\n")
+
+        for matchid in filtered_matchhistory:
+
             single_match = get_match(region, matchid, api_key)
-
+            
             #generell matchdata
-            class_match = Match(class_matchhistory.puuid, matchid, single_match)
-            #checking for gamemode with important stats (ranked (+flexq))
-            if class_match.gamemode == "CLASSIC":
-                #participant matchdata
-                participants = single_match["info"]["participants"]
-                all_participants = []
-                for participant in participants:
-                    class_playerstats = Playerstats(participant, matchid, participant["puuid"])
-                    class_playerstats.translate_ids(dict_items, dict_summonerspells, dict_primary_runes)
-                    all_participants.append(class_playerstats)
+            print(single_match)
+            if "httpStatus" in single_match:
+                if single_match["httpStatus"] == 404:
+                    print("Match not found")
+            else:
+                class_match = Match(class_matchhistory.PUUID, matchid, single_match)
 
-                #objectives matchdata
-                teams = single_match["info"]["teams"]
-                objective_teams =  {}
+                ####### DEBUGGING ########
+                print(class_match.patch)
+                ####### DEBUGGING ########
 
-                for team in teams:
-                    objective_team = Objectives(team=team, matchid=matchid)
-                    objective_teams[objective_team.teamid] = objective_team
+                #checking for gamemode with important stats (ranked (+flexq))
+                if class_match.gamemode == "CLASSIC":
+                    #participant matchdata
+                    participants = single_match["info"]["participants"]
+                    cdragon_items = cdragon_request(class_match.patch, "items")
+                    cdragon_perks = cdragon_request(class_match.patch, "perks")
+                    cdragon_summonerspells = cdragon_request(class_match.patch, "summoner-spells")
+
+                    all_participants = []
+                    for participant in participants:
+                        class_playerstats = Playerstats(participant, matchid, participant["puuid"], single_match)
+                        
+                        class_playerstats.translate_ids(cdragon_items, cdragon_summonerspells, cdragon_perks)
+                        all_participants.append(class_playerstats)
+
+                    #objectives matchdata
+                    teams = single_match["info"]["teams"]
+                    objective_teams =  {}
+
+                    for team in teams:
+                        objective_team = Objectives(team=team, matchid=matchid)
+                        objective_teams[objective_team.teamid] = objective_team
 
 
-                matchinfo = [class_match, all_participants, objective_teams]
-                full_matchinfo.update({
-                    matchid: matchinfo
-                })
+                    matchinfo = [class_match, all_participants, objective_teams]
+                    full_matchinfo.update({
+                        matchid: matchinfo
+                    })
 
 
     return full_matchinfo

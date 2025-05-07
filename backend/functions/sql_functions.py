@@ -1,6 +1,6 @@
 import psycopg2
-from def_classes.sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL, PLAYERINFO
-
+from def_classes.sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL, PLAYERINFO, MATCHHISTORY
+import os
 
 def create_db_connection_string(db_username, db_password, db_host, db_port, db_name):
     connection_url = "postgresql+psycopg2://" + db_username + ":" + db_password + "@" + db_host + ":" + db_port + "/" + db_name
@@ -40,6 +40,7 @@ def get_query(querytype,
 
 def execute_query(db_connection, query):
     # curser
+    
     conn = psycopg2.connect(dbname=db_connection[0],
                             user=db_connection[1],
                             password=db_connection[2],
@@ -47,24 +48,31 @@ def execute_query(db_connection, query):
                             port=db_connection[4])
     cur = conn.cursor()
     #f string for whole query, to minimize diff functions, use query for every SQL method
+
+
+    type_query = str(type(query))
+    with open("queries.txt", "a", encoding="utf-8") as f:
+        f.write(query)
+
     print("trying query: " , query)
-    try:
-        cur.execute(f'{query}')
+    #try:
+    cur.execute(f'{query}')
 
-        if query.strip().startswith("SELECT"):
-            rows = cur.fetchall()
-            return rows
-        else:
-            conn.commit()
-
+    if query.strip().startswith("SELECT"):
+        rows = cur.fetchall()
+        return rows
+    else:
+        conn.commit()
+    """
     except psycopg2.ProgrammingError as e:
         print(f"ProgrammingError: Query couldnt be executed")
         #print(psycopg2.ProgrammingError)
     except psycopg2.DatabaseError as e:
         print(f"DatabaseError: Query couldnt be executed")
+        #print(psycopg2.DatabaseError)
     except Exception as e:
         print(f"UnexpectedError: Query couldnt be executed")
-
+    """
     conn.close()
     cur.close()
 
@@ -149,7 +157,40 @@ def SELECT_PK_PLAYERINFO(db_connection):
         list_select_playerinfo.append(str_playerinfo)
     return list_select_playerinfo
 
-def insert_or_update_player(input_type, db_connection, classes_player = None, dict_matches = None, classes_champpool = None, classes_playerinfo = None):
+def SELECT_PK_MATCHHISTORY(db_connection):
+        # get objectives table from database
+    query_select_puuid = get_query("select", '"PUUID"', "playerdata", "matchhistory")
+    select_puuid = execute_query(db_connection, query_select_puuid)
+
+    list_select_puuid = []
+    # list with str datatypes of primary key
+    for puuid in select_puuid:
+        str_puuid = "".join(puuid)
+        list_select_puuid.append(str_puuid)
+    return list_select_puuid
+    
+def filter_matchhistory(db_connection, matchhistory):
+    query_select_matchhistory = get_query("select", '"matchid"', "playerdata", "match")
+    select_matches = execute_query(db_connection, query_select_matchhistory)
+
+    list_matchhistory = []
+
+    filtered_matchhistory = []
+    for matchid in select_matches:
+        striped_id = matchid[0].strip()
+        list_matchhistory.append(striped_id)
+
+    for matchid in matchhistory:
+        
+
+        if matchid not in list_matchhistory:
+            filtered_matchhistory.append(matchid)
+        elif matchid in list_matchhistory:
+            continue
+    
+    return filtered_matchhistory
+
+def insert_or_update_player(input_type, db_connection, classes_player = None, dict_matches = None, classes_champpool = None, classes_playerinfo = None, matchhistories = None):
     if input_type == "player":
         # SELECT to check if UPDATE or INSERT
         list_select_player = SELECT_PK_PLAYER(db_connection)
@@ -207,7 +248,7 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
             # UPDATE the SQL Table with new content
             if new_match.PUUID_MATCHID in list_select_match:
                 # variables for get_query
-                columns_and_values = f'"puuid" = \'{new_match.puuid}\', "matchid" = \'{new_match.matchid}\', "participants" = \'{participants_sql}\', "gamestart" = {new_match.gamestart}, "gameend" = {new_match.gameend}, "gameduration" = {new_match.gameduration}, "tournamentcode" = \'{new_match.tournamentcode}\', "gamemode" = \'{new_match.gamemode}\''
+                columns_and_values = f'"puuid" = \'{new_match.puuid}\', "matchid" = \'{new_match.matchid}\', "participants" = \'{participants_sql}\', "gamestart" = {new_match.gamestart}, "gameend" = {new_match.gameend}, "gameduration" = {new_match.gameduration}, "tournamentcode" = \'{new_match.tournamentcode}\', "gamemode" = \'{new_match.gamemode}\', "season" = \'{new_match.season}\', "patch" = \'{new_match.patch}\''
                 query_update = get_query("update", table='"playerdata"."match"', columns_and_values=columns_and_values, key='"PUUID_MATCHID"', keyvalue=new_match.PUUID_MATCHID)
                 do_i_need_equal = execute_query(db_connection, query_update)
 
@@ -219,13 +260,13 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
                     (
                         '"playerdata"."match"'
                         '("PUUID_MATCHID", "puuid", "matchid", "participants", "gamestart", "gameend", '
-                        '"gameduration", "tournamentcode", "gamemode")'
+                        '"gameduration", "tournamentcode", "gamemode", "season", "patch")'
                      )
                 values = (
                     f"'{new_match.PUUID_MATCHID}', '{new_match.puuid}', '{new_match.matchid}', "
                           f"'{participants_sql}', {new_match.gamestart}, {new_match.gameend}, "
                           f"{new_match.gameduration}, '{new_match.tournamentcode}', "
-                          f"'{new_match.gamemode}'"
+                          f"'{new_match.gamemode}', '{new_match.season}', '{new_match.patch}'"
                 )
                 query_insert = get_query("insert", tablename=tablename, values=values)
                 list_select_match.append(new_match.PUUID_MATCHID)
@@ -439,8 +480,54 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
 
                 #list_select_champpool.append(new_champpool.PUUID_CHAMP)
                 again_do_i_need_equal_2 = execute_query(db_connection, query_insert)
+    """
+    if input_type =="matchhistory":
+        list_select_matchhistory = SELECT_PK_MATCHHISTORY(db_connection)
+        for matchhistory in matchhistories:
+            new_matchhistory = MATCHHISTORY.from_matchhistory(matchhistory)
+
+        
+
+            if new_matchhistory.PUUID in list_select_matchhistory:
+                edited_matchhistory = ""
+                edited_matchhistory += "ARRAY["
+                for match in new_matchhistory.matchhistory:
+                        edited_matchhistory+="'"
+                        edited_matchhistory+=match
+                        edited_matchhistory+="'"
+                        edited_matchhistory+=","
+                edited_matchhistory = edited_matchhistory[:len(edited_matchhistory)-1] +"]::VARCHAR"
+
+                ###########################################
+                
+                print(edited_matchhistory)        ##DEBUG##
+                
+                ###########################################
+                columns_and_values = \
+                                    (
+                                      f'"puuid" = \'{new_matchhistory.PUUID}\', '
+                                      f'"matchhistory" = {edited_matchhistory}, '
+
+                                    )
+                query_update = get_query("update",
+                                         table='"playerdata"."matchhistory"',
+                                         columns_and_values=columns_and_values,
+                                         key='"PUUID"',
+                                         keyvalue=new_matchhistory.PUUID)
+                again_do_i_need_equal_3 = execute_query(db_connection, query_update)
 
 
+            if new_matchhistory.PUUID not in list_select_matchhistory:
+
+
+                tablename = '"playerdata"."matchhistory"("PUUID", "matchhistory")'
+                values = f'\'{new_matchhistory.PUUID}\', ARRAY {new_matchhistory.matchhistory}::VARCHAR[]'
+
+                query_insert = get_query("insert", tablename=tablename, values=values)
+
+            #list_select_champpool.append(new_champpool.PUUID_CHAMP)
+            again_do_i_need_equal_3 = execute_query(db_connection, query_insert)
+    """
 
 
 

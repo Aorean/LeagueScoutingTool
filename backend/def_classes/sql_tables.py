@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, Text
+from sqlalchemy import Column, Integer, String, Boolean, Float, Text, ARRAY
 from db_base import Base
 
 from def_classes.objectives import Objectives
@@ -40,6 +40,9 @@ class MATCH(Base):
     gameduration = Column(String, nullable=False)
     tournamentcode = Column(String, nullable=False)
     gamemode = Column(String, nullable=False)
+    season = Column(String, nullable=False)
+    patch = Column(String, nullable=False)
+
 
     @classmethod
     def from_match(cls, match):
@@ -61,7 +64,9 @@ class MATCH(Base):
             gameend=match.gameend,
             gameduration=match.gameduration,
             tournamentcode=tc,
-            gamemode=match.gamemode
+            gamemode=match.gamemode,
+            season=match.season,
+            patch=match.patch
         )
 
 #Table for Playerstats (=PLAYERSTATS)
@@ -332,4 +337,21 @@ class PLAYERINFO(Base):
             wins_total = playerinfo.wins_total,
             losses_total = playerinfo.losses_total,
             stuck = playerinfo.stuck
+        )
+
+class MATCHHISTORY(Base):
+    __table_args__ = {"schema": "playerdata"}
+    __tablename__ = "matchhistory"
+
+    PUUID = Column(String, primary_key=True, index=True)
+    matchhistory = Column(ARRAY(String), nullable=False)
+
+    @classmethod
+    def from_matchhistory(cls, matchhistory):
+        return cls(            
+            __table_args__= {"schema": "playerdata"},
+            __tablename__= "matchhistory",
+
+            PUUID = matchhistory.PUUID,
+            matchhistory = matchhistory.matchhistory
         )

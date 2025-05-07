@@ -1,4 +1,4 @@
-
+from config_data import db_connection
 from functions.def_func import process_userinput, get_playerclass, get_matchhistoriesclass, process_matches
 import os
 from dotenv import load_dotenv
@@ -32,7 +32,12 @@ classes_matchhistory = get_matchhistoriesclass(classes_player, region, api_key)
 
 #call riot api for single matches and saving it in a dict
 #key = matchid, value = list // list[0] = generall matchdata // list[1] = class stats all players // list[2] = class objectives
-dict_matches = process_matches(classes_matchhistory, region, api_key)
+dict_matches = process_matches(classes_matchhistory, region, api_key, db_connection)
+
+for matchid in dict_matches:
+    matchinfo = dict_matches[matchid][0]
+    print("season: ",matchinfo.season)
+    print("patch: " ,matchinfo.patch)
 
 #process matchdata from playerstats to get important data for champpools
 champpool_data = get_data_for_champpool(db_connection)

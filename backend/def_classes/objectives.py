@@ -1,19 +1,23 @@
 class Objectives:
     def __init__(self, team, matchid):
+
         self.MATCHID_TEAMID = matchid + str(team["teamId"])
         self.matchid = matchid
         self.teamid = team["teamId"]
-        self.baronfirst = team["objectives"]["baron"]["first"]
-        self.baronkills = team["objectives"]["baron"]["kills"]
-        self.atakhanfirst = team["objectives"]["atakhan"]["first"]
-        self.atakhankills = team["objectives"]["atakhan"]["kills"]
-        self.grubsfirst = team["objectives"]["horde"]["first"]
-        self.grubskills = team["objectives"]["horde"]["kills"]
-        self.dragonfirst = team["objectives"]["dragon"]["first"]
-        self.dragonkills = team["objectives"]["dragon"]["kills"]
-        self.riftheraldfirst = team["objectives"]["riftHerald"]["first"]
-        self.riftheraldkills = team["objectives"]["riftHerald"]["kills"]
-        self.towerfirst = team["objectives"]["tower"]["first"]
-        self.towerkills = team["objectives"]["tower"]["kills"]
-        self.inhibfirst = team["objectives"]["inhibitor"]["first"]
-        self.inhibkills = team["objectives"]["inhibitor"]["kills"]
+
+        objectives = team.get("objectives", 0)
+
+        self.baronfirst = objectives.get("baron", {}).get("first", False)
+        self.baronkills = objectives.get("baron", {}).get("kills", False)
+        self.atakhanfirst = objectives.get("atakhan", {}).get("first", False)
+        self.atakhankills = objectives.get("atakhan", {}).get("kills", False)
+        self.grubsfirst = objectives.get("horde", {}).get("first", False)
+        self.grubskills = objectives.get("horde", {}).get("kills", False)
+        self.dragonfirst = objectives.get("dragon", {}).get("first", False)
+        self.dragonkills = objectives.get("dragon", {}).get("kills", False)
+        self.riftheraldfirst = objectives.get("riftHerald", {}).get("first", False)
+        self.riftheraldkills = objectives.get("riftHerald", {}).get("kills", False)
+        self.towerfirst = objectives.get("tower", {}).get("first", False)
+        self.towerkills = objectives.get("tower", {}).get("kills", False)
+        self.inhibfirst = objectives.get("inhibitor", {}).get("first", False)
+        self.inhibkills = objectives.get("inhibitor", {}).get("kills", False)

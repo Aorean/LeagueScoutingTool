@@ -1,8 +1,18 @@
 class Match:
     def __init__ (self, puuid, matchid, single_match):
+
+        
+
         metadata = single_match["metadata"]
         participants = metadata["participants"]
         info = single_match["info"]
+
+        full_patch = info["gameVersion"]
+        list_patch = full_patch.split(".")
+        season = list_patch[0]
+        patch = str(list_patch[0])+"."+str(list_patch[1])
+        
+
         self.PUUID_MATCHID = puuid + matchid
         self.puuid = puuid
         self.matchid = matchid
@@ -12,14 +22,24 @@ class Match:
         self.gameduration = str(info["gameDuration"])
         self.tournamentcode = info["tournamentCode"]
         self.gamemode = info["gameMode"]
+        self.season = season
+        self.patch = patch
 
 
 class Playerstats:
 
-    def __init__(self, participant, matchid, puuid):
+    def __init__(self, participant, matchid, puuid, single_match):
+        info = single_match["info"]
+
+        full_patch = info["gameVersion"]
+        list_patch = full_patch.split(".")
+        season = list_patch[0]
+        patch = list_patch[0]+list_patch[1]
+
         self.PUUID_MATCHID = puuid + matchid
         self.puuid = participant["puuid"]
         self.matchid = matchid
+
         self.gamertag = participant["riotIdGameName"]
         self.tagline = participant["riotIdTagline"]
         self.team = participant["teamId"]
@@ -45,6 +65,8 @@ class Playerstats:
         self.keyrune = participant["perks"]["styles"][0]["selections"][0]["perk"]
         self.win = participant["win"]
 
+        self.season = season
+        self.patch = patch
 
     def translate_ids(self, dict_items, dict_summonerspells, dict_primary_rune):
 

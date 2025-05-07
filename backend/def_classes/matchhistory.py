@@ -1,4 +1,4 @@
 class Matchhistory:
     def __init__(self, puuid, matchhistory):
-        self.puuid = puuid
+        self.PUUID = puuid
         self.matchhistory = matchhistory

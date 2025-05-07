@@ -1,0 +1,3 @@
+SELECT "matchid" FROM "playerdata"."match"SELECT * FROM "playerdata"."playerstats"SELECT puuid FROM "playerdata"."player"SELECT "puuid" FROM "playerdata"."player"UPDATE "playerdata"."player"
+SET "gamertag" = 'Aorean', "tagline" = '1311'
+WHERE "puuid" = 'bO5blHOm9YeY2MXm15I3DiHVtQPb8PuQov9J-wJ4X3CBuhjScuFDdaEM7VMFtciIC5htsuFYT43ytw'SELECT "PUUID_MATCHID" FROM "playerdata"."match"SELECT puuid FROM "playerdata"."player"

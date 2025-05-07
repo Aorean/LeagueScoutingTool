@@ -1,7 +1,7 @@
 import requests
 import time
 
-def get_puuid(summoner_name, tag_line, region, api_key):
+def get_puuid(summoner_name: str, tag_line, region, api_key):
     # request Riot API to get puuid for further use
     root_url = f"https://{region}.api.riotgames.com/"
     puuid_url = f"riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag_line}?api_key={api_key}"
@@ -13,17 +13,18 @@ def get_puuid(summoner_name, tag_line, region, api_key):
 
     return puuid
 
-def get_matchhistory(region, puuid, api_key, startTime=20250108):
+def get_matchhistory(region, puuid, api_key, startindex):
     root_url = f"https://{region}.api.riotgames.com/"
-    history_url = f"lol/match/v5/matches/by-puuid/{puuid}/ids?{startTime}&api_key={api_key}"
+    history_url = f"lol/match/v5/matches/by-puuid/{puuid}/ids?startTime=20250108&start={startindex}&count=100&api_key={api_key}"
     while True:
         response_history = requests.get(root_url + history_url)
         if response_history == 429:
-            time.sleep(10)
+            time.sleep(120)
             continue
 
         return response_history.json()
 
+#/ids?start=1000&count=100&
 
 def get_match(region, matchId, api_key):
     root_url = f"https://{region}.api.riotgames.com/"
@@ -33,7 +34,8 @@ def get_match(region, matchId, api_key):
         resp_match = requests.get(root_url + match_url)
         if resp_match.status_code == 429:
             print("API limit reached, please wait!")
-            time.sleep(10)
+            time.sleep(120)
+
             continue
 
         response_match = resp_match.json()

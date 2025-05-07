@@ -42,16 +42,26 @@ def get_data_for_champpool(db):
 
     return to_process
 
+
+
 def get_champpool(to_process):
     amnt_players = len(to_process[1])
     all_champpools = []
     puuids = to_process[0]
     game_datas = to_process[1]
-
+    
+    
+    index_season = 0
 
     for puuid in puuids:
-
-
+        """
+        seasons_played = []
+        for game in game_datas:
+            if game[30] in seasons_played:       #add index for season
+                continue
+            elif game[30] not in seasons_played: #add index for season
+                seasons_played.append(game[30])  #add index for season
+        """
         #amount of champions
         unique_champs = []
 
@@ -59,7 +69,7 @@ def get_champpool(to_process):
         for game_data in game_datas:
             player = list(game_data[0])
             opponent = list(game_data[1])
-
+            
             #filling unique_champs
             if puuid == player[1]:
                 if player[6] not in unique_champs:
