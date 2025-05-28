@@ -45,8 +45,8 @@ import json
 from dotenv import load_dotenv
 import os
 
-from backend.functions.def_func import get_roleopponent, get_playerscouting, get_single_match
-from backend.functions.function_api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
+from backend.functions.general import get_roleopponent, get_playerscouting, get_single_match
+from backend.functions.api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
 import pandas as pd
 
 load_dotenv()

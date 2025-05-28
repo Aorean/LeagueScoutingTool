@@ -1,11 +1,11 @@
-from functions.function_api import get_summoner_id, get_rank
-from functions.sql_functions import get_query, execute_query
-from def_classes.player_info import Playerinfo
+from backend.functions.api import get_summoner_id, get_rank
+from backend.functions.psql import get_query, execute_query
+from backend.def_classes.summoners_rift import Playerinfo
 
 
 import os
 from dotenv import load_dotenv
-from config_data import db_connection
+from backend.config import db_connection
 
 
 load_dotenv()

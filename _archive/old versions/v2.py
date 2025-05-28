@@ -7,7 +7,7 @@ import json
 from dotenv import load_dotenv
 import os
 
-from backend.functions.function_api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
+from backend.functions.api import get_puuid, get_matchhistory, get_match, get_summoner_id, get_rank
 import pygsheets
 import pandas as pd
 

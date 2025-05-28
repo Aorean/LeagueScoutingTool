@@ -2,9 +2,9 @@
 # classes for a new table in sql
 # tables: player_arvg_stats, champpool_players
 
-from def_classes.champpool import Champpool
-from config_data import db_connection
-from functions.sql_functions import *
+from backend.def_classes.summoners_rift import Champpool
+from backend.config import db_connection
+from backend.functions.psql import *
 
 def get_data_for_champpool(db):
     #get matches from "playerstats" table
@@ -15,8 +15,14 @@ def get_data_for_champpool(db):
     query_player = get_query(querytype="select", selection="puuid", schema="playerdata", table="player")
     select_player = execute_query(db_connection=db_connection, query=query_player)
 
-
+    #get "match" table
+    query_match = get_query(querytype="select", selection="matchid, season", schema="playerdata", table="match")
+    select_matchids = execute_query(db_connection=db_connection, query=query_match)
+    print(select_matchids)
     list_puuid = []
+
+    # dict with puuid as a key and seasons played (list) as value
+    all_seasons_played = {}
 
     #cleanup "player" tuple (remove "(...,)"
     for v in select_player:
@@ -24,20 +30,34 @@ def get_data_for_champpool(db):
 
     champpool_data = []
     for puuid in list_puuid:
+        seasons_played = []
+        for match in select_matchids:
+            matchid = match[0]
+            season = match[1]
 
+            if season not in seasons_played:
+                seasons_played.append(season)
+            elif season in seasons_played:
+                continue
+
+        all_seasons_played[puuid] = seasons_played
         for matchdata in select_playerstats:
-
-
             if puuid == matchdata[1]:
                 champpool_data.append([matchdata])
 
+    print(all_seasons_played)
     for gamedata in champpool_data:
         for matchdata in select_playerstats:
 
             if gamedata[0][2] == matchdata[2] and gamedata[0][7] == matchdata[7]:
                 if gamedata[0][1] != matchdata[1]:
                     gamedata.append(matchdata)
+                    for matchid in select_matchids:
+                        if matchid[0] == gamedata[0][2]:
+                            gamedata.append(matchid[1])
+                            
 
+    print(champpool_data)
     to_process =[list_puuid, champpool_data]
 
     return to_process
@@ -151,7 +171,7 @@ def get_champpool(to_process):
 
         for champ_class in list_champpool_classes:
             champ_class.avarage_stats()
-            champ_class.print_all()
+            
 
             all_champpools.append(champ_class)
 

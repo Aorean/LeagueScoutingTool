@@ -1,9 +1,10 @@
-from config_data import db_connection
-from functions.def_func import process_userinput, get_playerclass, get_matchhistoriesclass, process_matches
+from backend.config import db_connection
+from backend.functions.general import get_playerclass, get_matchhistoriesclass
+from backend.functions.process import process_userinput, process_matches
 import os
 from dotenv import load_dotenv
 
-from process_data.avrg_stats import *
+from backend.process_data.avrg_stats import *
 
 
 load_dotenv()

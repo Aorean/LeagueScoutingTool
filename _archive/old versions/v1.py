@@ -6,7 +6,7 @@
 from dotenv import load_dotenv
 import os
 import requests
-from backend.functions.function_api import get_puuid, get_matchhistory, get_match
+from backend.functions.api import get_puuid, get_matchhistory, get_match
 import pygsheets
 import pandas as pd
 

@@ -1,4 +1,4 @@
-from backend.functions.function_api import get_puuid, get_match,  get_matchhistory
+from backend.functions.api import get_puuid, get_match,  get_matchhistory
 
 
 import os

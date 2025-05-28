@@ -9,11 +9,11 @@ from dotenv import load_dotenv
 import os
 
 #import api functions
-from backend.functions.function_api import get_puuid, get_summoner_id, get_rank
+from backend.functions.api import get_puuid, get_summoner_id, get_rank
 
 #import def_classes
-from backend.def_classes.player import Player
-from def_classes.player_info import Player_Info
+from backend.def_classes.summoners_rift import Player
+from backend.def_classes.summoners_rift import Player_Info
 
 
 load_dotenv()

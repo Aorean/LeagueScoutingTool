@@ -1,7 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float, Text, ARRAY
-from db_base import Base
-
-from def_classes.objectives import Objectives
+from backend.db_base import Base
 
 
 
@@ -101,6 +99,9 @@ class PLAYERSTATS(Base):
     item6 = Column(String, nullable=False)
     keyrune = Column(String, nullable=False)
     win = Column(Boolean, nullable=False)
+    season = Column(String, nullable=False)
+    patch = Column(String, nullable=False)
+
 
     @classmethod
     def from_playerstats(cls, playerstats):
@@ -143,7 +144,9 @@ class PLAYERSTATS(Base):
         item5=playerstats.item5,
         item6=playerstats.item6,
         keyrune=playerstats.keyrune,
-        win=playerstats.win
+        win=playerstats.win,
+        season=playerstats.season,
+        patch=playerstats.patch
         )
 
 class OBJECTIVES(Base):
@@ -354,4 +357,229 @@ class MATCHHISTORY(Base):
 
             PUUID = matchhistory.PUUID,
             matchhistory = matchhistory.matchhistory
+        )
+
+
+
+
+##############
+#### ARAM ####
+##############
+class ARAM_MATCH(Base):
+    __table_args__ = {"schema": "playerdata"}
+    __tablename__ = "aram_match"
+
+    PUUID_MATCHID = Column(String, primary_key=True, index=True)
+    puuid = Column(String, nullable=False)
+    matchid = Column(String, nullable=False)
+    participants = Column(String, nullable=False)
+    gamestart = Column(String, nullable=False)
+    gameend = Column(String, nullable=False)
+    gameduration = Column(String, nullable=False)
+    gamemode = Column(String, nullable=False)
+    season = Column(String, nullable=False)
+    patch = Column(String, nullable=False)
+
+
+    @classmethod
+    def from_match(cls, match):
+        return cls(
+            __table_args__={"schema": "playerdata"},
+            __tablename__="aram_match",
+
+            PUUID_MATCHID=match.PUUID_MATCHID,
+            puuid=match.puuid,
+            matchid=match.matchid,
+            participants=match.participants,
+            gamestart=match.gamestart,
+            gameend=match.gameend,
+            gameduration=match.gameduration,
+            gamemode=match.gamemode,
+            season=match.season,
+            patch=match.patch
+        )
+
+class ARAM_PLAYERSTATS(Base):
+    __table_args__ = {"schema": "playerdata"}
+    __tablename__ = "aram_playerstats"
+
+
+    PUUID_MATCHID = Column(String, primary_key=True, index=True)
+    puuid = Column(String, nullable=False)
+    matchid = Column(String, nullable=False)
+    gamertag = Column(String, nullable=False)
+    tagline = Column(String, nullable=False)
+    team = Column(Integer, nullable=False)
+    champ = Column(String, nullable=False)
+    kills = Column(Integer, nullable=False)
+    deaths = Column(Integer, nullable=False)
+    assists = Column(Integer, nullable=False)
+    cs = Column(Integer, nullable=False)
+    level = Column(Integer, nullable=False)
+    exp = Column(Integer, nullable=False)
+    gold = Column(Integer, nullable=False)
+    summonerspell1 = Column(String, nullable=False)
+    summonerspell2 = Column(String, nullable=False)
+    item1 = Column(String, nullable=False)
+    item2 = Column(String, nullable=False)
+    item3 = Column(String, nullable=False)
+    item4 = Column(String, nullable=False)
+    item5 = Column(String, nullable=False)
+    item6 = Column(String, nullable=False)
+    keyrune = Column(String, nullable=False)
+    win = Column(Boolean, nullable=False)
+    season = Column(String, nullable=False)
+    patch = Column(String, nullable=False)
+    @classmethod
+    def from_playerstats(cls, playerstats):
+        defeat = "FALSE"
+        victory = "TRUE"
+
+        if playerstats.win:
+            playerstats.win = victory
+        elif not playerstats.win:
+            playerstats.win = defeat
+
+
+        return cls(
+        __table_args__={"schema": "playerdata"},
+        __tablename__="aram_playerstats",
+
+
+        PUUID_MATCHID=playerstats.PUUID_MATCHID,
+        puuid=playerstats.puuid,
+        matchid=playerstats.matchid,
+        gamertag=playerstats.gamertag,
+        tagline=playerstats.tagline,
+        team=playerstats.team,
+        champ=playerstats.champ,
+        kills=playerstats.kills,
+        deaths=playerstats.deaths,
+        assists=playerstats.assists,
+        cs=playerstats.cs,
+        level=playerstats.level,
+        exp=playerstats.exp,
+        gold=playerstats.gold,
+        summonerspell1=playerstats.summonerspell1,
+        summonerspell2=playerstats.summonerspell2,
+        item1=playerstats.item1,
+        item2=playerstats.item2,
+        item3=playerstats.item3,
+        item4=playerstats.item4,
+        item5=playerstats.item5,
+        item6=playerstats.item6,
+        keyrune=playerstats.keyrune,
+        win=playerstats.win,
+        season=playerstats.season,
+        patch=playerstats.patch
+        )
+    
+###############
+#### Arena ####
+###############
+class ARENA_MATCH(Base):
+    __table_args__ = {"schema": "playerdata"}
+    __tablename__ = "arena_match"
+
+    PUUID_MATCHID = Column(String, primary_key=True, index=True)
+    puuid = Column(String, nullable=False)
+    matchid = Column(String, nullable=False)
+    participants = Column(String, nullable=False)
+    gamestart = Column(String, nullable=False)
+    gameend = Column(String, nullable=False)
+    gameduration = Column(String, nullable=False)
+    gamemode = Column(String, nullable=False)
+    season = Column(String, nullable=False)
+    patch = Column(String, nullable=False)
+
+
+    @classmethod
+    def from_match(cls, match):
+        return cls(
+            __table_args__={"schema": "playerdata"},
+            __tablename__="arena_match",
+
+            PUUID_MATCHID=match.PUUID_MATCHID,
+            puuid=match.puuid,
+            matchid=match.matchid,
+            participants=match.participants,
+            gamestart=match.gamestart,
+            gameend=match.gameend,
+            gameduration=match.gameduration,
+            gamemode=match.gamemode,
+            season=match.season,
+            patch=match.patch
+        )
+
+class ARENA_PLAYERSTATS(Base):
+    __table_args__ = {"schema": "playerdata"}
+    __tablename__ = "arena_playerstats"
+
+
+    PUUID_MATCHID = Column(String, primary_key=True, index=True)
+    puuid = Column(String, nullable=False)
+    matchid = Column(String, nullable=False)
+    gamertag = Column(String, nullable=False)
+    tagline = Column(String, nullable=False)
+    team = Column(Integer, nullable=False)
+    champ = Column(String, nullable=False)
+    kills = Column(Integer, nullable=False)
+    deaths = Column(Integer, nullable=False)
+    assists = Column(Integer, nullable=False)
+    level = Column(Integer, nullable=False)
+    exp = Column(Integer, nullable=False)
+    gold = Column(Integer, nullable=False)
+    summonerspell1 = Column(String, nullable=False)
+    summonerspell2 = Column(String, nullable=False)
+    item1 = Column(String, nullable=False)
+    item2 = Column(String, nullable=False)
+    item3 = Column(String, nullable=False)
+    item4 = Column(String, nullable=False)
+    item5 = Column(String, nullable=False)
+    item6 = Column(String, nullable=False)
+    keyrune = Column(String, nullable=False)
+    win = Column(Boolean, nullable=False)
+    season = Column(String, nullable=False)
+    patch = Column(String, nullable=False)
+    @classmethod
+    def from_playerstats(cls, playerstats):
+        defeat = "FALSE"
+        victory = "TRUE"
+
+        if playerstats.win:
+            playerstats.win = victory
+        elif not playerstats.win:
+            playerstats.win = defeat
+
+
+        return cls(
+        __table_args__={"schema": "playerdata"},
+        __tablename__="arena_playerstats",
+
+
+        PUUID_MATCHID=playerstats.PUUID_MATCHID,
+        puuid=playerstats.puuid,
+        matchid=playerstats.matchid,
+        gamertag=playerstats.gamertag,
+        tagline=playerstats.tagline,
+        team=playerstats.team,
+        champ=playerstats.champ,
+        kills=playerstats.kills,
+        deaths=playerstats.deaths,
+        assists=playerstats.assists,
+        level=playerstats.level,
+        exp=playerstats.exp,
+        gold=playerstats.gold,
+        summonerspell1=playerstats.summonerspell1,
+        summonerspell2=playerstats.summonerspell2,
+        item1=playerstats.item1,
+        item2=playerstats.item2,
+        item3=playerstats.item3,
+        item4=playerstats.item4,
+        item5=playerstats.item5,
+        item6=playerstats.item6,
+        keyrune=playerstats.keyrune,
+        win=playerstats.win,
+        season=playerstats.season,
+        patch=playerstats.patch
         )

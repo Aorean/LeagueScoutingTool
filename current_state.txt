@@ -1,0 +1,24 @@
+currently:
+    backend>function>general>process_matches
+
+
+        I figured out how to get the keys for classes, maybe use them in a function
+        to create queries in insert or update
+
+        get champpool season based
+
+        fix problem with matchhistory check/filter
+
+
+to do:
+    get insert or update ready for extra matchdata
+
+    get db matchcheck ready
+
+    test database
+
+    later, add gsheet function to get gsheet graphs if wanted 
+
+    api to comunicate with database
+
+    frontend 
