@@ -32,7 +32,7 @@ for playerinfo in json_playerinfos:
     playerinfo_class = Playerinfo(playerinfo)
     list_playerinfos_class.append(playerinfo_class)
 
-    print(playerinfo_class.puuid)
+
 
 
 

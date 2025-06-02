@@ -7,7 +7,7 @@ from backend.db_base import Base
 #SQL imports
 from sqlalchemy.orm import sessionmaker
 
-
+import json
 
 #my stuff
 from backend.functions.psql import *
@@ -28,8 +28,7 @@ DB_OBJECTIVES = OBJECTIVES()
 DB_CHAMPPOOL = CHAMPPOOL()
 DB_PLAYERINFO = PLAYERINFO()
 DB_MATCHHISTORY = MATCHHISTORY()
-DB_ARAM_MATCH = ARAM_MATCH()
-DB_ARENA_MATCH = ARENA_MATCH()
+
 
 #create tables if not in sql
 Base.metadata.create_all(db_engine)
@@ -56,17 +55,20 @@ insert_or_update_player("player" ,db_connection, classes_player=classes_player)
 from backend.process_data.process_data import dict_matches
 #getting dict of classes matches/playerstats/objectives
 dict_matches = dict_matches
+
+
+
 #function to insert or update matchdatas
 insert_or_update_player("match" ,db_connection, dict_matches=dict_matches)
 insert_or_update_player("playerstats" ,db_connection, dict_matches=dict_matches)
 insert_or_update_player("objectives" ,db_connection, dict_matches=dict_matches)
 
 #import
-from backend.process_data.process_data import list_champpools
+#from backend.process_data.process_data import list_champpools
 #getting list of classes champpools
-classes_champpool = list_champpools
+#classes_champpool = list_champpools
 #function to insert or update champool
-insert_or_update_player("champpool" ,db_connection, classes_champpool=classes_champpool)
+#insert_or_update_player("champpool" ,db_connection, classes_champpool=classes_champpool)
 
 #import
 from backend.process_data.playerinfo import export as list_playerinfos_class

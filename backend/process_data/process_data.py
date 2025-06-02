@@ -35,15 +35,12 @@ classes_matchhistory = get_matchhistoriesclass(classes_player, region, api_key)
 #key = matchid, value = list // list[0] = generall matchdata // list[1] = class stats all players // list[2] = class objectives
 dict_matches = process_matches(classes_matchhistory, region, api_key, db_connection)
 
-for matchid in dict_matches:
-    matchinfo = dict_matches[matchid][0]
-    print("season: ",matchinfo.season)
-    print("patch: " ,matchinfo.patch)
+
 
 #process matchdata from playerstats to get important data for champpools
-champpool_data = get_data_for_champpool(db_connection)
+#champpool_data = get_data_for_champpool(db_connection)
 #taking the above data and processing it into classes, getting a list of classes
-list_champpools = get_champpool(champpool_data)
+#list_champpools = get_champpool(champpool_data)
 
 
 

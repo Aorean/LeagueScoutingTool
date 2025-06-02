@@ -29,9 +29,47 @@ class Matchhistory:
 class Match:
     def __init__ (self, puuid, matchid, single_match):
 
+
+
         metadata = single_match["metadata"]
         participants = metadata["participants"]
         info = single_match["info"]
+
+        #getting early surrender for teams
+
+        blueteam_earlyff_list = []
+        redteam_earlyff_list = []
+
+        for participant in info["participants"]:
+            if participant["teamId"] == 100:
+                if participant["teamEarlySurrendered"] == True:
+                    blueteam_earlyff_list.append(True)
+                if participant["teamEarlySurrendered"] == False:
+                    blueteam_earlyff_list.append(False)
+
+            if participant["teamId"] == 200:
+                if participant["teamEarlySurrendered"] == True:
+                    redteam_earlyff_list.append(True)
+                if participant["teamEarlySurrendered"] == False:
+                    redteam_earlyff_list.append(False)
+
+        blueteam_earlyff_sum = sum(blueteam_earlyff_list)
+        redteam_earlyff_sum = sum(redteam_earlyff_list)
+
+
+
+
+        if blueteam_earlyff_sum > 3:
+            blueteam_earlyff = True
+        else: 
+            blueteam_earlyff = False
+
+        if redteam_earlyff_sum > 3:
+            redteam_earlyff = True
+        else: 
+            redteam_earlyff = False
+
+        early_surrender = blueteam_earlyff is True or redteam_earlyff is True
 
         full_patch = info["gameVersion"]
         list_patch = full_patch.split(".")
@@ -46,9 +84,13 @@ class Match:
         self.gameend = str(info["gameEndTimestamp"])
         self.gameduration = str(info["gameDuration"])
         self.tournamentcode = info["tournamentCode"]
-        self.gamemode = info["gameMode"]
+        self.gamemode = int(info["queueId"])
         self.season = season
         self.patch = patch
+        self.mapid = int(info["mapId"])
+        self.earlysurrender_blue = blueteam_earlyff
+        self.earlysurrender_red = redteam_earlyff
+        self.earlysurrender = early_surrender
 
 
 class Playerstats:
@@ -93,6 +135,9 @@ class Playerstats:
 
         self.season = season
         self.patch = patch
+        self.mapid = int(info["mapId"])
+
+        self.gamemode = int(info["queueId"])
 
 
     def translate_ids(self, dict_items, dict_summonerspells, dict_primary_rune):
@@ -142,7 +187,12 @@ class Playerstats:
 
         pr_id1 = self.keyrune
 
-        self.keyrune = dict_primary_rune[pr_id1]
+        if self.keyrune == 0:
+            self.keyrune = 0
+        else:
+            self.keyrune= dict_primary_rune[pr_id1]
+
+
 
     def print_all(self):
         for k,v in self.__dict__.items():
@@ -157,20 +207,20 @@ class Objectives:
 
         objectives = team.get("objectives", 0)
 
-        self.baronfirst = objectives.get("baron", {}).get("first", False)
-        self.baronkills = objectives.get("baron", {}).get("kills", False)
-        self.atakhanfirst = objectives.get("atakhan", {}).get("first", False)
-        self.atakhankills = objectives.get("atakhan", {}).get("kills", False)
-        self.grubsfirst = objectives.get("horde", {}).get("first", False)
-        self.grubskills = objectives.get("horde", {}).get("kills", False)
-        self.dragonfirst = objectives.get("dragon", {}).get("first", False)
-        self.dragonkills = objectives.get("dragon", {}).get("kills", False)
-        self.riftheraldfirst = objectives.get("riftHerald", {}).get("first", False)
-        self.riftheraldkills = objectives.get("riftHerald", {}).get("kills", False)
-        self.towerfirst = objectives.get("tower", {}).get("first", False)
-        self.towerkills = objectives.get("tower", {}).get("kills", False)
-        self.inhibfirst = objectives.get("inhibitor", {}).get("first", False)
-        self.inhibkills = objectives.get("inhibitor", {}).get("kills", False)
+        self.baronfirst = objectives.get("baron", {}).get("first", "FALSE")
+        self.baronkills = objectives.get("baron", {}).get("kills", 0)
+        self.atakhanfirst = objectives.get("atakhan", {}).get("first", "FALSE")
+        self.atakhankills = objectives.get("atakhan", {}).get("kills", 0)
+        self.grubsfirst = objectives.get("horde", {}).get("first", "FALSE")
+        self.grubskills = objectives.get("horde", {}).get("kills", 0)
+        self.dragonfirst = objectives.get("dragon", {}).get("first", "FALSE")
+        self.dragonkills = objectives.get("dragon", {}).get("kills", 0)
+        self.riftheraldfirst = objectives.get("riftHerald", {}).get("first", "FALSE")
+        self.riftheraldkills = objectives.get("riftHerald", {}).get("kills", 0)
+        self.towerfirst = objectives.get("tower", {}).get("first", "FALSE")
+        self.towerkills = objectives.get("tower", {}).get("kills", 0)
+        self.inhibfirst = objectives.get("inhibitor", {}).get("first", "FALSE")
+        self.inhibkills = objectives.get("inhibitor", {}).get("kills", 0)
 
 
 class Champpool:
@@ -363,15 +413,3 @@ class Champpool:
             print(f"{str(k)} = {str(v)}")
 
 
-#### HOWLING ABYSS ####
-
-
-
-
-
-
-#### ARENA ####
-
-
-
-#### BANDLE CITY ####

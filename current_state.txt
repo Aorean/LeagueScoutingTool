@@ -21,4 +21,44 @@ to do:
 
     api to comunicate with database
 
-    frontend 
+    frontend
+
+    found an issue:
+         ..psql [line281], only uploads rank games, need to check in playerstats, not in matches
+         for filtered_matchhistory
+
+
+
+    _________________________
+
+    MUST DO!!
+    Remove ARAM_MATCH, ARENA_MATCH and save all in
+    MATCH (PSQL TABLE) 
+
+    REMOVE PLAYERSTATS for not summonersrift games!
+
+    TOURNAMENTCODE might be a problem, find 
+    workaround
+    --> Tournamentcode and other stuff that 
+    necessery "Nullable=True"
+
+    look into team early surrender!!!
+
+    added early ff in match table --> NVM early ff is not accurate, always false, check why
+    -> filter matches if early ff or not
+    --> use only not ff'ed games for champpool
+
+    to_process = 
+{
+	puuid = 
+		[ 
+			{season1 = 
+				[[matchdata1, opponentdata1], [matchdata2, opponentdata2], ...],
+			season2 =
+				[[matchdata1, opponentdata1], [matchdata2, opponentdata2], ...],
+
+
+infodto
+    ->queueId
+        420 = flexqueue
+        440 = solo/duo

@@ -1,5 +1,5 @@
 import psycopg2
-from backend.def_classes.sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL, PLAYERINFO, MATCHHISTORY, ARAM_MATCH, ARENA_MATCH
+from backend.def_classes.sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL, PLAYERINFO, MATCHHISTORY
 import os
 
 def create_db_connection_string(db_username, db_password, db_host, db_port, db_name):
@@ -14,7 +14,9 @@ def get_query(querytype,
           values=None,
           columns_and_values=None,
           key=None,
-          keyvalue=None
+          keyvalue=None,
+          column=None,
+          value=None
               ):
     #querytypes = select, insert, update
     if querytype == "select":
@@ -32,6 +34,8 @@ def get_query(querytype,
         # columns_and_values = column1 = "value1", column2 = "value2", ...
         # key = name of the primarykey column
         # keyvalue = value of the primary key column that should be updated
+    elif querytype == "select_where":
+        query = f'SELECT {selection} FROM "{schema}"."{table}"\nWHERE {column} = \'{value}\''
     else:
         print("ERROR: Wrong querytype")
         query = None
@@ -40,7 +44,8 @@ def get_query(querytype,
 
 def execute_query(db_connection, query):
     # curser
-    
+
+    print(query)
     conn = psycopg2.connect(dbname=db_connection[0],
                             user=db_connection[1],
                             password=db_connection[2],
@@ -50,9 +55,7 @@ def execute_query(db_connection, query):
     #f string for whole query, to minimize diff functions, use query for every SQL method
 
 
-    type_query = str(type(query))
-    with open("queries.txt", "a", encoding="utf-8") as f:
-        f.write(query)
+
 
     #print("trying query: " , query)
     #try:
@@ -199,21 +202,17 @@ def filter_matchhistory(db_connection, matchhistory):
     query_select_matchhistory = get_query("select", '"matchid"', "playerdata", "match")
     select_matches = execute_query(db_connection, query_select_matchhistory)
     
-    query_select_matchhistory_aram = get_query("select", '"matchid"', "playerdata", "aram_match")
-    select_matches_aram = execute_query(db_connection, query_select_matchhistory_aram)
 
-    query_select_matchhistory_arena = get_query("select", '"matchid"', "playerdata", "arena_match")
-    select_matches_arena = execute_query(db_connection, query_select_matchhistory_arena)
 
-    queuetypes = [select_matches, select_matches_aram, select_matches_arena]
+
 
     list_matchhistory = []
 
     filtered_matchhistory = []
-    for queues in queuetypes:
-        for matchid in queues:
-            striped_id = matchid[0].strip()
-            list_matchhistory.append(striped_id)
+  
+    for matchid in select_matches:
+        striped_id = matchid[0].strip()
+        list_matchhistory.append(striped_id)
 
 
     for matchid in matchhistory:
@@ -268,8 +267,7 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
     if input_type == "match":
         # MATCH
         list_select_match = SELECT_PK_MATCH(db_connection)
-        list_select_match_aram = SELECT_PK_MATCH_ARAM(db_connection)
-        list_select_match_arena = SELECT_PK_MATCH_ARENA(db_connection)
+
         # iteration from last 20 matches, insert the ones that are new, update the ones that are _archive
         for key in dict_matches:
             #dependencies
@@ -279,119 +277,44 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
             queue_type = class_match.gamemode
 
 
-            if queue_type == "CLASSIC":
-
-                # create sql class
-                new_match = MATCH.from_match(class_match)
-                participants_sql = get_participants_sql(new_match)
 
 
-                # does the class already exist?:
-                # YES it exists
-                # UPDATE the SQL Table with new content
-                if new_match.PUUID_MATCHID in list_select_match:
-                    # variables for get_query
-                    columns_and_values = f'"puuid" = \'{new_match.puuid}\', "matchid" = \'{new_match.matchid}\', "participants" = \'{participants_sql}\', "gamestart" = {new_match.gamestart}, "gameend" = {new_match.gameend}, "gameduration" = {new_match.gameduration}, "tournamentcode" = \'{new_match.tournamentcode}\', "gamemode" = \'{new_match.gamemode}\', "season" = \'{new_match.season}\', "patch" = \'{new_match.patch}\''
-                    query_update = get_query("update", table='"playerdata"."match"', columns_and_values=columns_and_values, key='"PUUID_MATCHID"', keyvalue=new_match.PUUID_MATCHID)
-                    do_i_need_equal = execute_query(db_connection, query_update)
+            # create sql class
+            new_match = MATCH.from_match(class_match)
+            participants_sql = get_participants_sql(new_match)
 
-                # NO it does not exist
-                # INSERT the new data
-                elif new_match.PUUID_MATCHID not in list_select_match:
-                    # variables for get_query
-                    tablename = \
-                        (
-                            '"playerdata"."match"'
-                            '("PUUID_MATCHID", "puuid", "matchid", "participants", "gamestart", "gameend", '
-                            '"gameduration", "tournamentcode", "gamemode", "season", "patch")'
-                        )
-                    values = (
-                        f"'{new_match.PUUID_MATCHID}', '{new_match.puuid}', '{new_match.matchid}', "
-                            f"'{participants_sql}', {new_match.gamestart}, {new_match.gameend}, "
-                            f"{new_match.gameduration}, '{new_match.tournamentcode}', "
-                            f"'{new_match.gamemode}', '{new_match.season}', '{new_match.patch}'"
+
+            # does the class already exist?:
+            # YES it exists
+            # UPDATE the SQL Table with new content
+            if new_match.PUUID_MATCHID in list_select_match:
+                # variables for get_query
+                columns_and_values = f'"puuid" = \'{new_match.puuid}\', "matchid" = \'{new_match.matchid}\', "participants" = \'{participants_sql}\', "gamestart" = {new_match.gamestart}, "gameend" = {new_match.gameend}, "gameduration" = {new_match.gameduration}, "tournamentcode" = \'{new_match.tournamentcode}\', "gamemode" = {new_match.gamemode}, "season" = \'{new_match.season}\', "patch" = \'{new_match.patch}\', "mapid" = {new_match.mapid}, "earlysurrender_blue" = {new_match.earlysurrender_blue}, "earlysurrender_blue" = {new_match.earlysurrender_red}, "earlysurrender" = {new_match.earlysurrender}'
+                query_update = get_query("update", table='"playerdata"."match"', columns_and_values=columns_and_values, key='"PUUID_MATCHID"', keyvalue=new_match.PUUID_MATCHID)
+                do_i_need_equal = execute_query(db_connection, query_update)
+
+            # NO it does not exist
+            # INSERT the new data
+            elif new_match.PUUID_MATCHID not in list_select_match:
+                # variables for get_query
+                tablename = \
+                    (
+                        '"playerdata"."match"'
+                        '("PUUID_MATCHID", "puuid", "matchid", "participants", "gamestart", "gameend", '
+                        '"gameduration", "tournamentcode", "gamemode", "season", "patch", "mapid", "earlysurrender_blue", "earlysurrender_red", "earlysurrender")'
                     )
-                    query_insert = get_query("insert", tablename=tablename, values=values)
-                    list_select_match.append(new_match.PUUID_MATCHID)
-                    do_i_need_equal = execute_query(db_connection, query_insert)
+                values = (
+                    f"'{new_match.PUUID_MATCHID}', '{new_match.puuid}', '{new_match.matchid}', "
+                        f"'{participants_sql}', {new_match.gamestart}, {new_match.gameend}, "
+                        f"{new_match.gameduration}, '{new_match.tournamentcode}', "
+                        f"{new_match.gamemode}, '{new_match.season}', '{new_match.patch}', {new_match.mapid}, "
+                        f"'{new_match.earlysurrender_blue}', '{new_match.earlysurrender_red}', '{new_match.earlysurrender}'"
+                )
+                query_insert = get_query("insert", tablename=tablename, values=values)
+                list_select_match.append(new_match.PUUID_MATCHID)
+                do_i_need_equal = execute_query(db_connection, query_insert)
 
 
-
-
-
-            if queue_type == "CHERRY":
-
-                    # create sql class
-                    new_match = ARENA_MATCH.from_match(class_match)
-                    participants_sql = get_participants_sql(new_match)
-
-
-                    # does the class already exist?:
-                    # YES it exists
-                    # UPDATE the SQL Table with new content
-                    if new_match.PUUID_MATCHID in list_select_match_arena:
-                        # variables for get_query
-                        columns_and_values = f'"puuid" = \'{new_match.puuid}\', "matchid" = \'{new_match.matchid}\', "participants" = \'{participants_sql}\', "gamestart" = {new_match.gamestart}, "gameend" = {new_match.gameend}, "gameduration" = {new_match.gameduration}, "gamemode" = \'{new_match.gamemode}\', "season" = \'{new_match.season}\', "patch" = \'{new_match.patch}\''
-                        query_update = get_query("update", table='"playerdata"."arena_match"', columns_and_values=columns_and_values, key='"PUUID_MATCHID"', keyvalue=new_match.PUUID_MATCHID)
-                        do_i_need_equal = execute_query(db_connection, query_update)
-
-                    # NO it does not exist
-                    # INSERT the new data
-                    elif new_match.PUUID_MATCHID not in list_select_match_arena:
-                        # variables for get_query
-                        tablename = \
-                            (
-                                '"playerdata"."arena_match"'
-                                '("PUUID_MATCHID", "puuid", "matchid", "participants", "gamestart", "gameend", '
-                                '"gameduration", "gamemode", "season", "patch")'
-                            )
-                        values = (
-                            f"'{new_match.PUUID_MATCHID}', '{new_match.puuid}', '{new_match.matchid}', "
-                                f"'{participants_sql}', {new_match.gamestart}, {new_match.gameend}, "
-                                f"{new_match.gameduration},"
-                                f"'{new_match.gamemode}', '{new_match.season}', '{new_match.patch}'"
-                        )
-                        query_insert = get_query("insert", tablename=tablename, values=values)
-                        list_select_match.append(new_match.PUUID_MATCHID)
-                        do_i_need_equal = execute_query(db_connection, query_insert)
-
-
-
-            if queue_type == "ARAM":
-
-                # create sql class
-                new_match = ARAM_MATCH.from_match(class_match)
-                participants_sql = get_participants_sql(new_match)
-
-
-                # does the class already exist?:
-                # YES it exists
-                # UPDATE the SQL Table with new content
-                if new_match.PUUID_MATCHID in list_select_match_aram:
-                    # variables for get_query
-                    columns_and_values = f'"puuid" = \'{new_match.puuid}\', "matchid" = \'{new_match.matchid}\', "participants" = \'{participants_sql}\', "gamestart" = {new_match.gamestart}, "gameend" = {new_match.gameend}, "gameduration" = {new_match.gameduration}, "gamemode" = \'{new_match.gamemode}\', "season" = \'{new_match.season}\', "patch" = \'{new_match.patch}\''
-                    query_update = get_query("update", table='"playerdata"."aram_match"', columns_and_values=columns_and_values, key='"PUUID_MATCHID"', keyvalue=new_match.PUUID_MATCHID)
-                    do_i_need_equal = execute_query(db_connection, query_update)
-
-                # NO it does not exist
-                # INSERT the new data
-                elif new_match.PUUID_MATCHID not in list_select_match_aram:
-                    # variables for get_query
-                    tablename = \
-                        (
-                            '"playerdata"."aram_match"'
-                            '("PUUID_MATCHID", "puuid", "matchid", "participants", "gamestart", "gameend", '
-                            '"gameduration", "gamemode", "season", "patch")'
-                        )
-                    values = (
-                        f"'{new_match.PUUID_MATCHID}', '{new_match.puuid}', '{new_match.matchid}', "
-                            f"'{participants_sql}', {new_match.gamestart}, {new_match.gameend}, "
-                            f"{new_match.gameduration},"
-                            f"'{new_match.gamemode}', '{new_match.season}', '{new_match.patch}'"
-                    )
-                    query_insert = get_query("insert", tablename=tablename, values=values)
-                    list_select_match.append(new_match.PUUID_MATCHID)
-                    do_i_need_equal = execute_query(db_connection, query_insert)
 
 
     if input_type == "playerstats":
@@ -404,58 +327,68 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
 
             class_match = match[0]
             list_class_participants = match[1]
-            list_class_objectives = match[2]
+
 
             for participant in list_class_participants:
+                
+            
                 new_participant = PLAYERSTATS.from_playerstats(participant)
+
+
+
 
                 if new_participant.PUUID_MATCHID in list_select_playerstats:
                     columns_and_values = \
                                         (
-                                          f'"puuid" = \'{new_participant.puuid}\', '
-                                          f'"matchid" = \'{new_participant.matchid}\', '
-                                          f'"gamertag" = \'{new_participant.gamertag}\', '
-                                          f'"tagline" = \'{new_participant.tagline}\', '
-                                          f'"team" = {new_participant.team}, '
-                                          f'"champ" = \'{new_participant.champ}\', '
-                                          f'"role" = \'{new_participant.role}\', '
-                                          f'"kills" = {new_participant.kills}, '
-                                          f'"deaths" = {new_participant.deaths}, '
-                                          f'"assists" = {new_participant.assists}, '
-                                          f'"cs" = {new_participant.cs}, '
-                                          f'"level" = {new_participant.level}, '
-                                          f'"exp" = {new_participant.exp}, '
-                                          f'"gold" = {new_participant.gold}, '
-                                          f'"visionscore" = {new_participant.visionscore}, '
-                                          f'"summonerspell1" = \'{new_participant.summonerspell1}\', '
-                                          f'"summonerspell2" = \'{new_participant.summonerspell2}\', '
-                                          f'"item1" = \'{new_participant.item1}\', '
-                                          f'"item2" = \'{new_participant.item2}\', '
-                                          f'"item3" = \'{new_participant.item3}\', '
-                                          f'"item4" = \'{new_participant.item4}\', '
-                                          f'"item5" = \'{new_participant.item5}\', '
-                                          f'"item6" = \'{new_participant.item6}\', '
-                                          f'"keyrune" = \'{new_participant.keyrune}\', '
-                                          f'"win" = {new_participant.win}'
+                                        f'"puuid" = \'{new_participant.puuid}\', '
+                                        f'"matchid" = \'{new_participant.matchid}\', '
+                                        f'"gamertag" = \'{new_participant.gamertag}\', '
+                                        f'"tagline" = \'{new_participant.tagline}\', '
+                                        f'"team" = {new_participant.team}, '
+                                        f'"champ" = \'{new_participant.champ}\', '
+                                        f'"role" = \'{new_participant.role}\', '
+                                        f'"kills" = {new_participant.kills}, '
+                                        f'"deaths" = {new_participant.deaths}, '
+                                        f'"assists" = {new_participant.assists}, '
+                                        f'"cs" = {new_participant.cs}, '
+                                        f'"level" = {new_participant.level}, '
+                                        f'"exp" = {new_participant.exp}, '
+                                        f'"gold" = {new_participant.gold}, '
+                                        f'"visionscore" = {new_participant.visionscore}, '
+                                        f'"summonerspell1" = \'{new_participant.summonerspell1}\', '
+                                        f'"summonerspell2" = \'{new_participant.summonerspell2}\', '
+                                        f'"item1" = \'{new_participant.item1}\', '
+                                        f'"item2" = \'{new_participant.item2}\', '
+                                        f'"item3" = \'{new_participant.item3}\', '
+                                        f'"item4" = \'{new_participant.item4}\', '
+                                        f'"item5" = \'{new_participant.item5}\', '
+                                        f'"item6" = \'{new_participant.item6}\', '
+                                        f'"keyrune" = \'{new_participant.keyrune}\', '
+                                        f'"win" = {new_participant.win}, '
+                                        f'"mapid" = {new_participant.mapid}, '
+                                        f'"gamemode" = {new_participant.gamemode}'
                                         )
                     query_update = get_query("update",
-                                             table='"playerdata"."playerstats"',
-                                             columns_and_values=columns_and_values,
-                                             key='"PUUID_MATCHID"',
-                                             keyvalue=new_participant.PUUID_MATCHID
-                                             )
+                                            table='"playerdata"."playerstats"',
+                                            columns_and_values=columns_and_values,
+                                            key='"PUUID_MATCHID"',
+                                            keyvalue=new_participant.PUUID_MATCHID
+                                            )
 
                     again_do_i_need_equal = execute_query(db_connection,query_update)
 
                 elif new_participant.PUUID_MATCHID not in list_select_playerstats:
-                    tablename = '"playerdata"."playerstats"("PUUID_MATCHID","puuid","matchid","gamertag","tagline","team","champ","role","kills","deaths","assists","cs","level","exp","gold","visionscore","summonerspell1","summonerspell2","item1","item2","item3","item4","item5","item6","keyrune","win")'
+                    tablename = '"playerdata"."playerstats"("PUUID_MATCHID","puuid","matchid","gamertag","tagline","team","champ","role","kills","deaths","assists","cs","level","exp","gold","visionscore","summonerspell1","summonerspell2","item1","item2","item3","item4","item5","item6","keyrune","win","season","patch","mapid", "gamemode")'
 
-                    values = f'\'{new_participant.PUUID_MATCHID}\', \'{new_participant.puuid}\', \'{new_participant.matchid}\', \'{new_participant.gamertag}\', \'{new_participant.tagline}\', {new_participant.team}, \'{new_participant.champ}\', \'{new_participant.role}\', {new_participant.kills}, {new_participant.deaths}, {new_participant.assists}, {new_participant.cs}, {new_participant.level}, {new_participant.exp}, {new_participant.gold}, {new_participant.visionscore}, \'{new_participant.summonerspell1}\', \'{new_participant.summonerspell2}\', \'{new_participant.item1}\', \'{new_participant.item2}\', \'{new_participant.item3}\', \'{new_participant.item4}\', \'{new_participant.item5}\', \'{new_participant.item6}\', \'{new_participant.keyrune}\', {new_participant.win}'
+                    values = f'\'{new_participant.PUUID_MATCHID}\', \'{new_participant.puuid}\', \'{new_participant.matchid}\', \'{new_participant.gamertag}\', \'{new_participant.tagline}\', {new_participant.team}, \'{new_participant.champ}\', \'{new_participant.role}\', {new_participant.kills}, {new_participant.deaths}, {new_participant.assists}, {new_participant.cs}, {new_participant.level}, {new_participant.exp}, {new_participant.gold}, {new_participant.visionscore}, \'{new_participant.summonerspell1}\', \'{new_participant.summonerspell2}\', \'{new_participant.item1}\', \'{new_participant.item2}\', \'{new_participant.item3}\', \'{new_participant.item4}\', \'{new_participant.item5}\', \'{new_participant.item6}\', \'{new_participant.keyrune}\', {new_participant.win}, \'{new_participant.season}\', \'{new_participant.patch}\', {new_participant.mapid}, {new_participant.gamemode}'
 
                     query_insert = get_query("insert", tablename=tablename, values=values)
 
                     list_select_playerstats.append(new_participant.PUUID_MATCHID)
                     again_do_i_need_equal = execute_query(db_connection, query_insert)
+
+
+
 
     if input_type == "playerinfo":
         # PLAYERSTATS
@@ -500,6 +433,7 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
 
     if input_type == "objectives":
         # OBJECTIVES
+        
         list_select_objectives = SELECT_PK_OBJECTIVES(db_connection)
         #upload objectives
         for key in dict_matches:

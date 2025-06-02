@@ -13,7 +13,7 @@ primary_rune_json = requests.get(primary_rune).json()
 def cdragon_request(patch, request_object):
     cdragon_url = f"https://raw.communitydragon.org/{patch}/plugins/rcp-be-lol-game-data/global/default/v1/{request_object}.json"
     return_json = requests.get(cdragon_url ).json()
-    print("URL: " + cdragon_url)
+
 
     obj_dict = {}
     for obj in return_json:

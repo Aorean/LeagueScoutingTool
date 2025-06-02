@@ -34,7 +34,17 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
         matchids = class_matchhistory.matchhistory
         filtered_matchhistory = filter_matchhistory(db_connection, matchids)
 
+        #tracking to process
+        index = 0
+        total = len(filtered_matchhistory)
+
+
         for matchid in filtered_matchhistory:
+            
+            #tracking to process
+            index+=1
+            print(f"Processed {index} from {total}\n To process: {total - index}")
+
 
             single_match = get_match(region, matchid, api_key)
             
@@ -51,46 +61,44 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
 
             else:
                 class_match = Match(class_matchhistory.PUUID, matchid, single_match)
-                ###########
-                ###DEBUG###
-                ###########
-                print("GAMEMODE: ", class_match.gamemode)
+
                 cdragon_items = cdragon_request(class_match.patch, "items")
                 cdragon_perks = cdragon_request(class_match.patch, "perks")
                 cdragon_summonerspells = cdragon_request(class_match.patch, "summoner-spells")
                 #checking for gamemode with important stats (ranked (+flexq))
-                if class_match.gamemode == "CLASSIC":
+                #if class_match.gamemode == "CLASSIC":
+
+
                     #participant matchdata
-                    participants = single_match["info"]["participants"]
+                participants = single_match["info"]["participants"]
 
 
-                    all_participants = []
-                    for participant in participants:
-                        ###########
-                        ###DEBUG###
-                        ###########
-                        class_playerstats = Playerstats(participant, matchid, participant["puuid"], single_match)
-                        print("ID: " , class_playerstats.matchid)
-                        print("SINGLE MATCH: ", single_match["info"]["gameVersion"])
-                        print("CLASS MATCH: ", class_playerstats.patch)
+                all_participants = []
+                for participant in participants:
 
-                        class_playerstats.translate_ids(cdragon_items, cdragon_summonerspells, cdragon_perks)
-                        all_participants.append(class_playerstats)
-
-                    #objectives matchdata
-                    teams = single_match["info"]["teams"]
-                    objective_teams =  {}
-
-                    for team in teams:
-                        objective_team = Objectives(team=team, matchid=matchid)
-                        objective_teams[objective_team.teamid] = objective_team
+                    class_playerstats = Playerstats(participant, matchid, participant["puuid"], single_match)
 
 
-                    matchinfo = [class_match, all_participants, objective_teams]
-                    full_matchinfo.update({
-                        matchid: matchinfo
-                    })
+                    class_playerstats.translate_ids(cdragon_items, cdragon_summonerspells, cdragon_perks)
+                    all_participants.append(class_playerstats)
 
+                #objectives matchdata
+                teams = single_match["info"]["teams"]
+                objective_teams =  {}
+
+
+                
+                for team in teams:
+                    objective_team = Objectives(team=team, matchid=matchid)
+                    objective_teams[objective_team.teamid] = objective_team
+
+
+                matchinfo = [class_match, all_participants, objective_teams]
+                full_matchinfo.update({
+                    matchid: matchinfo
+                })
+
+                """
                 #ARENA
                 if class_match.gamemode =="CHERRY":
                     all_participants = []
@@ -121,5 +129,5 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
                     full_matchinfo.update({
                         matchid: matchinfo
                     })
-                    
+                """
     return full_matchinfo

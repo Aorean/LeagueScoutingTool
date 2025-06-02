@@ -36,10 +36,14 @@ class MATCH(Base):
     gamestart = Column(String, nullable=False)
     gameend = Column(String, nullable=False)
     gameduration = Column(String, nullable=False)
-    tournamentcode = Column(String, nullable=False)
-    gamemode = Column(String, nullable=False)
+    tournamentcode = Column(String, nullable=True)
+    gamemode = Column(Integer, nullable=False)
     season = Column(String, nullable=False)
     patch = Column(String, nullable=False)
+    mapid = Column(Integer, nullable=False)
+    earlysurrender_blue = Column(Boolean, nullable=False)
+    earlysurrender_red = Column(Boolean, nullable=False)
+    earlysurrender = Column(Boolean, nullable=False)
 
 
     @classmethod
@@ -64,7 +68,11 @@ class MATCH(Base):
             tournamentcode=tc,
             gamemode=match.gamemode,
             season=match.season,
-            patch=match.patch
+            patch=match.patch,
+            mapid=match.mapid,
+            earlysurrender_blue=match.earlysurrender_blue,
+            earlysurrender_red=match.earlysurrender_red,
+            earlysurrender=match.earlysurrender
         )
 
 #Table for Playerstats (=PLAYERSTATS)
@@ -80,15 +88,15 @@ class PLAYERSTATS(Base):
     tagline = Column(String, nullable=False)
     team = Column(Integer, nullable=False)
     champ = Column(String, nullable=False)
-    role = Column(String, nullable=False)
+    role = Column(String, nullable=True)
     kills = Column(Integer, nullable=False)
     deaths = Column(Integer, nullable=False)
     assists = Column(Integer, nullable=False)
-    cs = Column(Integer, nullable=False)
+    cs = Column(Integer, nullable=True)
     level = Column(Integer, nullable=False)
     exp = Column(Integer, nullable=False)
     gold = Column(Integer, nullable=False)
-    visionscore = Column(Integer, nullable=False)
+    visionscore = Column(Integer, nullable=True)
     summonerspell1 = Column(String, nullable=False)
     summonerspell2 = Column(String, nullable=False)
     item1 = Column(String, nullable=False)
@@ -97,11 +105,12 @@ class PLAYERSTATS(Base):
     item4 = Column(String, nullable=False)
     item5 = Column(String, nullable=False)
     item6 = Column(String, nullable=False)
-    keyrune = Column(String, nullable=False)
+    keyrune = Column(String, nullable=True)
     win = Column(Boolean, nullable=False)
     season = Column(String, nullable=False)
     patch = Column(String, nullable=False)
-
+    mapid = Column(Integer, nullable=False)
+    gamemode = Column(Integer, nullable=False)
 
     @classmethod
     def from_playerstats(cls, playerstats):
@@ -146,7 +155,9 @@ class PLAYERSTATS(Base):
         keyrune=playerstats.keyrune,
         win=playerstats.win,
         season=playerstats.season,
-        patch=playerstats.patch
+        patch=playerstats.patch,
+        mapid=playerstats.mapid,
+        gamemode=playerstats.gamemode
         )
 
 class OBJECTIVES(Base):
@@ -361,7 +372,7 @@ class MATCHHISTORY(Base):
 
 
 
-
+"""
 ##############
 #### ARAM ####
 ##############
@@ -583,3 +594,4 @@ class ARENA_PLAYERSTATS(Base):
         season=playerstats.season,
         patch=playerstats.patch
         )
+"""

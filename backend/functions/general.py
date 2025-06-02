@@ -24,6 +24,10 @@ def get_matchhistoriesclass(classes_player, region, api_key):
         #looping get matchhistory, so it gets more data until 
         #return from api is empty
 
+
+
+        
+        
         full_matchhistory = []
         startindex = 0
         while True:
@@ -39,8 +43,9 @@ def get_matchhistoriesclass(classes_player, region, api_key):
         #add check if match is already in sql
         #query_matchid = get_query(selection="matchid",schema="playerstats", table="match")
         
-        class_matchhistory = Matchhistory(puuid, full_matchhistory)
+        class_matchhistory = Matchhistory(puuid, full_matchhistory)  
         classes_matchhistory.append(class_matchhistory)
+
 
     return classes_matchhistory
 
