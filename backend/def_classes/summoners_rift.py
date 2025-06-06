@@ -224,8 +224,8 @@ class Objectives:
 
 
 class Champpool:
-    def __init__(self, champ, puuid, matchdata=None):
-        self.PUUID_CHAMP = puuid + champ
+    def __init__(self, champ, puuid, season, matchdata=None):
+        self.PUUID_CHAMP_SEASON = puuid + champ + season
 
 
         self.puuid = puuid
@@ -262,6 +262,8 @@ class Champpool:
         self.winrate = []
         self.win_blue = []
         self.win_red = []
+
+        self.season= season
 
     #smarter to do that outside of the class? and just insert the data inside
 

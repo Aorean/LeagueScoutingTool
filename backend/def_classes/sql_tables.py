@@ -252,7 +252,7 @@ class CHAMPPOOL(Base):
     __tablename__ = "champpool"
 
 
-    PUUID_CHAMP = Column(String, primary_key=True, index=True)
+    PUUID_CHAMP_SEASON = Column(String, primary_key=True, index=True)
 
     puuid = Column(String, nullable=False)
     champ = Column(String, nullable=False)
@@ -283,11 +283,11 @@ class CHAMPPOOL(Base):
 
     fav_role = Column(String, nullable=False)
 
-
-
     winrate = Column(Float, nullable=False)
     win_blue = Column(Float, nullable=False)
     win_red = Column(Float, nullable=False)
+
+    season = Column(Integer, nullable=False)
 
     @classmethod
     def from_champpool(cls, champpool):
@@ -295,7 +295,7 @@ class CHAMPPOOL(Base):
             __table_args__= {"schema": "playerdata"},
             __tablename__= "champpool",
 
-            PUUID_CHAMP=champpool.PUUID_CHAMP,
+            PUUID_CHAMP_SEASON=champpool.PUUID_CHAMP_SEASON,
             puuid=champpool.puuid,
             champ=champpool.champ,
             name=champpool.name,
@@ -321,7 +321,8 @@ class CHAMPPOOL(Base):
 
             winrate=champpool.winrate,
             win_blue=champpool.win_blue,
-            win_red=champpool.win_red
+            win_red=champpool.win_red,
+            season=champpool.season
         )
 
 class PLAYERINFO(Base):

@@ -38,9 +38,9 @@ dict_matches = process_matches(classes_matchhistory, region, api_key, db_connect
 
 
 #process matchdata from playerstats to get important data for champpools
-#champpool_data = get_data_for_champpool(db_connection)
+champpool_data = get_data_for_champpool(db_connection)
 #taking the above data and processing it into classes, getting a list of classes
-#list_champpools = get_champpool(champpool_data)
+list_champpools = get_champpool(champpool_data)
 
 
 

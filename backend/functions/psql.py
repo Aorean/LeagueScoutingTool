@@ -57,16 +57,16 @@ def execute_query(db_connection, query):
 
 
 
-    #print("trying query: " , query)
-    #try:
-    cur.execute(f'{query}')
 
-    if query.strip().startswith("SELECT"):
-        rows = cur.fetchall()
-        return rows
-    else:
-        conn.commit()
-    """
+    try:
+        cur.execute(f'{query}')
+
+        if query.strip().startswith("SELECT"):
+            rows = cur.fetchall()
+            return rows
+        else:
+            conn.commit()
+    
     except psycopg2.ProgrammingError as e:
         print(f"ProgrammingError: Query couldnt be executed")
         #print(psycopg2.ProgrammingError)
@@ -75,7 +75,7 @@ def execute_query(db_connection, query):
         #print(psycopg2.DatabaseError)
     except Exception as e:
         print(f"UnexpectedError: Query couldnt be executed")
-    """
+    
     conn.close()
     cur.close()
 
@@ -138,7 +138,7 @@ def SELECT_PK_OBJECTIVES(db_connection):
 
 def SELECT_PK_CHAMPPOOL(db_connection):
     # get objectives table from database
-    query_select_champpool = get_query("select", '"PUUID_CHAMP"', "playerdata", "champpool")
+    query_select_champpool = get_query("select", '"PUUID_CHAMP_SEASON"', "playerdata", "champpool")
     select_champpool = execute_query(db_connection, query_select_champpool)
 
     list_select_champpool = []
@@ -491,7 +491,7 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
 
         
             
-            if new_champpool.PUUID_CHAMP in list_select_champpool:
+            if new_champpool.PUUID_CHAMP_SEASON in list_select_champpool:
                 columns_and_values = \
                                     (
                                       f'"puuid" = \'{new_champpool.puuid}\', '
@@ -518,19 +518,20 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
                                       f'"fav_role" = \'{new_champpool.fav_role}\', '
                                       f'"winrate" = {new_champpool.winrate}, '
                                       f'"win_blue" = {new_champpool.win_blue}, '
-                                      f'"win_red" = {new_champpool.win_red}'
+                                      f'"win_red" = {new_champpool.win_red}, '
+                                      f'"season" = {new_champpool.season}'
                                     )
                 query_update = get_query("update",
                                          table='"playerdata"."champpool"',
                                          columns_and_values=columns_and_values,
-                                         key='"PUUID_CHAMP"',
-                                         keyvalue=new_champpool.PUUID_CHAMP)
+                                         key='"PUUID_CHAMP_SEASON"',
+                                         keyvalue=new_champpool.PUUID_CHAMP_SEASON)
                 again_do_i_need_equal_2 = execute_query(db_connection, query_update)
 
 
-            if new_champpool.PUUID_CHAMP not in list_select_champpool:
-                tablename = '"playerdata"."champpool"("PUUID_CHAMP", "puuid", "champ","name","tagline","games_played","kda","kills","deaths","assists","cs","exp","level","gold","visionscore","cs_diff","exp_diff","level_diff","gold_diff","visionscore_diff","summonerspell1","summonerspell2","fav_role","winrate","win_blue","win_red")'
-                values = f'\'{new_champpool.PUUID_CHAMP}\', \'{new_champpool.puuid}\', \'{new_champpool.champ}\', \'{new_champpool.name}\', \'{new_champpool.tagline}\', {new_champpool.games_played}, {new_champpool.kda}, {new_champpool.kills}, {new_champpool.deaths}, {new_champpool.assists}, {new_champpool.cs}, {new_champpool.exp}, {new_champpool.level}, {new_champpool.gold}, {new_champpool.visionscore}, {new_champpool.cs_diff}, {new_champpool.exp_diff}, {new_champpool.level_diff}, {new_champpool.gold_diff}, {new_champpool.visionscore_diff}, \'{new_champpool.summonerspell1}\', \'{new_champpool.summonerspell2}\', \'{new_champpool.fav_role}\', {new_champpool.winrate}, {new_champpool.win_blue}, {new_champpool.win_red}'
+            if new_champpool.PUUID_CHAMP_SEASON not in list_select_champpool:
+                tablename = '"playerdata"."champpool"("PUUID_CHAMP_SEASON", "puuid", "champ","name","tagline","games_played","kda","kills","deaths","assists","cs","exp","level","gold","visionscore","cs_diff","exp_diff","level_diff","gold_diff","visionscore_diff","summonerspell1","summonerspell2","fav_role","winrate","win_blue","win_red", "season")'
+                values = f'\'{new_champpool.PUUID_CHAMP_SEASON}\', \'{new_champpool.puuid}\', \'{new_champpool.champ}\', \'{new_champpool.name}\', \'{new_champpool.tagline}\', {new_champpool.games_played}, {new_champpool.kda}, {new_champpool.kills}, {new_champpool.deaths}, {new_champpool.assists}, {new_champpool.cs}, {new_champpool.exp}, {new_champpool.level}, {new_champpool.gold}, {new_champpool.visionscore}, {new_champpool.cs_diff}, {new_champpool.exp_diff}, {new_champpool.level_diff}, {new_champpool.gold_diff}, {new_champpool.visionscore_diff}, \'{new_champpool.summonerspell1}\', \'{new_champpool.summonerspell2}\', \'{new_champpool.fav_role}\', {new_champpool.winrate}, {new_champpool.win_blue}, {new_champpool.win_red}, {new_champpool.season}'
 
                 query_insert = get_query("insert", tablename=tablename, values=values)
 

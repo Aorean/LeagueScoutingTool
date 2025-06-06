@@ -64,11 +64,11 @@ insert_or_update_player("playerstats" ,db_connection, dict_matches=dict_matches)
 insert_or_update_player("objectives" ,db_connection, dict_matches=dict_matches)
 
 #import
-#from backend.process_data.process_data import list_champpools
+from backend.process_data.process_data import list_champpools
 #getting list of classes champpools
-#classes_champpool = list_champpools
+classes_champpool = list_champpools
 #function to insert or update champool
-#insert_or_update_player("champpool" ,db_connection, classes_champpool=classes_champpool)
+insert_or_update_player("champpool" ,db_connection, classes_champpool=classes_champpool)
 
 #import
 from backend.process_data.playerinfo import export as list_playerinfos_class

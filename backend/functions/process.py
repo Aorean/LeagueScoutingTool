@@ -5,6 +5,7 @@ from backend.process_data.c_dragon import *
 from backend.functions.psql import get_query,execute_query, filter_matchhistory
 from backend.functions.general import get_match
 
+import json
 
 def process_userinput(user_input):
     usernames = user_input[0].split(",")
@@ -47,7 +48,10 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
 
 
             single_match = get_match(region, matchid, api_key)
-            
+
+            #with open(f"{matchid}.json", "w") as f:
+            #    json.dump(single_match, f, indent=4)
+
             #generell matchdata
             
             #Errorcatches
@@ -74,29 +78,34 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
 
 
                 all_participants = []
-                for participant in participants:
 
-                    class_playerstats = Playerstats(participant, matchid, participant["puuid"], single_match)
-
-
-                    class_playerstats.translate_ids(cdragon_items, cdragon_summonerspells, cdragon_perks)
-                    all_participants.append(class_playerstats)
-
-                #objectives matchdata
-                teams = single_match["info"]["teams"]
-                objective_teams =  {}
+                if (class_match.gamemode == 0 or
+                    class_match.gamemode == 420 or
+                    class_match.gamemode == 440
+                ): 
+                    for participant in participants:
+                        print(matchid)
+                        class_playerstats = Playerstats(participant, matchid, participant["puuid"], single_match)
 
 
-                
-                for team in teams:
-                    objective_team = Objectives(team=team, matchid=matchid)
-                    objective_teams[objective_team.teamid] = objective_team
+                        class_playerstats.translate_ids(cdragon_items, cdragon_summonerspells, cdragon_perks)
+                        all_participants.append(class_playerstats)
+
+                    #objectives matchdata
+                    teams = single_match["info"]["teams"]
+                    objective_teams =  {}
 
 
-                matchinfo = [class_match, all_participants, objective_teams]
-                full_matchinfo.update({
-                    matchid: matchinfo
-                })
+                    
+                    for team in teams:
+                        objective_team = Objectives(team=team, matchid=matchid)
+                        objective_teams[objective_team.teamid] = objective_team
+
+
+                    matchinfo = [class_match, all_participants, objective_teams]
+                    full_matchinfo.update({
+                        matchid: matchinfo
+                    })
 
                 """
                 #ARENA

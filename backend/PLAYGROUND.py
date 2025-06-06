@@ -12,7 +12,7 @@ from backend.process_data.avrg_stats import get_champpool, get_data_for_champpoo
 
 to_process = get_data_for_champpool(db_connection)
 
-#champool_classes = get_champpool(to_process)
+champool_classes = get_champpool(to_process)
 
 
 

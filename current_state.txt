@@ -62,3 +62,44 @@ infodto
     ->queueId
         420 = flexqueue
         440 = solo/duo
+
+
+
+
+PSQL playerdata.playerstats
+    0   PUUID_MATCHID
+    1   puuid
+    2   matchid
+    3   gamertag
+    4   tagline
+    5   team
+    6   champ
+    7   role
+    8   kills       
+    9   deaths      
+    10  assists     
+    11  cs              **
+    12  level           **
+    13  exp             **
+    14  gold            **
+    15  visionscore     **
+    16  summonerspell1
+    17  summonerspell2
+    18  item1
+    19  item2
+    20  item3
+    21  item4
+    22  item5
+    23  item6
+    24  keyrune
+    25  win
+    26  season
+    27  patch
+    28  mapid
+    29  gamemode
+    30  cs_diff
+    31  level_diff
+    32  exp_diff
+    33  gold_diff
+    34  visionscore_diff
+    35  kda
