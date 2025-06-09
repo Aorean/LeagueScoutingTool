@@ -103,3 +103,6 @@ PSQL playerdata.playerstats
     33  gold_diff
     34  visionscore_diff
     35  kda
+
+
+3rd player doesnt show up in champpool, finnd out why
