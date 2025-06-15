@@ -37,7 +37,7 @@ def get_match(region, matchId, api_key):
             time.sleep(120)
 
             continue
-
+        print(resp_match.status_code)
         response_match = resp_match.json()
         return response_match
 
