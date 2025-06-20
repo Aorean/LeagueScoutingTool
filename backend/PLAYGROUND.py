@@ -1,24 +1,27 @@
-from backend.config import db_connection
-from backend.process_data.avrg_stats import get_data_for_champpool
-import json
-from backend.def_classes.summoners_rift import Playerstats
-from backend.process_data.c_dragon import *
-from backend.process_data.avrg_stats import get_champpool, get_data_for_champpool
 
 
+userinput = "https://op.gg/lol/multisearch/euw?summoners=Cοnni%23EUW%2CFenrirShadow%23TBS%2CAsoka30%23EUW%2CAorean%231311%2CQaQ%2300000%2C"
 
+def process_input(userinput):
+    if userinput.startswith("https://op.gg/lol/multisearch/"):
+        processed_link = userinput.split("/")
+        region_names = processed_link[-1]
+        region = region_names.split("?")[0]
+        names = region_names.split("?")[1].split("=")[1]
+        single_names = names.split("%2C")[:-1]
 
+        processed_names = []
+        for gamertag_tagline in single_names:
 
+            list_name = gamertag_tagline.split("%23")
 
-to_process = get_data_for_champpool(db_connection)
+            processed_names.append(list_name)
 
-champool_classes = get_champpool(to_process)
-
-
-
-
-
-
+        processed_userinput = [region, processed_names]
+        print(processed_userinput)
+        return processed_userinput
+    else:
+        return False
 
 
 

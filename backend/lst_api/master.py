@@ -18,10 +18,11 @@ app = FastAPI()
 @app.get("/")
 def read_root():
     return {"players" : "http://127.0.0.1:8000/players",
-            "match" : "http://127.0.0.1:8000/match",
+            "match" : "http://127.0.0.1:8000/matches",
             "playerstats" : "http://127.0.0.1:8000/playerstats",
             "objectives" : "http://127.0.0.1:8000/objectives",
-            "champpool" : "http://127.0.0.1:8000/champpool"
+            "champpool" : "http://127.0.0.1:8000/champpools",
+            "playerinfo" : "http://127.0.0.1:8000/playerinfos"
             }
 
 @app.get("/players/", response_model=list[PlayerSchema])

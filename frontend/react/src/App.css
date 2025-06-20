@@ -1,0 +1,60 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+}
+
+.logo {
+  height: 20em;
+  padding: 0;
+  filter: drop-shadow(0 0 2em #61dafbaa) 
+
+}
+
+.SearchBar {
+  width: 400px;
+  height: 50px;
+  
+}
+
+.SearchButton {
+  width :100px;
+  color: #61dafbaa
+}
+
+.SearchBarLabel {
+  text-decoration-thickness: 10px;
+  color: #61dafbaa
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 5px;
+  padding: 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  margin-left: -110px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltip-text{
+  visibility: visible;
+  opacity: 1;
+}
