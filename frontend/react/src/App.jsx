@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import Logo, {SearchBar} from './components'
+import Logo from "./components/Logo"
+import ParentSearch from './components/ParentSearch'
+import OptionCard from "./components/Frontpage/OptionCard"
 
 import './App.css'
-import { SearchButton } from './components'
-import { OptionCard } from './components'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -11,8 +12,7 @@ function App() {
   return (
     <div>
       <Logo />
-      <SearchBar />
-      <SearchButton />
+      <ParentSearch/>
       <p>
         You can costumise your Output by clicking the Buttons below. <br/> If you need more information about the options, hover over the "i"
       </p>

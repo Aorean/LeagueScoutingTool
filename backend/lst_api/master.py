@@ -140,3 +140,8 @@ def get_playerstats(puuid: str, db: session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Match is not found")
     
     return playerinfo
+
+
+@app.post("/post_url")
+def post_url(url: PostUrl):
+    return{"responsecode" : 200, "message": "Link transfered", "link": url.link}

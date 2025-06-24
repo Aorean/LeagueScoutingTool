@@ -138,3 +138,6 @@ class PlayerinfoSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+class PostUrl(BaseModel):
+    link: str

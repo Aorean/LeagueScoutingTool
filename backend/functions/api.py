@@ -7,7 +7,7 @@ def get_puuid(summoner_name: str, tag_line, region, api_key):
     puuid_url = f"riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag_line}?api_key={api_key}"
 
     response_puuid = requests.get(root_url + puuid_url)
-
+    print(response_puuid.json())
     puuid = response_puuid.json()["puuid"]
 
 

@@ -18,9 +18,16 @@
   
 }
 
+.SearchBar::placeholder {
+  color: #646cff57;
+
+
+}
+
 .SearchButton {
   width :100px;
   color: #61dafbaa
+  
 }
 
 .SearchBarLabel {
