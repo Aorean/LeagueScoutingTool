@@ -6,7 +6,7 @@ def process_input(userinput):
     if userinput.startswith("https://op.gg/lol/multisearch/"):
         processed_link = userinput.split("/")
         region_names = processed_link[-1]
-        region = region_names.split("?")[0]
+        region = region_names.split("?")[0]+"1"
         names = region_names.split("?")[1].split("=")[1]
         single_names = names.split("%2C")[:-1]
 
@@ -16,7 +16,8 @@ def process_input(userinput):
             list_name = gamertag_tagline.split("%23")
 
             processed_names.append(list_name)
-
+        if region == "euw1":
+            region = "europe"
         processed_userinput = [region, processed_names]
         print(processed_userinput)
         return processed_userinput

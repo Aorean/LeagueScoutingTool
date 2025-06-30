@@ -41,6 +41,8 @@ def get_match(region, matchId, api_key):
         response_match = resp_match.json()
         return response_match
 
+
+#seems like riot changed stuff and i dont need this anymore
 def get_summoner_id(region, puuid, api_key):
     root_url = f"https://{region}.api.riotgames.com/"
     summoner_id_url = f"/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={api_key}"
@@ -52,10 +54,10 @@ def get_summoner_id(region, puuid, api_key):
 
 def get_rank(region, summoner_id, api_key):
     root_url = f"https://{region}.api.riotgames.com/"
-    rank_url = f"/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={api_key}"
+    rank_url = f"/lol/league/v4/entries/by-puuid/{summoner_id}?api_key={api_key}"
     response_rank = requests.get(root_url + rank_url)
 
     response_rank = response_rank.json()
-
+    print("API Request: " +root_url + rank_url)
     return response_rank
 

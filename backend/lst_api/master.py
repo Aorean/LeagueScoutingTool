@@ -3,6 +3,14 @@ from backend.lst_api.models import *
 from sqlalchemy.orm import session, sessionmaker
 from backend.config import db_engine
 from backend.def_classes.sql_tables import *
+from backend.main import run_main
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+import os
+from backend.config import db_connection
+
+load_dotenv()
+api_key = os.environ.get("api_key")
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=db_engine)
 
@@ -14,6 +22,19 @@ def get_db():
         db.close()
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:8000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = origins,
+    allow_credentials = True,
+    allow_methods = ["*"],
+    allow_headers = ["*"],
+)
 
 @app.get("/")
 def read_root():
@@ -144,4 +165,7 @@ def get_playerstats(puuid: str, db: session = Depends(get_db)):
 
 @app.post("/post_url")
 def post_url(url: PostUrl):
+
+    run_main(user_input=url.link, api_key=api_key, db_connection=db_connection)
     return{"responsecode" : 200, "message": "Link transfered", "link": url.link}
+
