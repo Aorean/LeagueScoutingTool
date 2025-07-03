@@ -1,26 +1,28 @@
-import { useState } from 'react'
-import Logo from "./components/Logo"
-import ParentSearch from './components/ParentSearch'
-import OptionCard from "./components/Frontpage/OptionCard"
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/home"; 
+import Dashboard from "./pages/Dashboard"
 
 import './App.css'
 
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
 
   return (
-    <div>
-      <Logo />
-      <ParentSearch/>
-      <p>
-        You can costumise your Output by clicking the Buttons below. <br/> If you need more information about the options, hover over the "i"
-      </p>
-      <OptionCard/>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home/>} />
+        <Route path="/dashboard" element={<Dashboard/>}/>
+      </Routes>
 
+    </Router>
   )
 }
+
+
+
+
+
+
 {
 /*
 <div>

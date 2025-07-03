@@ -1,6 +1,30 @@
+from backend.config import db_engine, db_connection
+from backend.db_base import Base
+
+#SQL imports
+from sqlalchemy.orm import sessionmaker
+
+import json
+
+#psql
+from backend.functions.psql import insert_or_update_player, get_query, execute_query
+from backend.def_classes.sql_tables import *
+
+#process data
+from backend.config import db_connection
+from backend.functions.general import get_playerclass, get_matchhistoriesclass
+from backend.functions.process import process_userinput, process_matches
+import os
+from dotenv import load_dotenv
 
 
-userinput = "https://op.gg/lol/multisearch/euw?summoners=Cοnni%23EUW%2CFenrirShadow%23TBS%2CAsoka30%23EUW%2CAorean%231311%2CQaQ%2300000%2C"
+from backend.process_data.avrg_stats import *
+
+from backend.process_data.playerinfo import get_playerinfo_classes
+
+
+
+userinput = "https://op.gg/lol/multisearch/euw?summoners=Aorean%231311%2CQaQ%2300000"
 
 def process_input(userinput):
     if userinput.startswith("https://op.gg/lol/multisearch/"):
@@ -8,14 +32,18 @@ def process_input(userinput):
         region_names = processed_link[-1]
         region = region_names.split("?")[0]+"1"
         names = region_names.split("?")[1].split("=")[1]
-        single_names = names.split("%2C")[:-1]
+        single_names = names.split("%2C")
+
+        print(single_names)
 
         processed_names = []
         for gamertag_tagline in single_names:
-
+            
             list_name = gamertag_tagline.split("%23")
+            gamertag = list_name[0].replace("+", " ")
+            tagline = list_name[1]
 
-            processed_names.append(list_name)
+            processed_names.append([gamertag, tagline])
         if region == "euw1":
             region = "europe"
         processed_userinput = [region, processed_names]
@@ -24,10 +52,69 @@ def process_input(userinput):
     else:
         return False
 
-asdf = process_input(userinput)
 
 
+test=process_input(userinput)
+print(test)
 """
+load_dotenv()
+#def session
+SessionLocal = sessionmaker(bind=db_engine, autocommit=False, autoflush=False)
+#open session
+session = SessionLocal()
+
+
+
+
+puuids = [
+    "pGSPl_CvQKjMkHq5m1j3CSrL6KEG3gMol1H8G-M_wpoK1LTT2F9Qe9aCYJyGoXf_L0rUpKzJAR6xUQ",
+    "auom9H6uf9iN4yPls9QidJQWB1Mz2n4UIhfap9aQoITqA5gtRU0RE0ojafStbkIYrQzKtqxWmQr_jg",
+    "xN9AE0xmaCYwytheZ-FfNqdPBBDN1EUwlia3opOR1ms1KDWrJUpTPpEOjvTx4c6J_70OchHbztx-XA",
+    "bO5blHOm9YeY2MXm15I3DiHVtQPb8PuQov9J-wJ4X3CBuhjScuFDdaEM7VMFtciIC5htsuFYT43ytw"]
+
+tables = [
+    "player",
+    "playerinfo",
+    "match",
+    "playerstats",
+    "champpool"
+]
+
+return_dict = {}
+id = 1
+for puuid in puuids:
+    player_dict = {}
+
+    
+    for table in tables:
+        table_data = []
+        query = get_query(querytype="select_json",
+                    selection="puuid",
+                    schema="playerdata", 
+                    table=table,
+                    column="puuid",
+                    value=puuid
+                        )
+        result = execute_query(db_connection=db_connection, query=query)
+        
+        for row in result:
+            table_data.append(row)
+        player_dict[table] = table_data
+    
+    return_dict[id] = player_dict
+
+    id += 1
+
+
+return_json = json.dumps(return_dict)
+with open("test.json", "w") as f:
+    json.dump(return_dict, f, indent=4)
+
+
+#close session with sql
+session.close()
+
+
 class test:
     def __init__(self, data):
         self.value1 = data[0]

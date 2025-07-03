@@ -36,6 +36,8 @@ def get_query(querytype,
         # keyvalue = value of the primary key column that should be updated
     elif querytype == "select_where":
         query = f'SELECT {selection} FROM "{schema}"."{table}"\nWHERE {column} = \'{value}\''
+    elif querytype == "select_json":
+        query = f'SELECT json_agg(row_to_json(t))\nFROM (SELECT * FROM "{schema}"."{table}"\nWHERE {selection}=\'{value}\') t;'
     else:
         print("ERROR: Wrong querytype")
         query = None

@@ -25,12 +25,12 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173",
-    "http://127.0.0.1:8000"
+    "http://127.0.0.1:5173"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = origins,
+    allow_origins = ["*"],
     allow_credentials = True,
     allow_methods = ["*"],
     allow_headers = ["*"],
@@ -165,7 +165,7 @@ def get_playerstats(puuid: str, db: session = Depends(get_db)):
 
 @app.post("/post_url")
 def post_url(url: PostUrl):
+    data = run_main(user_input=url.link, api_key=api_key, db_connection=db_connection)
 
-    run_main(user_input=url.link, api_key=api_key, db_connection=db_connection)
-    return{"responsecode" : 200, "message": "Link transfered", "link": url.link}
+    return{"responsecode" : 200, "message": "Response", "Body": data}
 

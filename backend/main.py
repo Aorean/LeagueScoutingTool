@@ -7,13 +7,13 @@ from backend.db_base import Base
 #SQL imports
 from sqlalchemy.orm import sessionmaker
 
+import json
 
 #psql
-from backend.functions.psql import insert_or_update_player
+from backend.functions.psql import insert_or_update_player, get_query, execute_query
 from backend.def_classes.sql_tables import *
 
 #process data
-from backend.config import db_connection
 from backend.functions.general import get_playerclass, get_matchhistoriesclass
 from backend.functions.process import process_userinput, process_matches
 import os
@@ -96,7 +96,55 @@ def run_main(user_input, api_key, db_connection):
     #function to insert or update playerinfo
     insert_or_update_player("playerinfo", db_connection, classes_playerinfo=classes_playerinfo)
 
+    puuids = []
+    for player in classes_player:
+        puuids.append(player.puuid)
+
+    tables = [
+        "player",
+        "playerinfo",
+        "match",
+        "playerstats",
+        "champpool"
+    ]
+
+    return_dict = {}
+    id = 1
+    for puuid in puuids:
+        player_dict = {}
+
+        
+        for table in tables:
+            table_data = []
+            query = get_query(querytype="select_json",
+                        selection="puuid",
+                        schema="playerdata", 
+                        table=table,
+                        column="puuid",
+                        value=puuid
+                            )
+            result = execute_query(db_connection=db_connection, query=query)
+            print("RESULTS: " , result)
+
+            for row in result:
+                table_data.append(row)
+            player_dict[table] = table_data[0][0]
+        
+            print("TABLEDATA " , table_data)
+        return_dict[id] = player_dict
+
+        id += 1
+
+
+    return_json = json.dumps(return_dict)
+
+
+    with open("idkwhattocallthistest.json" , "w") as f:
+        json.dump(return_dict, f, indent=4)
+
 
     #close session with sql
     session.close()
 
+
+    return return_json

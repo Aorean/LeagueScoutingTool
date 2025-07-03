@@ -61,11 +61,12 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
             elif "status" in single_match:
                 if single_match["status"]["status_code"] == 403:
                     print("Forbidden")
-
+            elif "riotIdGameName" not in single_match["info"]["participants"]:
+                continue
 
             else:
                 class_match = Match(class_matchhistory.PUUID, matchid, single_match)
-
+                
                 cdragon_items = cdragon_request(class_match.patch, "items")
                 cdragon_perks = cdragon_request(class_match.patch, "perks")
                 cdragon_summonerspells = cdragon_request(class_match.patch, "summoner-spells")
