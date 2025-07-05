@@ -7,6 +7,9 @@ const Dashboard = () => {
   const { state } = useLocation();
   const rawContent = state?.returnedBody ?? [];
   const content = JSON.parse(rawContent);
+
+  
+
   console.log("STATE: ", state)
 
   //id = dashboard for me
