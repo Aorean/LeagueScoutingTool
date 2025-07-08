@@ -50,3 +50,142 @@ def get_matchhistoriesclass(classes_player, region, api_key):
     return classes_matchhistory
 
 
+def create_dashboard_json(puuids, db_connection):
+
+
+    tables = [
+        "player",
+        "playerinfo",
+        "match",
+        "playerstats",
+        "champpool"
+    ]
+    dashboard = {
+        "player" : [], 
+        "tc_Matches": []
+        }
+
+    
+    for puuid in puuids:
+        tc_matches = []
+        account = {}
+        player = {}
+        for table in tables:
+            if table == "player":
+
+                query = get_query(querytype="select_json",
+                        selection="puuid",
+                        schema="playerdata", 
+                        table=table,
+                        column="puuid",
+                        value=puuid
+                            )
+                row = execute_query(db_connection=db_connection, query=query)
+                clean_row = row[0][0][0]
+
+                for key,value in clean_row.items():
+                    account[key] = value
+            
+            if table == "playerinfo":
+                query = get_query(querytype="select_json",
+                selection="puuid",
+                schema="playerdata", 
+                table=table,
+                column="puuid",
+                value=puuid
+                    )
+                row = execute_query(db_connection=db_connection, query=query)
+
+                clean_row = row[0][0][0]
+                account["elo"] = clean_row["division"] + clean_row["rank"]
+
+                try:  
+                    account["winrate"] = round(clean_row["wins_total"]/(clean_row["wins_total"]+clean_row["losses_total"]), 2)
+                except ZeroDivisionError:
+                    if clean_row["wins_total"]==0:
+                        account["winrate"] = 0
+                    if clean_row["losses_total"]==0:
+                        account["winrate"] = 1
+
+            if table == "champpool":
+                query = get_query(querytype="top3_json",
+                                  selection="champ, kda, games_played, winrate, fav_role",
+                                  schema="playerdata",
+                                  table=table,
+                                  argument="puuid",
+                                  value=puuid,
+                                  order="games_played")
+
+                row = execute_query(query=query, db_connection=db_connection)
+
+                clean_row = row[0][0]
+                
+                player["champpool"] = clean_row
+
+
+            if table == "match":
+                query = get_query(querytype="select_json", 
+                                  schema="playerdata", 
+                                  table=table, 
+                                  selection="tournamentcode!", 
+                                  value="NULL")
+                row = execute_query(db_connection=db_connection, query=query)
+                clean_row = row[0][0]
+                
+                match_json = {
+                    
+                }
+ 
+                for data in clean_row:
+                    data["matchid"]
+                    participants_string = data["participants"]
+                    
+                    participants_list = participants_string.split(",")
+                    participants = []
+                    for participant_puuid in participants_list:
+                        cleanup = participant_puuid.strip('"')
+                        prep = {"puuid" : cleanup}
+                        participants.append(prep)
+
+
+                    match_json = {
+                        "matchId" : data["matchid"],
+                        "participants" : participants,
+                        "gameDuration" : data["gameduration"],
+                        "tournamentcode" : data["tournamentcode"],
+                    }
+
+                    tc_matches.append(match_json)
+
+
+
+            if table == "playerstats":
+                for matchdata in tc_matches:
+                    matchid = matchdata["matchId"]
+                    
+                    
+                    query_playerdata = get_query(querytype="select_json", 
+                                schema="playerdata",
+                                table="playerstats",
+                                selection="matchid",
+                                value=matchid
+                                )
+                    rows_playerstats = execute_query(db_connection=db_connection, query=query_playerdata)
+                    
+                    clean_playerstat_rows = rows_playerstats[0][0]
+                    
+                    for playerstat in clean_playerstat_rows:
+                        for participants_dict in matchdata["participants"]:
+                            matchdata_puuid = participants_dict["puuid"]
+                            playerstats_puuid = playerstat["puuid"]
+                            if matchdata_puuid == playerstats_puuid:
+                                for k, v in playerstat.items():
+                                    participants_dict[k]=v
+
+        player["account"] = account
+        dashboard["player"].append(player)
+        dashboard["tc_Matches"] = tc_matches
+
+        
+
+    return dashboard

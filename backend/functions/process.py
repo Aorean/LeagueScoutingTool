@@ -7,26 +7,31 @@ from backend.functions.general import get_match
 
 import json
 
-def process_userinput(user_input):
-    usernames = user_input[0].split(",")
-    region = user_input[1]
+def process_input(userinput):
+    if userinput.startswith("https://op.gg/lol/multisearch/"):
+        processed_link = userinput.split("/")
+        region_names = processed_link[-1]
+        region = region_names.split("?")[0]+"1"
+        names = region_names.split("?")[1].split("=")[1]
+        single_names = names.split("%2C")
 
-    api_data = []
-    api_data.append(region)
+        print(single_names)
 
-    accounts = []
-    for username in usernames:
-        split = username.split("#")
-        #strip trailing newline
-        strip = split[1].rstrip()
-        split[1] = strip
-        #append account to list
-        accounts.append(split)
+        processed_names = []
+        for gamertag_tagline in single_names:
+            
+            list_name = gamertag_tagline.split("%23")
+            gamertag = list_name[0].replace("+", " ")
+            tagline = list_name[1]
 
-    #append accounts to return data
-    api_data.append(accounts)
-
-    return api_data
+            processed_names.append([gamertag, tagline])
+        if region == "euw1":
+            region = "europe"
+        processed_userinput = [region, processed_names]
+        print(processed_userinput)
+        return processed_userinput
+    else:
+        return False
 
 def process_matches(classes_matchhistory, region, api_key, db_connection):
 

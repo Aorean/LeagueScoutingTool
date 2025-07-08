@@ -16,7 +16,9 @@ def get_query(querytype,
           key=None,
           keyvalue=None,
           column=None,
-          value=None
+          value=None,
+          argument=None,
+          order=None
               ):
     #querytypes = select, insert, update
     if querytype == "select":
@@ -38,6 +40,8 @@ def get_query(querytype,
         query = f'SELECT {selection} FROM "{schema}"."{table}"\nWHERE {column} = \'{value}\''
     elif querytype == "select_json":
         query = f'SELECT json_agg(row_to_json(t))\nFROM (SELECT * FROM "{schema}"."{table}"\nWHERE {selection}=\'{value}\') t;'
+    elif querytype == "top3_json":
+        query = f'SELECT json_agg(row_to_json(t))\nFROM (SELECT {selection} FROM {schema}.{table}\nWHERE {argument} = \'{value}\'\n AND season = (\n SELECT MAX(season)\n FROM {schema}.{table}\nWHERE {argument} = \'{value}\'\n) ORDER BY {order} DESC\nLIMIT 3\n) t;'
     else:
         print("ERROR: Wrong querytype")
         query = None
@@ -47,7 +51,7 @@ def get_query(querytype,
 def execute_query(db_connection, query):
     # curser
 
-    print(query)
+    #print(query)
     conn = psycopg2.connect(dbname=db_connection[0],
                             user=db_connection[1],
                             password=db_connection[2],

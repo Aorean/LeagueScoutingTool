@@ -65,3 +65,22 @@
   visibility: visible;
   opacity: 1;
 }
+
+.Icon {
+  width: 30px;
+  height: 30px;
+  text-align: right;
+}
+
+.tableInfo {
+  border: 1px solid rgb(107, 107, 107);
+  text-align: left;
+  border-collapse:separate;
+}
+
+.table {
+  border: 2px solid rgb(107, 107, 107);
+  color: white;
+  width: 750px;
+  
+}

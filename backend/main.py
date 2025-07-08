@@ -10,16 +10,16 @@ from sqlalchemy.orm import sessionmaker
 import json
 
 #psql
-from backend.functions.psql import insert_or_update_player, get_query, execute_query
+from backend.functions.psql import insert_or_update_player
 from backend.def_classes.sql_tables import *
 
 #process data
 from backend.functions.general import get_playerclass, get_matchhistoriesclass
-from backend.functions.process import process_userinput, process_matches
+from backend.functions.process import process_input, process_matches
 import os
 from dotenv import load_dotenv
-from backend.PLAYGROUND import process_input
 
+from backend.functions.general import create_dashboard_json
 from backend.process_data.avrg_stats import *
 
 from backend.process_data.playerinfo import get_playerinfo_classes
@@ -100,6 +100,15 @@ def run_main(user_input, api_key, db_connection):
     for player in classes_player:
         puuids.append(player.puuid)
 
+    dashboard = create_dashboard_json(puuids, db_connection)
+
+    return_json = json.dumps(dashboard)
+
+    """
+    puuids = []
+    for player in classes_player:
+        puuids.append(player.puuid)
+
     tables = [
         "player",
         "playerinfo",
@@ -146,5 +155,5 @@ def run_main(user_input, api_key, db_connection):
     #close session with sql
     session.close()
 
-
+    """
     return return_json

@@ -1,5 +1,6 @@
 import { useLocation, useParams, useNavigate } from "react-router-dom"; 
 import { useState } from "react";
+import DashboardTcMatches from "./components/dachboardTcMatches";
 
 const Dashboard = () => {
   const [player, setPlayer] = useState([]);
@@ -8,27 +9,21 @@ const Dashboard = () => {
   const rawContent = state?.returnedBody ?? [];
   const content = JSON.parse(rawContent);
 
-  
 
-  console.log("STATE: ", state)
+
+
 
   //id = dashboard for me
   //state = content
   if (!state) {
     return <p>No {id} found</p>;
   }
-  console.log(state)
+  console.log(content)
 return (
   <div>
-    <h1>Gamertags</h1>
-    {Object.values(content)
-      .filter(entry => Array.isArray(entry.player))
-      .map((entry, index) =>
-        entry.player.map((playerObj, innerIndex) => (
-          <p key={`${index}-${innerIndex}`}>{playerObj.gamertag}</p>
-        ))
-      )
-      .flat()}
+    {content.tc_Matches.map((match, index) => (<DashboardTcMatches key={index} {...match} />))
+    
+    }
   </div>
 )
 };

@@ -8,4 +8,16 @@ const postLink = async (link) => {
     return data
 };
 
-export default {postLink};
+const cDragonRequestIcon = async (patch, champ) => {
+    /*
+    Formats
+    patch: 14.22
+    champ: akali
+    */ 
+    const url = `https://raw.communitydragon.org/${patch}/plugins/rcp-be-lol-game-data/global/default/assets/characters/${champ}/skins/base/images/${champ}_splash_tile_0.jpg`
+    const icon = await axios.get(url)
+    return icon
+}
+
+
+export default {postLink, cDragonRequestIcon};

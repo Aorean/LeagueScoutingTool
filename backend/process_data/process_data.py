@@ -1,6 +1,6 @@
-from backend.config import db_connection
+"""from backend.config import db_connection
 from backend.functions.general import get_playerclass, get_matchhistoriesclass
-from backend.functions.process import process_userinput, process_matches
+from backend.functions.process import process_input, process_matches
 import os
 from dotenv import load_dotenv
 
@@ -46,3 +46,4 @@ list_champpools = get_champpool(champpool_data)
 
 
 
+"""
