@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, Text, ARRAY
+from sqlalchemy import Column, Integer, String, Boolean, Float, Text, ARRAY, PrimaryKeyConstraint
 from backend.db_base import Base
 
 
@@ -29,9 +29,8 @@ class MATCH(Base):
     __table_args__ = {"schema": "playerdata"}
     __tablename__ = "match"
 
-    PUUID_MATCHID = Column(String, primary_key=True, index=True)
+    matchid = Column(String, primary_key=True, index=True)
     puuid = Column(String, nullable=False)
-    matchid = Column(String, nullable=False)
     participants = Column(String, nullable=False)
     gamestart = Column(String, nullable=False)
     gameend = Column(String, nullable=False)
@@ -54,13 +53,12 @@ class MATCH(Base):
             tc = match.tournamentcode
 
         return cls(
-            __table_args__={"schema": "playerdata"},
-            __tablename__="match",
+            #__table_args__={"schema": "playerdata"},
+            #__tablename__="match",
 
 
-            PUUID_MATCHID=match.PUUID_MATCHID,
-            puuid=match.puuid,
             matchid=match.matchid,
+            puuid=match.puuid,
             participants=match.participants,
             gamestart=match.gamestart,
             gameend=match.gameend,
@@ -77,13 +75,12 @@ class MATCH(Base):
 
 #Table for Playerstats (=PLAYERSTATS)
 class PLAYERSTATS(Base):
-    __table_args__ = {"schema": "playerdata"}
+    __table_args__ = (PrimaryKeyConstraint("puuid", "matchid") ,{"schema": "playerdata"})
     __tablename__ = "playerstats"
 
 
-    PUUID_MATCHID = Column(String, primary_key=True, index=True)
-    puuid = Column(String, nullable=False)
     matchid = Column(String, nullable=False)
+    puuid = Column(String, nullable=False)
     gamertag = Column(String, nullable=False)
     tagline = Column(String, nullable=False)
     team = Column(Integer, nullable=False)
@@ -124,13 +121,12 @@ class PLAYERSTATS(Base):
 
 
         return cls(
-        __table_args__={"schema": "playerdata"},
-        __tablename__="playerstats",
+        #__table_args__={"schema": "playerdata"},
+        #__tablename__="playerstats",
 
 
-        PUUID_MATCHID=playerstats.PUUID_MATCHID,
-        puuid=playerstats.puuid,
         matchid=playerstats.matchid,
+        puuid=playerstats.puuid,
         gamertag=playerstats.gamertag,
         tagline=playerstats.tagline,
         team=playerstats.team,
@@ -161,10 +157,9 @@ class PLAYERSTATS(Base):
         )
 
 class OBJECTIVES(Base):
-    __table_args__ = {"schema": "playerdata"}
+    __table_args__ = (PrimaryKeyConstraint("matchid", "teamid") ,{"schema": "playerdata"})
     __tablename__ = "objectives"
 
-    MATCHID_TEAMID = Column(String, primary_key=True, index=True)
     matchid = Column(String, nullable=False)
     teamid = Column(Integer, nullable=False)
     baronfirst = Column(Boolean, nullable=False)
@@ -225,10 +220,9 @@ class OBJECTIVES(Base):
 
 
         return cls(
-            __table_args__={"schema": "playerdata"},
-            __tablename__="objectives",
+            #__table_args__={"schema": "playerdata"},
+            #__tablename__="objectives",
 
-            MATCHID_TEAMID=objectives.MATCHID_TEAMID,
             matchid=objectives.matchid,
             teamid=objectives.teamid,
             baronfirst=objectives.baronfirst,
@@ -248,14 +242,15 @@ class OBJECTIVES(Base):
         )
 
 class CHAMPPOOL(Base):
-    __table_args__ = {"schema": "playerdata"}
+    __table_args__ = (PrimaryKeyConstraint("puuid", "champ", "season") ,{"schema": "playerdata"})
     __tablename__ = "champpool"
 
 
-    PUUID_CHAMP_SEASON = Column(String, primary_key=True, index=True)
+
 
     puuid = Column(String, nullable=False)
     champ = Column(String, nullable=False)
+    season = Column(Integer, nullable=False)
 
     name = Column(String, nullable=False)
     tagline = Column(String, nullable=False)
@@ -287,17 +282,17 @@ class CHAMPPOOL(Base):
     win_blue = Column(Float, nullable=False)
     win_red = Column(Float, nullable=False)
 
-    season = Column(Integer, nullable=False)
+    
 
     @classmethod
     def from_champpool(cls, champpool):
         return cls(
-            __table_args__= {"schema": "playerdata"},
-            __tablename__= "champpool",
+            #__table_args__= {"schema": "playerdata"},
+            #__tablename__= "champpool",
 
-            PUUID_CHAMP_SEASON=champpool.PUUID_CHAMP_SEASON,
             puuid=champpool.puuid,
             champ=champpool.champ,
+            season=champpool.season,
             name=champpool.name,
             tagline=champpool.tagline,
             games_played=champpool.games_played,
@@ -322,7 +317,7 @@ class CHAMPPOOL(Base):
             winrate=champpool.winrate,
             win_blue=champpool.win_blue,
             win_red=champpool.win_red,
-            season=champpool.season
+            
         )
 
 class PLAYERINFO(Base):

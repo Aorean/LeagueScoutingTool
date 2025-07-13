@@ -15,7 +15,8 @@ from backend.def_classes.sql_tables import *
 
 #process data
 from backend.functions.general import get_playerclass, get_matchhistoriesclass
-from backend.functions.process import process_input, process_matches
+from backend.functions.process import process_input                                     #, process_matches
+from backend.PLAYGROUND import process_matches                                          #temporary
 import os
 from dotenv import load_dotenv
 
@@ -27,11 +28,8 @@ from backend.process_data.playerinfo import get_playerinfo_classes
 load_dotenv()
 api_key = os.environ.get("api_key")
 
-#read user_input
-user_input = []
-with open("C:\\Users\\joels\\Desktop\\LeagueScoutingTool\\backend\\user_input", "r") as f:
-    for line in f:
-        user_input.append(line)
+
+
 
 
 def run_main(user_input, api_key, db_connection):
@@ -39,28 +37,6 @@ def run_main(user_input, api_key, db_connection):
     api_data = process_input(user_input)
     region = api_data[0]
     riot_ids = api_data[1]
-
-
-
-
-
-    #call riot api for puuids and save it in a list of classes "classes_player"
-    classes_player = get_playerclass(riot_ids, region, api_key)
-
-    #call riot api for matchhistories for each player and saving it in "classes_matchhistory"
-    classes_matchhistory = get_matchhistoriesclass(classes_player, region, api_key)
-
-    #call riot api for single matches and saving it in a dict
-    dict_matches = process_matches(classes_matchhistory, region, api_key, db_connection)
-
-    #process matchdata from playerstats to get important data for champpools
-    champpool_data = get_data_for_champpool(db_connection)
-    #taking the above data and processing it into classes, getting a list of classes
-    classes_champpool = get_champpool(champpool_data)
-
-    #getting list of classes playerinfo
-    classes_playerinfo = get_playerinfo_classes(db_connection, api_key)
-
 
     #def session
     SessionLocal = sessionmaker(bind=db_engine, autocommit=False, autoflush=False)
@@ -76,25 +52,42 @@ def run_main(user_input, api_key, db_connection):
     DB_PLAYERINFO = PLAYERINFO()
     DB_MATCHHISTORY = MATCHHISTORY()
 
-
-    #create tables if not in sql
-    Base.metadata.create_all(db_engine)
-
-
+    #call riot api for puuids and save it in a list of classes "classes_player"
+    classes_player = get_playerclass(riot_ids, region, api_key)
 
     #function to insert or update player
     insert_or_update_player("player" ,db_connection, classes_player=classes_player)
+
+    #call riot api for matchhistories for each player and saving it in "classes_matchhistory"
+    classes_matchhistory = get_matchhistoriesclass(classes_player, region, api_key)
+
+    #call riot api for single matches and saving it in a dict
+    dict_matches = process_matches(classes_matchhistory, region, api_key, db_connection)
 
     #function to insert or update matchdatas
     insert_or_update_player("match" ,db_connection, dict_matches=dict_matches)
     insert_or_update_player("playerstats" ,db_connection, dict_matches=dict_matches)
     insert_or_update_player("objectives" ,db_connection, dict_matches=dict_matches)
 
+    #process matchdata from playerstats to get important data for champpools
+    champpool_data = get_data_for_champpool(db_connection)
+    #taking the above data and processing it into classes, getting a list of classes
+    classes_champpool = get_champpool(champpool_data)
     #function to insert or update champool
     insert_or_update_player("champpool" ,db_connection, classes_champpool=classes_champpool)
 
+    #getting list of classes playerinfo
+    classes_playerinfo = get_playerinfo_classes(db_connection, api_key)
     #function to insert or update playerinfo
     insert_or_update_player("playerinfo", db_connection, classes_playerinfo=classes_playerinfo)
+
+
+
+
+
+    #create tables if not in sql
+    Base.metadata.create_all(db_engine)
+
 
     puuids = []
     for player in classes_player:
@@ -104,56 +97,28 @@ def run_main(user_input, api_key, db_connection):
 
     return_json = json.dumps(dashboard)
 
-    """
-    puuids = []
-    for player in classes_player:
-        puuids.append(player.puuid)
-
-    tables = [
-        "player",
-        "playerinfo",
-        "match",
-        "playerstats",
-        "champpool"
-    ]
-
-    return_dict = {}
-    id = 1
-    for puuid in puuids:
-        player_dict = {}
-
-        
-        for table in tables:
-            table_data = []
-            query = get_query(querytype="select_json",
-                        selection="puuid",
-                        schema="playerdata", 
-                        table=table,
-                        column="puuid",
-                        value=puuid
-                            )
-            result = execute_query(db_connection=db_connection, query=query)
-            print("RESULTS: " , result)
-
-            for row in result:
-                table_data.append(row)
-            player_dict[table] = table_data[0][0]
-        
-            print("TABLEDATA " , table_data)
-        return_dict[id] = player_dict
-
-        id += 1
-
-
-    return_json = json.dumps(return_dict)
-
-
-    with open("idkwhattocallthistest.json" , "w") as f:
-        json.dump(return_dict, f, indent=4)
-
-
-    #close session with sql
     session.close()
 
-    """
     return return_json
+
+
+
+
+
+
+
+
+
+
+
+
+###############DEBUGGING###############
+userinput = "https://op.gg/lol/multisearch/euw?summoners=Aorean%231311%2CQaQ%2300000%2CMoris%23RIVEN%2Cihatethisnerd%23euw%2Ci+is+pidgeon%23EUW"
+
+api_data = process_input(userinput)
+region = api_data[0]
+riot_ids = api_data[1]
+
+
+run_main(userinput, api_key, db_connection)
+###############DEBUGGING###############

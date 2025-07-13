@@ -18,7 +18,8 @@ def get_query(querytype,
           column=None,
           value=None,
           argument=None,
-          order=None
+          order=None,
+          key_and_value=None
               ):
     #querytypes = select, insert, update
     if querytype == "select":
@@ -36,6 +37,8 @@ def get_query(querytype,
         # columns_and_values = column1 = "value1", column2 = "value2", ...
         # key = name of the primarykey column
         # keyvalue = value of the primary key column that should be updated
+    elif querytype == "update_multi_arg":
+        query = f"UPDATE {table}\nSET {columns_and_values}\nWHERE {key_and_value}"
     elif querytype == "select_where":
         query = f'SELECT {selection} FROM "{schema}"."{table}"\nWHERE {column} = \'{value}\''
     elif querytype == "select_json":
@@ -51,7 +54,7 @@ def get_query(querytype,
 def execute_query(db_connection, query):
     # curser
 
-    #print(query)
+    print(query)
     conn = psycopg2.connect(dbname=db_connection[0],
                             user=db_connection[1],
                             password=db_connection[2],
@@ -75,12 +78,15 @@ def execute_query(db_connection, query):
     
     except psycopg2.ProgrammingError as e:
         print(f"ProgrammingError: Query couldnt be executed")
+
         #print(psycopg2.ProgrammingError)
     except psycopg2.DatabaseError as e:
         print(f"DatabaseError: Query couldnt be executed")
+
         #print(psycopg2.DatabaseError)
     except Exception as e:
         print(f"UnexpectedError: Query couldnt be executed")
+
     
     conn.close()
     cur.close()
@@ -96,141 +102,163 @@ def get_participants_sql(new_match):
     return participants_sql
 
 def SELECT_PK_PLAYER(db_connection):
+
     # get player table from database
     query_select_player = get_query("select", '"puuid"', "playerdata", "player")
     select_player = execute_query(db_connection, query_select_player)
-    # getting a list with all puuids in the sql database already
-    list_select_player = []
-    for player in select_player:
-        str_player = "".join(player)
-        list_select_player.append(str_player)
-    return list_select_player
+    try:
+        # getting a list with all puuids in the sql database already
+        list_select_player = []
+        for player in select_player:
+            str_player = "".join(player)
+            list_select_player.append(str_player)
+
+        return list_select_player
+    
+    except TypeError as e:
+        return []
+    
+
 
 def SELECT_PK_MATCH(db_connection):
     # get match table from database
-    query_select_match = get_query("select", '"PUUID_MATCHID"', "playerdata", "match")
+    query_select_match = get_query("select", 'matchid', "playerdata", "match")
     select_match = execute_query(db_connection, query_select_match)
-
-    # list with str datatypes of primary key
-    list_select_match = []
-    for match in select_match:
-        str_match = "".join(match)
-        list_select_match.append(str_match)
-    return list_select_match
+    try:
+        # list with str datatypes of primary key
+        list_select_match = []
+        for match in select_match:
+            str_match = "".join(match)
+            list_select_match.append(str_match)
+        return list_select_match
+    except TypeError as e:
+        return []
 
 def SELECT_PK_PLAYERSTATS(db_connection):
     # get playerstats table from database
-    query_select_playerstats = get_query("select", '"PUUID_MATCHID"', "playerdata", "playerstats")
+    query_select_playerstats = get_query("select", '"puuid", "matchid"', "playerdata", "playerstats")
     select_playerstats = execute_query(db_connection, query_select_playerstats)
-
-    list_select_playerstats = []
-    # list with str datatypes of primary key
-    for playerstats in select_playerstats:
-        str_playerstats = "".join(playerstats)
-        list_select_playerstats.append(str_playerstats)
-    return list_select_playerstats
+    try:
+        list_select_playerstats = []
+        # list with str datatypes of primary key
+        for playerstats in select_playerstats:
+            str_playerstats = "".join(playerstats)
+            list_select_playerstats.append(str_playerstats)
+        return list_select_playerstats
+    except TypeError as e:
+        return []
 
 def SELECT_PK_OBJECTIVES(db_connection):
     # get objectives table from database
-    query_select_objectives = get_query("select", '"MATCHID_TEAMID"', "playerdata", "objectives")
+    query_select_objectives = get_query("select", '"matchid" "teamid"', "playerdata", "objectives")
     select_objectives = execute_query(db_connection, query_select_objectives)
-
-    list_select_objectives = []
-    # list with str datatypes of primary key
-    for playerstats in select_objectives:
-        str_objectives = "".join(playerstats)
-        list_select_objectives.append(str_objectives)
-    return list_select_objectives
+    try:
+        list_select_objectives = []
+        # list with str datatypes of primary key
+        for playerstats in select_objectives:
+            str_objectives = "".join(playerstats)
+            list_select_objectives.append(str_objectives)
+        return list_select_objectives
+    except TypeError as e:
+        return []
 
 def SELECT_PK_CHAMPPOOL(db_connection):
     # get objectives table from database
-    query_select_champpool = get_query("select", '"PUUID_CHAMP_SEASON"', "playerdata", "champpool")
+    query_select_champpool = get_query("select", '"puuid", "champ", "season"', "playerdata", "champpool")
     select_champpool = execute_query(db_connection, query_select_champpool)
-
-    list_select_champpool = []
-    # list with str datatypes of primary key
-    for champpool in select_champpool:
-        str_champpool = "".join(champpool)
-        list_select_champpool.append(str_champpool)
-    return list_select_champpool
+    try:
+        list_select_champpool = []
+        # list with str datatypes of primary key
+        for champpool in select_champpool:
+            str_champpool = "".join(champpool)
+            list_select_champpool.append(str_champpool)
+        return list_select_champpool
+    except TypeError as e:
+        return []
 
 def SELECT_PK_PLAYERINFO(db_connection):
     # get objectives table from database
     query_select_playerinfo = get_query("select", '"puuid"', "playerdata", "playerinfo")
     select_playerinfo = execute_query(db_connection, query_select_playerinfo)
-
-    list_select_playerinfo = []
-    # list with str datatypes of primary key
-    for playerinfo in select_playerinfo:
-        str_playerinfo = "".join(playerinfo)
-        list_select_playerinfo.append(str_playerinfo)
-    return list_select_playerinfo
+    try:
+        list_select_playerinfo = []
+        # list with str datatypes of primary key
+        for playerinfo in select_playerinfo:
+            str_playerinfo = "".join(playerinfo)
+            list_select_playerinfo.append(str_playerinfo)
+        return list_select_playerinfo
+    except TypeError as e:
+        return []
 
 def SELECT_PK_MATCHHISTORY(db_connection):
         # get objectives table from database
     query_select_puuid = get_query("select", '"PUUID"', "playerdata", "matchhistory")
     select_puuid = execute_query(db_connection, query_select_puuid)
-
-    list_select_puuid = []
-    # list with str datatypes of primary key
-    for puuid in select_puuid:
-        str_puuid = "".join(puuid)
-        list_select_puuid.append(str_puuid)
-    return list_select_puuid
+    try:
+        list_select_puuid = []
+        # list with str datatypes of primary key
+        for puuid in select_puuid:
+            str_puuid = "".join(puuid)
+            list_select_puuid.append(str_puuid)
+        return list_select_puuid
+    except TypeError as e:
+        return []
     
 
 def SELECT_PK_MATCH_ARAM(db_connection):
-        # get objectives table from database
+    # get objectives table from database
     query_select_puuid_matchid = get_query("select", '"PUUID_MATCHID"', "playerdata", "aram_match")
     select_aram_match = execute_query(db_connection, query_select_puuid_matchid)
-
-    list_select_aram_match = []
-    # list with str datatypes of primary key
-    for puuid in select_aram_match:
-        str_puuid = "".join(puuid)
-        list_select_aram_match.append(str_puuid)
-    return list_select_aram_match
-
+    try:
+        list_select_aram_match = []
+        # list with str datatypes of primary key
+        for puuid in select_aram_match:
+            str_puuid = "".join(puuid)
+            list_select_aram_match.append(str_puuid)
+        return list_select_aram_match
+    except TypeError as e:
+        return []
+    
 def SELECT_PK_MATCH_ARENA(db_connection):
         # get objectives table from database
     query_select_puuid_matchid = get_query("select", '"PUUID_MATCHID"', "playerdata", "arena_match")
     select_arena_match = execute_query(db_connection, query_select_puuid_matchid)
-
-    list_select_arena_match = []
-    # list with str datatypes of primary key
-    for puuid in select_arena_match:
-        str_puuid = "".join(puuid)
-        list_select_arena_match.append(str_puuid)
-    return list_select_arena_match
-
+    try:
+        list_select_arena_match = []
+        # list with str datatypes of primary key
+        for puuid in select_arena_match:
+            str_puuid = "".join(puuid)
+            list_select_arena_match.append(str_puuid)
+        return list_select_arena_match
+    except TypeError as e:
+        return []
 
 def filter_matchhistory(db_connection, matchhistory):
+
     query_select_matchhistory = get_query("select", '"matchid"', "playerdata", "match")
     select_matches = execute_query(db_connection, query_select_matchhistory)
-    
+    try:
+        list_matchhistory = []
+
+        filtered_matchhistory = []
+
+        for matchid in select_matches:
+            striped_id = matchid[0].strip()
+            list_matchhistory.append(striped_id)
 
 
+        for matchid in matchhistory:
+            
 
+            if matchid not in list_matchhistory:
+                filtered_matchhistory.append(matchid)
+            elif matchid in list_matchhistory:
+                continue
 
-    list_matchhistory = []
+        return filtered_matchhistory
+    except TypeError as e:
+        return matchhistory
 
-    filtered_matchhistory = []
-  
-    for matchid in select_matches:
-        striped_id = matchid[0].strip()
-        list_matchhistory.append(striped_id)
-
-
-    for matchid in matchhistory:
-        
-
-        if matchid not in list_matchhistory:
-            filtered_matchhistory.append(matchid)
-        elif matchid in list_matchhistory:
-            continue
-
-
-    return filtered_matchhistory
 
 def insert_or_update_player(input_type, db_connection, classes_player = None, dict_matches = None, classes_champpool = None, classes_playerinfo = None, matchhistories = None):
     if input_type == "player":
@@ -293,31 +321,31 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
             # does the class already exist?:
             # YES it exists
             # UPDATE the SQL Table with new content
-            if new_match.PUUID_MATCHID in list_select_match:
+            if new_match.matchid in list_select_match:
                 # variables for get_query
                 columns_and_values = f'"puuid" = \'{new_match.puuid}\', "matchid" = \'{new_match.matchid}\', "participants" = \'{participants_sql}\', "gamestart" = {new_match.gamestart}, "gameend" = {new_match.gameend}, "gameduration" = {new_match.gameduration}, "tournamentcode" = \'{new_match.tournamentcode}\', "gamemode" = {new_match.gamemode}, "season" = \'{new_match.season}\', "patch" = \'{new_match.patch}\', "mapid" = {new_match.mapid}, "earlysurrender_blue" = {new_match.earlysurrender_blue}, "earlysurrender_blue" = {new_match.earlysurrender_red}, "earlysurrender" = {new_match.earlysurrender}'
-                query_update = get_query("update", table='"playerdata"."match"', columns_and_values=columns_and_values, key='"PUUID_MATCHID"', keyvalue=new_match.PUUID_MATCHID)
+                query_update = get_query("update", table='"playerdata"."match"', columns_and_values=columns_and_values, key='"matchid"', keyvalue=new_match.matchid)
                 do_i_need_equal = execute_query(db_connection, query_update)
 
             # NO it does not exist
             # INSERT the new data
-            elif new_match.PUUID_MATCHID not in list_select_match:
+            elif new_match.matchid not in list_select_match:
                 # variables for get_query
                 tablename = \
                     (
                         '"playerdata"."match"'
-                        '("PUUID_MATCHID", "puuid", "matchid", "participants", "gamestart", "gameend", '
+                        '("matchid", "puuid", "participants", "gamestart", "gameend", '
                         '"gameduration", "tournamentcode", "gamemode", "season", "patch", "mapid", "earlysurrender_blue", "earlysurrender_red", "earlysurrender")'
                     )
                 values = (
-                    f"'{new_match.PUUID_MATCHID}', '{new_match.puuid}', '{new_match.matchid}', "
+                    f"'{new_match.matchid}', '{new_match.puuid}', "
                         f"'{participants_sql}', {new_match.gamestart}, {new_match.gameend}, "
                         f"{new_match.gameduration}, '{new_match.tournamentcode}', "
                         f"{new_match.gamemode}, '{new_match.season}', '{new_match.patch}', {new_match.mapid}, "
                         f"'{new_match.earlysurrender_blue}', '{new_match.earlysurrender_red}', '{new_match.earlysurrender}'"
                 )
                 query_insert = get_query("insert", tablename=tablename, values=values)
-                list_select_match.append(new_match.PUUID_MATCHID)
+                list_select_match.append(new_match.matchid)
                 do_i_need_equal = execute_query(db_connection, query_insert)
 
 
@@ -326,6 +354,12 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
     if input_type == "playerstats":
         # PLAYERSTATS
         list_select_playerstats = SELECT_PK_PLAYERSTATS(db_connection)
+
+        puuids = []
+        matchids = []
+        for data in list_select_playerstats:
+            puuids.append(data[0])
+            matchids.append(data[1])
         #upload participants
         for key in dict_matches:
             # dependencies
@@ -336,14 +370,15 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
 
 
             for participant in list_class_participants:
-                
+
+
             
                 new_participant = PLAYERSTATS.from_playerstats(participant)
 
 
 
 
-                if new_participant.PUUID_MATCHID in list_select_playerstats:
+                if (new_participant.puuid in puuids) and (new_participant.matchid in matchids):
                     columns_and_values = \
                                         (
                                         f'"puuid" = \'{new_participant.puuid}\', '
@@ -374,23 +409,23 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
                                         f'"mapid" = {new_participant.mapid}, '
                                         f'"gamemode" = {new_participant.gamemode}'
                                         )
-                    query_update = get_query("update",
+                    query_update = get_query("update_multi_arg",
                                             table='"playerdata"."playerstats"',
                                             columns_and_values=columns_and_values,
-                                            key='"PUUID_MATCHID"',
-                                            keyvalue=new_participant.PUUID_MATCHID
+                                            key_and_value=f'"puuid" = "{new_participant.puuid}" AND "matchid" = "{new_participant.matchid}',
                                             )
 
                     again_do_i_need_equal = execute_query(db_connection,query_update)
 
-                elif new_participant.PUUID_MATCHID not in list_select_playerstats:
-                    tablename = '"playerdata"."playerstats"("PUUID_MATCHID","puuid","matchid","gamertag","tagline","team","champ","role","kills","deaths","assists","cs","level","exp","gold","visionscore","summonerspell1","summonerspell2","item1","item2","item3","item4","item5","item6","keyrune","win","season","patch","mapid", "gamemode")'
+                elif (new_participant.puuid not in puuids) and (new_participant.matchid not in matchids):
+                    tablename = '"playerdata"."playerstats"("puuid","matchid","gamertag","tagline","team","champ","role","kills","deaths","assists","cs","level","exp","gold","visionscore","summonerspell1","summonerspell2","item1","item2","item3","item4","item5","item6","keyrune","win","season","patch","mapid", "gamemode")'
 
-                    values = f'\'{new_participant.PUUID_MATCHID}\', \'{new_participant.puuid}\', \'{new_participant.matchid}\', \'{new_participant.gamertag}\', \'{new_participant.tagline}\', {new_participant.team}, \'{new_participant.champ}\', \'{new_participant.role}\', {new_participant.kills}, {new_participant.deaths}, {new_participant.assists}, {new_participant.cs}, {new_participant.level}, {new_participant.exp}, {new_participant.gold}, {new_participant.visionscore}, \'{new_participant.summonerspell1}\', \'{new_participant.summonerspell2}\', \'{new_participant.item1}\', \'{new_participant.item2}\', \'{new_participant.item3}\', \'{new_participant.item4}\', \'{new_participant.item5}\', \'{new_participant.item6}\', \'{new_participant.keyrune}\', {new_participant.win}, \'{new_participant.season}\', \'{new_participant.patch}\', {new_participant.mapid}, {new_participant.gamemode}'
+                    values = f'\'{new_participant.matchid}\', \'{new_participant.puuid}\', \'{new_participant.gamertag}\', \'{new_participant.tagline}\', {new_participant.team}, \'{new_participant.champ}\', \'{new_participant.role}\', {new_participant.kills}, {new_participant.deaths}, {new_participant.assists}, {new_participant.cs}, {new_participant.level}, {new_participant.exp}, {new_participant.gold}, {new_participant.visionscore}, \'{new_participant.summonerspell1}\', \'{new_participant.summonerspell2}\', \'{new_participant.item1}\', \'{new_participant.item2}\', \'{new_participant.item3}\', \'{new_participant.item4}\', \'{new_participant.item5}\', \'{new_participant.item6}\', \'{new_participant.keyrune}\', {new_participant.win}, \'{new_participant.season}\', \'{new_participant.patch}\', {new_participant.mapid}, {new_participant.gamemode}'
 
                     query_insert = get_query("insert", tablename=tablename, values=values)
 
-                    list_select_playerstats.append(new_participant.PUUID_MATCHID)
+                    puuids.append(new_participant.puuid)
+                    matchids.append(new_participant.matchid)
                     again_do_i_need_equal = execute_query(db_connection, query_insert)
 
 

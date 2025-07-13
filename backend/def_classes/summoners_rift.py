@@ -76,9 +76,8 @@ class Match:
         season = list_patch[0]
         patch = str(list_patch[0])+"."+str(list_patch[1])
         
-        self.PUUID_MATCHID = puuid + matchid
-        self.puuid = puuid
         self.matchid = matchid
+        self.puuid = puuid
         self.participants = participants
         self.gamestart = str(info["gameStartTimestamp"])
         self.gameend = str(info["gameEndTimestamp"])
@@ -108,8 +107,14 @@ class Playerstats:
         self.puuid = participant["puuid"]
         self.matchid = matchid
 
-        self.gamertag = participant["riotIdGameName"]
-        self.tagline = participant["riotIdTagline"]
+        try:
+            self.gamertag = participant["riotIdGameName"]
+            self.tagline = participant["riotIdTagline"]
+        except KeyError as e:
+            self.gamertag = participant["riotIdName"]
+            self.tagline = participant["riotIdTagline"]
+
+
         self.team = participant["teamId"]
         self.champ = participant["championName"]
         self.role = participant["teamPosition"]

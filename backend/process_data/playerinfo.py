@@ -23,7 +23,7 @@ def get_playerinfo_classes(db_connection, api_key):
         puuid[0]
         json_summonerid = get_summoner_id(region="EUW1", puuid=puuid[0], api_key=api_key)
 
-        summonerid = json_summonerid["id"]
+        #summonerid = json_summonerid["id"]
         json_rank = get_rank(region="EUW1", summoner_id=puuid, api_key=api_key)
 
         json_playerinfo = [json_summonerid,json_rank]
@@ -31,7 +31,7 @@ def get_playerinfo_classes(db_connection, api_key):
 
     list_playerinfos_class =[]
     for playerinfo in json_playerinfos:
-        print(playerinfo)
+
         playerinfo_class = Playerinfo(playerinfo)
         list_playerinfos_class.append(playerinfo_class)
 

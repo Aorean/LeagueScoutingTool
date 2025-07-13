@@ -4,6 +4,7 @@ from backend.def_classes.summoners_rift import Match, Objectives, Playerstats, C
 from backend.process_data.c_dragon import *
 from backend.functions.psql import get_query,execute_query, filter_matchhistory
 from backend.functions.general import get_match
+import os
 
 import json
 
@@ -15,7 +16,7 @@ def process_input(userinput):
         names = region_names.split("?")[1].split("=")[1]
         single_names = names.split("%2C")
 
-        print(single_names)
+
 
         processed_names = []
         for gamertag_tagline in single_names:
@@ -28,7 +29,7 @@ def process_input(userinput):
         if region == "euw1":
             region = "europe"
         processed_userinput = [region, processed_names]
-        print(processed_userinput)
+
         return processed_userinput
     else:
         return False
@@ -46,7 +47,10 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
 
 
         for matchid in filtered_matchhistory:
-            
+
+
+
+
             #tracking to process
             index+=1
             print(f"Processed {index} from {total}\n To process: {total - index}")
@@ -108,43 +112,14 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
                         objective_teams[objective_team.teamid] = objective_team
 
 
-                    matchinfo = [class_match, all_participants, objective_teams]
-                    full_matchinfo.update({
-                        matchid: matchinfo
-                    })
+                matchinfo = [class_match, all_participants, objective_teams]
+                full_matchinfo.update({
+                    matchid: matchinfo
+                })
 
-                """
-                #ARENA
-                if class_match.gamemode =="CHERRY":
-                    all_participants = []
-                    participants = single_match["info"]["participants"]
-                    for participant in participants:
-                        puuid = participant["puuid"]
-                        class_playerstats = arena_Playerstats(participant, single_match)
 
-                        class_playerstats.translate_ids(cdragon_items, cdragon_summonerspells, cdragon_perks)
-                        all_participants.append(class_playerstats)
 
-                    matchinfo = [class_match, all_participants]
-                    full_matchinfo.update({
-                        matchid: matchinfo
-                    })
 
-                #ARAM
-                if class_match.gamemode =="ARAM":
-                    participants = single_match["info"]["participants"]
-                    all_participants = []
-                    for participant in participants:
-                        class_playerstats = aram_Playerstats(participant, single_match)
-
-                        class_playerstats.translate_ids(cdragon_items, cdragon_summonerspells, cdragon_perks)
-                        all_participants.append(class_playerstats)
-
-                    matchinfo = [class_match, all_participants]
-                    full_matchinfo.update({
-                        matchid: matchinfo
-                    })
-                """
     return full_matchinfo
 
 ########           FUNCTION         ########

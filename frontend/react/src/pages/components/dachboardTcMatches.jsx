@@ -2,10 +2,13 @@ import cDragonRequestIcon from "../../playerdata"
 
 
 const DashboardTcMatches = (props) => {
-    let blueTeam = props.participants.filter((participant, index) => {
+    const blueTeam = props.participants.filter((participant, index) => {
         return participant.team === 100});
-    let redTeam = props.participants.filter((participant, index) => {
+    const redTeam = props.participants.filter((participant, index) => {
         return participant.team === 200});
+
+    const min = Math.floor(props.gameDuration / 60)
+    const sec = Math.floor(props.gameDuration % 60)
 
     const roleOrder = [
         "TOP",
@@ -14,22 +17,22 @@ const DashboardTcMatches = (props) => {
         "BOTTOM",
         "UTILITY"
     ]
-
-    let blueTeamSorted = roleOrder.map((role) => {
+ 
+    const blueTeamSorted = roleOrder.map((role) => {
         return blueTeam.find((player, index) => {return player.role === role});
     });
-    let redTeamSorted = roleOrder.map((role) => {
+    const redTeamSorted = roleOrder.map((role) => {
         return redTeam.find((player, index) => {return player.role === role});
     });
 
-    console.log(redTeamSorted)
+
     return(
         <div className="tc-panel">
             <h3>
                 {props.matchId}
             </h3>
             <p>
-                {props.gameDuration}
+                {min}:{sec}
             </p>
             <table className="table">
                 <thead>
@@ -44,9 +47,12 @@ const DashboardTcMatches = (props) => {
                             return (
                             <tr key={index} className="tableInfo">
 
-                                    <td>
+                                    <td style={{
+                                        backgroundColor: playerBlueSide.win === true ? 'rgba(0, 89, 255, 0.22)' : 'rgba(255, 68, 0, 0.2)',
+                                    }}>
 
-                                         {playerBlueSide.gamertag}#{playerBlueSide.tagline} - | {playerBlueSide.kills} / {playerBlueSide.deaths} / {playerBlueSide.assists} | {playerBlueSide.cs}
+                                         {playerBlueSide.gamertag}#{playerBlueSide.tagline} - | {playerBlueSide.kills} / {playerBlueSide.deaths} / {playerBlueSide.assists} | {playerBlueSide.cs} 
+
                                         <img className="Icon" 
                                         crossOrigin="anonymous"
                                         referrerPolicy="no-referrer"
@@ -54,7 +60,9 @@ const DashboardTcMatches = (props) => {
                                         alt={playerBlueSide.champ}
                                         /> 
                                     </td>
-                                    <td>
+                                    <td style={{
+                                        backgroundColor: playerRedSide.win === true ? 'rgba(0, 89, 255, 0.22)' : 'rgba(255, 68, 0, 0.2)'
+                                    }}>
                                         <img className="Icon" 
                                         crossOrigin="anonymous"
                                         referrerPolicy="no-referrer"

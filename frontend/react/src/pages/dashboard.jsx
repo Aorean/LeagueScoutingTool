@@ -1,6 +1,7 @@
 import { useLocation, useParams, useNavigate } from "react-router-dom"; 
 import { useState } from "react";
 import DashboardTcMatches from "./components/dachboardTcMatches";
+import DashboardMatchSwitch from "./components/dashboardMatchSwitch";
 
 const Dashboard = () => {
   const [player, setPlayer] = useState([]);
@@ -18,12 +19,12 @@ const Dashboard = () => {
   if (!state) {
     return <p>No {id} found</p>;
   }
-  console.log(content)
+
 return (
   <div>
-    {content.tc_Matches.map((match, index) => (<DashboardTcMatches key={index} {...match} />))
-    
-    }
+    <div>
+      <DashboardMatchSwitch content={content} />
+    </div>
   </div>
 )
 };

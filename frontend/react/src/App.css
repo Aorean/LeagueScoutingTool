@@ -84,3 +84,22 @@
   width: 750px;
   
 }
+
+.MatchSwitchContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.MatchSwitch {
+    flex: 1 0 300px;
+    background-color: #303030;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
+    padding: 20px;
+    border-radius: 10px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.MatchSwitch:hover {
+  filter: drop-shadow(0 0 1em #646cffaa);
+}
