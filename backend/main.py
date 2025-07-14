@@ -1,8 +1,7 @@
 #Using processdata in main, minimalistic code, just running the functions
 #and getting the values/classes I need.
 #add "google sheet export" Boolean in user_input
-from backend.config import db_engine, db_connection
-from backend.db_base import Base
+
 
 #SQL imports
 from sqlalchemy.orm import sessionmaker
@@ -12,6 +11,9 @@ import json
 #psql
 from backend.functions.psql import insert_or_update_player
 from backend.def_classes.sql_tables import *
+
+from backend.config import db_engine, db_connection
+from backend.db_base import Base
 
 #process data
 from backend.functions.general import get_playerclass, get_matchhistoriesclass
@@ -51,7 +53,9 @@ def run_main(user_input, api_key, db_connection):
     DB_CHAMPPOOL = CHAMPPOOL()
     DB_PLAYERINFO = PLAYERINFO()
     DB_MATCHHISTORY = MATCHHISTORY()
-
+    #create tables if not in sql
+    Base.metadata.create_all(db_engine)
+    
     #call riot api for puuids and save it in a list of classes "classes_player"
     classes_player = get_playerclass(riot_ids, region, api_key)
 
@@ -85,8 +89,7 @@ def run_main(user_input, api_key, db_connection):
 
 
 
-    #create tables if not in sql
-    Base.metadata.create_all(db_engine)
+
 
 
     puuids = []

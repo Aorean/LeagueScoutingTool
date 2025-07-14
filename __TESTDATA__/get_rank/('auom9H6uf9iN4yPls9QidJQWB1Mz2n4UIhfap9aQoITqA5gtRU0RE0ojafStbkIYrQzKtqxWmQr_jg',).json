@@ -14,17 +14,17 @@
         "hotStreak": false
     },
     {
-        "leagueId": "2e73f553-e192-4249-9bdc-18c242144303",
+        "leagueId": "f0412c15-2ded-4c99-b665-d58e3b61494b",
         "queueType": "RANKED_SOLO_5x5",
         "tier": "EMERALD",
         "rank": "IV",
         "puuid": "auom9H6uf9iN4yPls9QidJQWB1Mz2n4UIhfap9aQoITqA5gtRU0RE0ojafStbkIYrQzKtqxWmQr_jg",
-        "leaguePoints": 49,
-        "wins": 232,
-        "losses": 203,
+        "leaguePoints": 35,
+        "wins": 235,
+        "losses": 207,
         "veteran": false,
         "inactive": false,
-        "freshBlood": false,
+        "freshBlood": true,
         "hotStreak": true
     }
 ]
