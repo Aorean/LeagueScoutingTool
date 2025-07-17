@@ -18,7 +18,7 @@ from backend.db_base import Base
 #process data
 from backend.functions.general import get_playerclass, get_matchhistoriesclass
 from backend.functions.process import process_input                                     #, process_matches
-from backend.PLAYGROUND import process_matches                                          #temporary
+from backend.functions.process import process_matches                                          #temporary
 import os
 from dotenv import load_dotenv
 
@@ -75,6 +75,7 @@ def run_main(user_input, api_key, db_connection):
 
     #process matchdata from playerstats to get important data for champpools
     champpool_data = get_data_for_champpool(db_connection)
+    
     #taking the above data and processing it into classes, getting a list of classes
     classes_champpool = get_champpool(champpool_data)
     #function to insert or update champool

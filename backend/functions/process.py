@@ -94,7 +94,7 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
                     class_match.gamemode == 440
                 ): 
                     for participant in participants:
-                        print(matchid)
+                        
                         class_playerstats = Playerstats(participant, matchid, participant["puuid"], single_match)
 
 
@@ -130,17 +130,19 @@ def filter_earlyffs(all_matches, all_playerstats):
 
     for match in all_matches:
         for playerstats in all_playerstats:
+            
             match_matchid = match[0]
-            playerstats_matchid = playerstats[2]
+            
+            playerstats_matchid = playerstats[0]
 
-
+            
             if match_matchid == playerstats_matchid:
                 early_ff_match = match[2]
 
                 #early surrender filter not neccessery
                 #query selects only non early surrender games
                 if early_ff_match == False:
-                    gamemode = playerstats[29]
+                    gamemode = playerstats[28]
                     
                     #gamemode 440 = SOLODUO, gamemode 420 = FLEX
                     if gamemode == 440 or gamemode == 420:
@@ -158,11 +160,11 @@ def get_seasons_by_player(all_puuid, all_playerstats):
         seasons_played = []
 
         for playerstats in all_playerstats:
-
+            
             if playerstats[1] == puuid:
 
-                season = playerstats[26]
-
+                season = playerstats[25]
+                
                 if season not in seasons_played:
                     seasons_played.append(season)
                 elif season in seasons_played:
@@ -174,6 +176,7 @@ def get_seasons_by_player(all_puuid, all_playerstats):
     
 def matching_opponents(all_puuid, no_earlyff_rank_playerstats):
     puuid_matched_stats = {}
+    
     for puuid in all_puuid:
 
         full_match_playerstats = []
@@ -181,20 +184,21 @@ def matching_opponents(all_puuid, no_earlyff_rank_playerstats):
             #create a list of opponent and player
             matched_playerstats = []
             playerstats_puuid = playerstats[1]
-
+            
             if puuid == playerstats_puuid:
                 
                 matched_playerstats.append(playerstats)
                 for opponentstats in no_earlyff_rank_playerstats:
-                    matchid = playerstats[2]
-                    matchid_opponent = opponentstats[2]
-
-                    role =playerstats[7]
-                    role_opponent = opponentstats[7]
-
-                    team = playerstats[5]
-                    team_opponent = opponentstats[5]
-
+                    
+                    matchid = playerstats[0]
+                    matchid_opponent = opponentstats[0]
+                    
+                    role =playerstats[6]
+                    role_opponent = opponentstats[6]
+                    
+                    team = playerstats[4]
+                    team_opponent = opponentstats[4]
+                    
                     if (
                         matchid == matchid_opponent and 
                         role == role_opponent and 
@@ -206,7 +210,7 @@ def matching_opponents(all_puuid, no_earlyff_rank_playerstats):
                 #to filter out empty lists
                 if len(matched_playerstats) > 0:
                     full_match_playerstats.append(matched_playerstats)
-
+            
         puuid_matched_stats[puuid] = full_match_playerstats
 
     return puuid_matched_stats
@@ -224,15 +228,20 @@ def sort_data_by_season(seasons_by_player, puuid_matched_stats):
 
                 for matched_match in matched_playerstats:
                     
-                    season_match = matched_match[0][26]
+                    season_match = matched_match[0][25]
                     puuid_match = matched_match[0][1]
-                    if season_key == puuid_match:
+                    
+                    
+                    if season_key == puuid_match:   #somehow only 1 puuid gets matched and dict only contains 1 player, why?
+                        
                         if season == season_match:
                             seasons_dict[season].append(matched_match)
 
         return_dict[season_key] = seasons_dict
 
     return return_dict
+
+    
 
 
 ########    FUNCTION       ########
@@ -256,7 +265,7 @@ def get_unique_champs(to_process):
                 player = matched_data[0]
                 opponent = matched_data[1]
 
-                champ_player = player[6]
+                champ_player = player[5]
                 if champ_player in unique_champs:
                     continue
                 if champ_player not in unique_champs:
@@ -279,20 +288,20 @@ def append_diff_stats(to_process):
                 opponent = matched_data[1]
 
 
-                kills = player[8]
-                deaths = player[9]
-                assists = player[10]
-                cs = player[11]
-                level = player[12]
-                exp = player[13]
-                gold = player[14]
-                visionscore = player[15]
+                kills = player[7]
+                deaths = player[8]
+                assists = player[9]
+                cs = player[10]
+                level = player[11]
+                exp = player[12]
+                gold = player[13]
+                visionscore = player[14]
 
-                cs_opponent = opponent[11]
-                level_opponent = opponent[12]
-                exp_opponent = opponent[13]
-                gold_opponent = opponent[14]
-                visionscore_opponent = opponent[15]
+                cs_opponent = opponent[10]
+                level_opponent = opponent[11]
+                exp_opponent = opponent[12]
+                gold_opponent = opponent[13]
+                visionscore_opponent = opponent[14]
 
                 cs_diff = cs - cs_opponent
                 level_diff = level - level_opponent
@@ -314,6 +323,9 @@ def append_diff_stats(to_process):
 
                 matched_data[0] = player
 
+    return to_process
+
+
 def create_champpool_classes(unique_champs_puuid, to_process):
     all_champpools = []
     for puuid in to_process:
@@ -329,33 +341,33 @@ def create_champpool_classes(unique_champs_puuid, to_process):
                 class_champpool = Champpool(champ=champ, puuid=puuid, season=season)
                 for matched_data in playerstats_season:
                     playerstats = matched_data[0]
-                    playerstats_champ = playerstats[6]
+                    playerstats_champ = playerstats[5]
 
                     if playerstats_champ == champ:
 
-                        class_champpool.name = playerstats[3]
-                        class_champpool.tagline = playerstats[4]
+                        class_champpool.name = playerstats[2]
+                        class_champpool.tagline = playerstats[3]
                         class_champpool.games_played+=1
-                        class_champpool.tagline = playerstats[4]
-                        class_champpool.kda.append(playerstats[35])
-                        class_champpool.kills.append(playerstats[8])
-                        class_champpool.deaths.append(playerstats[9])
-                        class_champpool.assists.append(playerstats[10])
-                        class_champpool.cs.append(playerstats[11])
-                        class_champpool.exp.append(playerstats[13])
-                        class_champpool.level.append(playerstats[12])
-                        class_champpool.gold.append(playerstats[14])
-                        class_champpool.visionscore.append(playerstats[15])
-                        class_champpool.cs_diff.append(playerstats[30])
-                        class_champpool.exp_diff.append(playerstats[32])
-                        class_champpool.level_diff.append(playerstats[31])
-                        class_champpool.gold_diff.append(playerstats[33])
-                        class_champpool.visionscore_diff.append(playerstats[34])
-                        class_champpool.summonerspell1.append(playerstats[16])
-                        class_champpool.summonerspell2.append(playerstats[17])
-                        class_champpool.fav_role.append(playerstats[7])
-                        class_champpool.team.append(playerstats[5])
-                        class_champpool.winrate.append(playerstats[25])
+                        class_champpool.tagline = playerstats[3] #is this needed?
+                        class_champpool.kda.append(playerstats[34])
+                        class_champpool.kills.append(playerstats[7])
+                        class_champpool.deaths.append(playerstats[8])
+                        class_champpool.assists.append(playerstats[9])
+                        class_champpool.cs.append(playerstats[10])
+                        class_champpool.exp.append(playerstats[12])
+                        class_champpool.level.append(playerstats[11])
+                        class_champpool.gold.append(playerstats[13])
+                        class_champpool.visionscore.append(playerstats[14])
+                        class_champpool.cs_diff.append(playerstats[29])
+                        class_champpool.exp_diff.append(playerstats[31])
+                        class_champpool.level_diff.append(playerstats[30])
+                        class_champpool.gold_diff.append(playerstats[32])
+                        class_champpool.visionscore_diff.append(playerstats[33])
+                        class_champpool.summonerspell1.append(playerstats[15])
+                        class_champpool.summonerspell2.append(playerstats[16])
+                        class_champpool.fav_role.append(playerstats[6])
+                        class_champpool.team.append(playerstats[4])
+                        class_champpool.winrate.append(playerstats[24])
                         #class_champpool.win_blue.append(playerstats[30])
                         #class_champpool.winrate.append(playerstats[30])
                 class_champpool.avarage_stats()

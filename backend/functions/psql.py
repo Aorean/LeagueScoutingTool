@@ -1,6 +1,7 @@
 import psycopg2
 from backend.def_classes.sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL, PLAYERINFO, MATCHHISTORY
 import os
+import json
 
 def create_db_connection_string(db_username, db_password, db_host, db_port, db_name):
     connection_url = "postgresql+psycopg2://" + db_username + ":" + db_password + "@" + db_host + ":" + db_port + "/" + db_name
@@ -54,7 +55,7 @@ def get_query(querytype,
 def execute_query(db_connection, query):
     # curser
 
-    print(query)
+    #print(query)
     conn = psycopg2.connect(dbname=db_connection[0],
                             user=db_connection[1],
                             password=db_connection[2],
@@ -77,14 +78,17 @@ def execute_query(db_connection, query):
             conn.commit()
     
     except psycopg2.ProgrammingError as e:
+        print(query)
         print(f"ProgrammingError: Query couldnt be executed")
 
         #print(psycopg2.ProgrammingError)
     except psycopg2.DatabaseError as e:
+        print(query)
         print(f"DatabaseError: Query couldnt be executed")
 
         #print(psycopg2.DatabaseError)
     except Exception as e:
+        print(query)
         print(f"UnexpectedError: Query couldnt be executed")
 
     
@@ -170,7 +174,8 @@ def SELECT_PK_CHAMPPOOL(db_connection):
         list_select_champpool = []
         # list with str datatypes of primary key
         for champpool in select_champpool:
-            str_champpool = "".join(champpool)
+            key = str(champpool[0])+str(champpool[1])+str(champpool[2])
+            str_champpool = "".join(key)
             list_select_champpool.append(str_champpool)
         return list_select_champpool
     except TypeError as e:
@@ -355,11 +360,12 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
         # PLAYERSTATS
         list_select_playerstats = SELECT_PK_PLAYERSTATS(db_connection)
 
-        puuids = []
-        matchids = []
-        for data in list_select_playerstats:
-            puuids.append(data[0])
-            matchids.append(data[1])
+
+        playerstats_keys = []
+
+        for keys in list_select_playerstats:
+            playerstats_keys.append(keys)
+
         #upload participants
         for key in dict_matches:
             # dependencies
@@ -378,7 +384,8 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
 
 
 
-                if (new_participant.puuid in puuids) and (new_participant.matchid in matchids):
+                if (new_participant.puuid, new_participant.matchid) in  list_select_playerstats:
+                    print("UPDATE")
                     columns_and_values = \
                                         (
                                         f'"puuid" = \'{new_participant.puuid}\', '
@@ -417,15 +424,15 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
 
                     execute_query(db_connection,query_update)
 
-                elif (new_participant.puuid not in puuids) and (new_participant.matchid not in matchids):
+                elif (new_participant.puuid, new_participant.matchid) not in  list_select_playerstats:
+                    print("NEW")
                     tablename = '"playerdata"."playerstats"("matchid","puuid","gamertag","tagline","team","champ","role","kills","deaths","assists","cs","level","exp","gold","visionscore","summonerspell1","summonerspell2","item1","item2","item3","item4","item5","item6","keyrune","win","season","patch","mapid", "gamemode")'
 
                     values = f'\'{new_participant.matchid}\', \'{new_participant.puuid}\', \'{new_participant.gamertag}\', \'{new_participant.tagline}\', {new_participant.team}, \'{new_participant.champ}\', \'{new_participant.role}\', {new_participant.kills}, {new_participant.deaths}, {new_participant.assists}, {new_participant.cs}, {new_participant.level}, {new_participant.exp}, {new_participant.gold}, {new_participant.visionscore}, \'{new_participant.summonerspell1}\', \'{new_participant.summonerspell2}\', \'{new_participant.item1}\', \'{new_participant.item2}\', \'{new_participant.item3}\', \'{new_participant.item4}\', \'{new_participant.item5}\', \'{new_participant.item6}\', \'{new_participant.keyrune}\', {new_participant.win}, \'{new_participant.season}\', \'{new_participant.patch}\', {new_participant.mapid}, {new_participant.gamemode}'
 
                     query_insert = get_query("insert", tablename=tablename, values=values)
 
-                    puuids.append(new_participant.puuid)
-                    matchids.append(new_participant.matchid)
+                    playerstats_keys.append((new_participant.puuid, new_participant.matchid))
                     execute_query(db_connection, query_insert)
 
 
@@ -476,65 +483,75 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
         # OBJECTIVES
         
         list_select_objectives = SELECT_PK_OBJECTIVES(db_connection)
-        matchids = []
-        for data in list_select_objectives:
-            matchids.append(data[0])
+
+
+
+
+
         #upload objectives
         for key in dict_matches:
             # dependencies
             match = dict_matches[key]
             
             list_class_objectives = match[2]
-            print("DEBUGGG: " , list_class_objectives)
+
             
-            for team in list_class_objectives:
-                objectives = list_class_objectives.team
+            check_matchid = ""
+            for data_key in list_class_objectives:
+                match_data = list_class_objectives[data_key]
+                check_matchid = match_data.matchid
 
-                if (objectives.team in list_select_objectives):
-                    
+            if (check_matchid in list_select_objectives):
+            
+                for team in list_class_objectives:
+                    objectives = list_class_objectives[team]
+
+                
+                    new_team = OBJECTIVES.from_objectives(objectives)
+                    # check for conflict
+
+
+                    columns_and_values = \
+                                        (
+                                        f'"matchid" = \'{new_team.matchid}\', '
+                                        f'"teamid" = {new_team.teamid}, '
+                                        f'"baronfirst" = {new_team.baronfirst}, '
+                                        f'"baronkills" = {new_team.baronkills}, '
+                                        f'"atakhanfirst" = {new_team.atakhanfirst}, '
+                                        f'"atakhankills" = {new_team.atakhankills}, '
+                                        f'"grubsfirst" = {new_team.grubsfirst}, '
+                                        f'"grubskills" = {new_team.grubskills}, '
+                                        f'"dragonfirst" = {new_team.dragonfirst}, '
+                                        f'"dragonkills" = {new_team.dragonkills}, '
+                                        f'"riftheraldfirst" = {new_team.riftheraldfirst}, '
+                                        f'"riftheraldkills" = {new_team.riftheraldkills}, '
+                                        f'"towerfirst" = {new_team.towerfirst}, '
+                                        f'"towerkills" = {new_team.towerkills}, '
+                                        f'"inhibfirst" = {new_team.inhibfirst}, '
+                                        f'"inhibkills" = {new_team.inhibkills}'
+                                        )
+                    query_update = get_query("update_multi_arg",
+                                            table='"playerdata"."objectives"',
+                                            columns_and_values=columns_and_values,
+                                            key_and_value=f'"matchid"="{new_team.matchid}" AND "teamid"={new_team.teamid}')
+                    execute_query(db_connection, query_update)
                         
-                        new_team = OBJECTIVES.from_objectives(objectives)
-                        # check for conflict
+            elif (check_matchid not in list_select_objectives):
+                
+                for team in list_class_objectives:
+                    objectives = list_class_objectives[team]
 
 
-                        columns_and_values = \
-                                            (
-                                            f'"matchid" = \'{new_team.matchid}\', '
-                                            f'"teamid" = {new_team.teamid}, '
-                                            f'"baronfirst" = {new_team.baronfirst}, '
-                                            f'"baronkills" = {new_team.baronkills}, '
-                                            f'"atakhanfirst" = {new_team.atakhanfirst}, '
-                                            f'"atakhankills" = {new_team.atakhankills}, '
-                                            f'"grubsfirst" = {new_team.grubsfirst}, '
-                                            f'"grubskills" = {new_team.grubskills}, '
-                                            f'"dragonfirst" = {new_team.dragonfirst}, '
-                                            f'"dragonkills" = {new_team.dragonkills}, '
-                                            f'"riftheraldfirst" = {new_team.riftheraldfirst}, '
-                                            f'"riftheraldkills" = {new_team.riftheraldkills}, '
-                                            f'"towerfirst" = {new_team.towerfirst}, '
-                                            f'"towerkills" = {new_team.towerkills}, '
-                                            f'"inhibfirst" = {new_team.inhibfirst}, '
-                                            f'"inhibkills" = {new_team.inhibkills}'
-                                            )
-                        query_update = get_query("update_multi_arg",
-                                                table='"playerdata"."objectives"',
-                                                columns_and_values=columns_and_values,
-                                                key_and_value=f'"matchid"="{new_team.teamid}" AND "teamid"={new_team.teamid}')
-                        execute_query(db_connection, query_update)
-                        
-                elif (new_team.matchid not in list_select_objectives):
-                    for team in list_class_objectives:
-                        objectives = list_class_objectives[team]
-                        new_team = OBJECTIVES.from_objectives(objectives)
-                        # check for conflict
+                    new_team = OBJECTIVES.from_objectives(objectives)
+                    # check for conflict
 
-                        tablename = '"playerdata"."objectives"("matchid","teamid","baronfirst","baronkills","atakhanfirst","atakhankills","grubsfirst","grubskills","dragonfirst","dragonkills","riftheraldfirst","riftheraldkills","towerfirst","towerkills","inhibfirst","inhibkills")'
-                        values = f'\'{new_team.matchid}\', {new_team.teamid}, {new_team.baronfirst}, {new_team.baronkills}, {new_team.atakhanfirst}, {new_team.atakhankills}, {new_team.grubsfirst}, {new_team.grubskills}, {new_team.dragonfirst}, {new_team.dragonkills}, {new_team.riftheraldfirst}, {new_team.riftheraldkills}, {new_team.towerfirst}, {new_team.towerkills}, {new_team.inhibfirst}, {new_team.inhibkills}'
+                    tablename = '"playerdata"."objectives"("matchid","teamid","baronfirst","baronkills","atakhanfirst","atakhankills","grubsfirst","grubskills","dragonfirst","dragonkills","riftheraldfirst","riftheraldkills","towerfirst","towerkills","inhibfirst","inhibkills")'
+                    values = f'\'{new_team.matchid}\', {new_team.teamid}, {new_team.baronfirst}, {new_team.baronkills}, {new_team.atakhanfirst}, {new_team.atakhankills}, {new_team.grubsfirst}, {new_team.grubskills}, {new_team.dragonfirst}, {new_team.dragonkills}, {new_team.riftheraldfirst}, {new_team.riftheraldkills}, {new_team.towerfirst}, {new_team.towerkills}, {new_team.inhibfirst}, {new_team.inhibkills}'
 
-                        query_insert = get_query("insert", tablename=tablename, values=values)
+                    query_insert = get_query("insert", tablename=tablename, values=values)
 
-                        list_select_objectives.append(new_team.matchid)
-                        execute_query(db_connection, query_insert)
+                    list_select_objectives.append(new_team.matchid)
+                    execute_query(db_connection, query_insert)
 
     if input_type == "champpool":
 
@@ -542,9 +559,13 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
         for champpool in classes_champpool:
             new_champpool = CHAMPPOOL.from_champpool(champpool)
 
-        
+            primary_key = str(new_champpool.puuid)+str(new_champpool.champ)+str(new_champpool.season)
+
             
-            if new_champpool.PUUID_CHAMP_SEASON in list_select_champpool:
+            
+
+            
+            if primary_key in list_select_champpool:
                 columns_and_values = \
                                     (
                                       f'"puuid" = \'{new_champpool.puuid}\', '
@@ -574,17 +595,16 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
                                       f'"win_red" = {new_champpool.win_red}, '
                                       f'"season" = {new_champpool.season}'
                                     )
-                query_update = get_query("update",
+                query_update = get_query("update_multi_arg",
                                          table='"playerdata"."champpool"',
                                          columns_and_values=columns_and_values,
-                                         key='"PUUID_CHAMP_SEASON"',
-                                         keyvalue=new_champpool.PUUID_CHAMP_SEASON)
-                again_do_i_need_equal_2 = execute_query(db_connection, query_update)
+                                         key_and_value=f'"puuid" = \'{new_champpool.puuid}\' AND "champ" = \'{new_champpool.champ}\' AND "season" = {new_champpool.season}')
+                execute_query(db_connection, query_update)
 
 
-            if new_champpool.PUUID_CHAMP_SEASON not in list_select_champpool:
-                tablename = '"playerdata"."champpool"("PUUID_CHAMP_SEASON", "puuid", "champ","name","tagline","games_played","kda","kills","deaths","assists","cs","exp","level","gold","visionscore","cs_diff","exp_diff","level_diff","gold_diff","visionscore_diff","summonerspell1","summonerspell2","fav_role","winrate","win_blue","win_red", "season")'
-                values = f'\'{new_champpool.PUUID_CHAMP_SEASON}\', \'{new_champpool.puuid}\', \'{new_champpool.champ}\', \'{new_champpool.name}\', \'{new_champpool.tagline}\', {new_champpool.games_played}, {new_champpool.kda}, {new_champpool.kills}, {new_champpool.deaths}, {new_champpool.assists}, {new_champpool.cs}, {new_champpool.exp}, {new_champpool.level}, {new_champpool.gold}, {new_champpool.visionscore}, {new_champpool.cs_diff}, {new_champpool.exp_diff}, {new_champpool.level_diff}, {new_champpool.gold_diff}, {new_champpool.visionscore_diff}, \'{new_champpool.summonerspell1}\', \'{new_champpool.summonerspell2}\', \'{new_champpool.fav_role}\', {new_champpool.winrate}, {new_champpool.win_blue}, {new_champpool.win_red}, {new_champpool.season}'
+            if primary_key not in list_select_champpool:
+                tablename = '"playerdata"."champpool"("puuid", "champ","name","tagline","games_played","kda","kills","deaths","assists","cs","exp","level","gold","visionscore","cs_diff","exp_diff","level_diff","gold_diff","visionscore_diff","summonerspell1","summonerspell2","fav_role","winrate","win_blue","win_red", "season")'
+                values = f'\'{new_champpool.puuid}\', \'{new_champpool.champ}\', \'{new_champpool.name}\', \'{new_champpool.tagline}\', {new_champpool.games_played}, {new_champpool.kda}, {new_champpool.kills}, {new_champpool.deaths}, {new_champpool.assists}, {new_champpool.cs}, {new_champpool.exp}, {new_champpool.level}, {new_champpool.gold}, {new_champpool.visionscore}, {new_champpool.cs_diff}, {new_champpool.exp_diff}, {new_champpool.level_diff}, {new_champpool.gold_diff}, {new_champpool.visionscore_diff}, \'{new_champpool.summonerspell1}\', \'{new_champpool.summonerspell2}\', \'{new_champpool.fav_role}\', {new_champpool.winrate}, {new_champpool.win_blue}, {new_champpool.win_red}, {new_champpool.season}'
 
                 query_insert = get_query("insert", tablename=tablename, values=values)
 

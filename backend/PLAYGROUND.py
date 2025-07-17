@@ -42,6 +42,7 @@ puuids = [
         ]
 
 
+champooldata = get_data_for_champpool(db_connection)
 
 
 
@@ -52,9 +53,9 @@ riot_ids = api_data[1]
 
 
 #call riot api for puuids and save it in a list of classes "classes_player"
-classes_player = get_playerclass(riot_ids, region, api_key)
-for player in classes_player:
-    print(player.puuid)
+#classes_player = get_playerclass(riot_ids, region, api_key)
+#for player in classes_player:
+#    print(player.puuid)
 
 #classes_matchhistory = get_matchhistoriesclass(classes_player, region, api_key)
 
@@ -125,13 +126,13 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
 
 
                         all_participants = []
-                        objective_teams =  {}
+                        
                         if (class_match.gamemode == 0 or
                             class_match.gamemode == 420 or
                             class_match.gamemode == 440
                         ): 
                             for participant in participants:
-                                print(matchid)
+                                
                                 class_playerstats = Playerstats(participant, matchid, participant["puuid"], single_match)
 
 
@@ -140,7 +141,7 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
 
                             #objectives matchdata
                             teams = single_match["info"]["teams"]
-                            
+                            objective_teams =  {}
 
 
                             
