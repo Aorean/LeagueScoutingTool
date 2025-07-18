@@ -1,19 +1,5 @@
 [
     {
-        "leagueId": "0aedbecd-1050-4a3d-8757-aa230232b41b",
-        "queueType": "RANKED_SOLO_5x5",
-        "tier": "DIAMOND",
-        "rank": "IV",
-        "puuid": "xN9AE0xmaCYwytheZ-FfNqdPBBDN1EUwlia3opOR1ms1KDWrJUpTPpEOjvTx4c6J_70OchHbztx-XA",
-        "leaguePoints": 89,
-        "wins": 47,
-        "losses": 38,
-        "veteran": false,
-        "inactive": false,
-        "freshBlood": false,
-        "hotStreak": true
-    },
-    {
         "leagueId": "4c469c4d-2dce-4ab4-b9a3-c2ebc173f28d",
         "queueType": "RANKED_FLEX_SR",
         "tier": "EMERALD",
@@ -26,5 +12,19 @@
         "inactive": false,
         "freshBlood": false,
         "hotStreak": false
+    },
+    {
+        "leagueId": "0aedbecd-1050-4a3d-8757-aa230232b41b",
+        "queueType": "RANKED_SOLO_5x5",
+        "tier": "DIAMOND",
+        "rank": "IV",
+        "puuid": "xN9AE0xmaCYwytheZ-FfNqdPBBDN1EUwlia3opOR1ms1KDWrJUpTPpEOjvTx4c6J_70OchHbztx-XA",
+        "leaguePoints": 89,
+        "wins": 47,
+        "losses": 38,
+        "veteran": false,
+        "inactive": false,
+        "freshBlood": false,
+        "hotStreak": true
     }
 ]

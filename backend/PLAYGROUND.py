@@ -42,7 +42,7 @@ puuids = [
         ]
 
 
-champooldata = get_data_for_champpool(db_connection)
+
 
 
 

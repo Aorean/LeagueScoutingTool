@@ -1,5 +1,5 @@
 import psycopg2
-from backend.def_classes.sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL, PLAYERINFO, MATCHHISTORY
+from backend.def_classes.sql_tables import PLAYER, MATCH, PLAYERSTATS, OBJECTIVES, CHAMPPOOL, PLAYERINFO, MATCHHISTORY, MASTERY
 import os
 import json
 
@@ -44,8 +44,10 @@ def get_query(querytype,
         query = f'SELECT {selection} FROM "{schema}"."{table}"\nWHERE {column} = \'{value}\''
     elif querytype == "select_json":
         query = f'SELECT json_agg(row_to_json(t))\nFROM (SELECT * FROM "{schema}"."{table}"\nWHERE {selection}=\'{value}\') t;'
-    elif querytype == "top3_json":
+    elif querytype == "top3_json+season":
         query = f'SELECT json_agg(row_to_json(t))\nFROM (SELECT {selection} FROM {schema}.{table}\nWHERE {argument} = \'{value}\'\n AND season = (\n SELECT MAX(season)\n FROM {schema}.{table}\nWHERE {argument} = \'{value}\'\n) ORDER BY {order} DESC\nLIMIT 3\n) t;'
+    elif querytype == "top3_json":
+        query = f'SELECT json_agg(row_to_json(t))\nFROM (SELECT {selection} FROM {schema}.{table}\nWHERE {argument} = \'{value}\'\nORDER BY {order} DESC\nLIMIT 3\n) t;'
     else:
         print("ERROR: Wrong querytype")
         query = None
@@ -237,6 +239,20 @@ def SELECT_PK_MATCH_ARENA(db_connection):
         return list_select_arena_match
     except TypeError as e:
         return []
+    
+def SELECT_PK_MASTERY(db_connection):
+    query_select_mastery = get_query("select", '"puuid", "champ"', "playerdata", "mastery")
+    select_mastery = execute_query(db_connection, query_select_mastery)
+    try:
+        pks = []
+        for entry in select_mastery:
+            key = entry[0] + entry[1]
+            pks.append(key)
+
+        return pks
+    except TypeError as e:
+        return []
+
 
 def filter_matchhistory(db_connection, matchhistory):
 
@@ -265,7 +281,14 @@ def filter_matchhistory(db_connection, matchhistory):
         return matchhistory
 
 
-def insert_or_update_player(input_type, db_connection, classes_player = None, dict_matches = None, classes_champpool = None, classes_playerinfo = None, matchhistories = None):
+def insert_or_update_player(input_type, 
+                            db_connection, 
+                            classes_player = None, 
+                            dict_matches = None, 
+                            classes_champpool = None, 
+                            classes_playerinfo = None, 
+                            matchhistories = None,
+                            mastery_classes = None):
     if input_type == "player":
         # SELECT to check if UPDATE or INSERT
         list_select_player = SELECT_PK_PLAYER(db_connection)
@@ -609,8 +632,42 @@ def insert_or_update_player(input_type, db_connection, classes_player = None, di
                 query_insert = get_query("insert", tablename=tablename, values=values)
 
                 #list_select_champpool.append(new_champpool.PUUID_CHAMP)
-                again_do_i_need_equal_2 = execute_query(db_connection, query_insert)
+                execute_query(db_connection, query_insert)
+
+    if input_type == "mastery":
+        list_mastery = SELECT_PK_MASTERY(db_connection)
+        for mastery in mastery_classes:
+            mastery_table = MASTERY.from_mastery(mastery)
+            key = mastery.puuid+mastery.champ
+
+            if key in list_mastery:
+                columns_and_values=(
+                                      f'"puuid" = \'{mastery_table.puuid}\', '
+                                      f'"champ" = \'{mastery_table.champ}\', '
+                                      f'"gamertag" = \'{mastery_table.gamertag}\', '
+                                      f'"tagline" = \'{mastery_table.tagline}\', '
+                                      f'"masterylevel" = {mastery_table.masterylevel}, '
+                                      f'"masterypoints" = {mastery_table.masterypoints}'
+                                    )
+                query_update = get_query("update_multi_arg",
+                                         table='"playerdata"."mastery"',
+                                         columns_and_values=columns_and_values,
+                                         key_and_value=f'"puuid" = \'{mastery_table.puuid}\' AND "champ" = \'{mastery_table.champ}\'')
+                execute_query(db_connection, query_update)
+
+            elif key not in list_mastery:
+                tablename = '"playerdata"."mastery"("puuid", "champ", "gamertag", "tagline" ,"masterylevel", "masterypoints")'
+                values = f'\'{mastery_table.puuid}\', \'{mastery_table.champ}\', \'{mastery_table.gamertag}\',\'{mastery_table.tagline}\',{mastery_table.masterylevel}, {mastery_table.masterypoints}'
+
+                query_insert = get_query("insert", tablename=tablename, values=values)
+
+                #list_select_champpool.append(new_champpool.PUUID_CHAMP)
+                execute_query(db_connection, query_insert)
+
+
+
     """
+
     if input_type =="matchhistory":
         list_select_matchhistory = SELECT_PK_MATCHHISTORY(db_connection)
         for matchhistory in matchhistories:

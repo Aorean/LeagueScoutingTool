@@ -420,3 +420,17 @@ class Champpool:
             print(f"{str(k)} = {str(v)}")
 
 
+class Mastery:
+    def __init__(self, mastery_data, playerclass): #dict_champions
+        self.puuid = str(playerclass.puuid)
+        self.gamertag = str(playerclass.gamertag)
+        self.tagline = str(playerclass.tagline)
+        self.champ = str(mastery_data["championId"])
+        self.masterylevel = int(mastery_data["championLevel"])
+        self.masterypoints = int(mastery_data["championPoints"])
+
+    def translate_ids(self, dict_champ_id):
+
+        champid = int(self.champ)
+
+        self.champ = dict_champ_id[champid]

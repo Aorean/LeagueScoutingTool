@@ -8,19 +8,23 @@ def get_puuid(summoner_name: str, tag_line, region, api_key):
     root_url = f"https://{region}.api.riotgames.com/"
     puuid_url = f"riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag_line}?api_key={api_key}"
 
-    response_puuid = requests.get(root_url + puuid_url)
+    while True:
+        response_puuid = requests.get(root_url + puuid_url)
+        if (response_puuid.status_code == 429) or (response_puuid.status_code == 502) or (response_puuid.status_code == 504):
+            if response_puuid.status_code == 429:
+                print("API limit reached, please wait!")
+            if response_puuid.status_code == 502:
+                print("Bad Gateaway")
+            if response_puuid.status_code == 504:
+                print("Gateaway Timeout")
+            time.sleep(120)
 
-    puuid = response_puuid.json()["puuid"]
+            continue
+        
 
+        puuid = response_puuid.json()["puuid"]
 
-    #TESTDATA#
-    path = os.path.join("__TESTDATA__", "get_puuid")
-    os.makedirs(path, exist_ok=True)
-    file_path = os.path.join(path, f"{puuid}.json")
-    with open(file_path, "w") as f:
-        json.dump(puuid, f, indent=4)
-
-    return puuid
+        return puuid
 
 def get_matchhistory(region, puuid, api_key, startindex):
     root_url = f"https://{region}.api.riotgames.com/"
@@ -32,12 +36,7 @@ def get_matchhistory(region, puuid, api_key, startindex):
             continue
 
         response = response_history.json()
-        #TESTDATA#
-        path = os.path.join("__TESTDATA__", "get_matchhistory")
-        os.makedirs(path, exist_ok=True)
-        file_path = os.path.join(path, f"{puuid}.json")
-        with open(file_path, "w") as f:
-            json.dump(response_history.json(), f, indent=4)
+
 
         return response_history.json()
 
@@ -60,16 +59,7 @@ def get_match(region, matchId, api_key):
 
             continue
 
-        
-
         response_match = resp_match.json()
-
-        #TESTDATA#
-        path = os.path.join("__TESTDATA__", "get_match")
-        os.makedirs(path, exist_ok=True)
-        file_path = os.path.join(path, f"{matchId}.json")
-        with open(file_path, "w") as f:
-            json.dump(response_match, f, indent=4)
 
         return response_match
 
@@ -78,34 +68,62 @@ def get_match(region, matchId, api_key):
 def get_summoner_id(region, puuid, api_key):
     root_url = f"https://{region}.api.riotgames.com/"
     summoner_id_url = f"/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={api_key}"
-    response_summoner_id = requests.get(root_url + summoner_id_url)
+    while True:
+        response_summoner_id = requests.get(root_url + summoner_id_url)
+        if (response_summoner_id.status_code == 429) or (response_summoner_id.status_code == 502) or (response_summoner_id.status_code == 504):
+            if response_summoner_id.status_code == 429:
+                print("API limit reached, please wait!")
+            if response_summoner_id.status_code == 502:
+                print("Bad Gateaway")
+            if response_summoner_id.status_code == 504:
+                print("Gateaway Timeout")
+            time.sleep(120) 
 
-    response_summoner_id = response_summoner_id.json()
+            continue
+    
 
-    #TESTDATA#
-    path = os.path.join("__TESTDATA__", "get_summoner_id")
-    os.makedirs(path, exist_ok=True)
-    file_path = os.path.join(path, f"{puuid}.json")
-    with open(file_path, "w") as f:
-        json.dump(response_summoner_id, f, indent=4)
+        response_summoner_id = response_summoner_id.json()
 
-    return response_summoner_id
+        return response_summoner_id
 
 def get_rank(region, summoner_id, api_key):
     root_url = f"https://{region}.api.riotgames.com/"
     rank_url = f"/lol/league/v4/entries/by-puuid/{summoner_id}?api_key={api_key}"
-    response_rank = requests.get(root_url + rank_url)
+    while True:
+        response_rank = requests.get(root_url + rank_url)
+        if (response_rank.status_code == 429) or (response_rank.status_code == 502) or (response_rank.status_code == 504):
+            if response_rank.status_code == 429:
+                print("API limit reached, please wait!")
+            if response_rank.status_code == 502:
+                print("Bad Gateaway")
+            if response_rank.status_code == 504:
+                print("Gateaway Timeout")
+            time.sleep(120)
 
-    response_rank = response_rank.json()
-
-
+            continue
     
-    #TESTDATA#
-    path = os.path.join("__TESTDATA__", "get_rank")
-    os.makedirs(path, exist_ok=True)
-    file_path = os.path.join(path, f"{summoner_id}.json")
-    with open(file_path, "w") as f:
-        json.dump(response_rank, f, indent=4)
+        response_rank = response_rank.json()
 
-    return response_rank
+        return response_rank
 
+def get_mastery(region, puuid, api_key):
+    if region == "europe":
+        region = "euw1"
+    root_url = f"https://{region}.api.riotgames.com/"
+    mastery_url = f"lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}?api_key={api_key}"
+    while True:
+        resp_mastery = requests.get(root_url + mastery_url)
+        if (resp_mastery.status_code == 429) or (resp_mastery.status_code == 502) or (resp_mastery.status_code == 504):
+            if resp_mastery.status_code == 429:
+                print("API limit reached, please wait!")
+            if resp_mastery.status_code == 502:
+                print("Bad Gateaway")
+            if resp_mastery.status_code == 504:
+                print("Gateaway Timeout")
+            time.sleep(120)
+
+            continue
+
+        resp_mastery = resp_mastery.json()
+
+        return resp_mastery

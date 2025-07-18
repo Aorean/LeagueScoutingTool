@@ -16,7 +16,7 @@ from backend.config import db_engine, db_connection
 from backend.db_base import Base
 
 #process data
-from backend.functions.general import get_playerclass, get_matchhistoriesclass
+from backend.functions.general import get_playerclass, get_matchhistoriesclass, get_masteryclasses
 from backend.functions.process import process_input                                     #, process_matches
 from backend.functions.process import process_matches                                          #temporary
 import os
@@ -53,6 +53,7 @@ def run_main(user_input, api_key, db_connection):
     DB_CHAMPPOOL = CHAMPPOOL()
     DB_PLAYERINFO = PLAYERINFO()
     DB_MATCHHISTORY = MATCHHISTORY()
+    DB_MASTERY = MASTERY()
     #create tables if not in sql
     Base.metadata.create_all(db_engine)
     
@@ -87,6 +88,9 @@ def run_main(user_input, api_key, db_connection):
     insert_or_update_player("playerinfo", db_connection, classes_playerinfo=classes_playerinfo)
 
 
+    classes_mastery = get_masteryclasses(classes_player=classes_player, region=region, api_key=api_key)
+
+    insert_or_update_player("mastery", db_connection, mastery_classes=classes_mastery)
 
 
 
@@ -102,6 +106,9 @@ def run_main(user_input, api_key, db_connection):
     return_json = json.dumps(dashboard)
 
     session.close()
+
+
+
 
     return return_json
 
@@ -124,5 +131,6 @@ region = api_data[0]
 riot_ids = api_data[1]
 
 
-run_main(userinput, api_key, db_connection)
+test=run_main(userinput, api_key, db_connection)
+
 ###############DEBUGGING###############

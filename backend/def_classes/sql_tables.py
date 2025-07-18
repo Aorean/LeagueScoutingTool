@@ -366,6 +366,29 @@ class MATCHHISTORY(Base):
             matchhistory = matchhistory.matchhistory
         )
 
+class MASTERY(Base):
+    __table_args__ = (PrimaryKeyConstraint("puuid", "champ") ,{"schema": "playerdata"})
+    __tablename__ = "mastery"
+
+    puuid = Column(String, nullable=False)
+    champ = Column(String, nullable=False)
+    gamertag = Column(String, nullable=False)
+    tagline = Column(String, nullable=False)
+    masterylevel = Column(Integer, nullable=False)
+    masterypoints = Column(Integer, nullable=False)
+
+    @classmethod
+    def from_mastery(cls, mastery):
+        return cls(
+            puuid = mastery.puuid,
+            champ = mastery.champ,
+            gamertag = mastery.gamertag,  
+            tagline = mastery.tagline,
+            masterylevel = mastery.masterylevel,
+            masterypoints = mastery.masterypoints
+        )
+    
+
 
 
 """

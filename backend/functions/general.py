@@ -1,4 +1,4 @@
-from backend.def_classes.summoners_rift import Player,Matchhistory,Match,Playerstats,Objectives
+from backend.def_classes.summoners_rift import Player,Matchhistory,Match,Playerstats,Objectives, Mastery
 from backend.def_classes.howling_abyss import aram_Match, aram_Playerstats
 from backend.def_classes.arena import arena_Match, arena_Playerstats
 from backend.process_data.c_dragon import *
@@ -23,11 +23,6 @@ def get_matchhistoriesclass(classes_player, region, api_key):
 
         #looping get matchhistory, so it gets more data until 
         #return from api is empty
-
-
-
-        
-        
         full_matchhistory = []
         startindex = 0
         while True:
@@ -58,7 +53,8 @@ def create_dashboard_json(puuids, db_connection):
         "playerinfo",
         "match",
         "playerstats",
-        "champpool"
+        "champpool",
+        "mastery"
     ]
     dashboard = {
         "player" : [], 
@@ -108,7 +104,7 @@ def create_dashboard_json(puuids, db_connection):
                         account["winrate"] = 1
 
             if table == "champpool":
-                query = get_query(querytype="top3_json",
+                query = get_query(querytype="top3_json+season",
                                   selection="champ, kda, games_played, winrate, fav_role",
                                   schema="playerdata",
                                   table=table,
@@ -182,10 +178,50 @@ def create_dashboard_json(puuids, db_connection):
                                 for k, v in playerstat.items():
                                     participants_dict[k]=v
 
+            if table == "mastery":
+                query = get_query(querytype="top3_json",
+                                  selection="champ, masterylevel, masterypoints",
+                                  schema="playerdata",
+                                  table=table,
+                                  argument="puuid",
+                                  value=puuid,
+                                  order="masterypoints")
+
+                rows_playerstats = execute_query(db_connection=db_connection, query=query)
+                clean_rows = rows_playerstats[0][0]
+
+                player["mastery"] = clean_rows
+
         player["account"] = account
         dashboard["player"].append(player)
         dashboard["tc_Matches"] = tc_matches
 
-        
+    with open("dashboard_json.json", "w") as f:
+        json.dump(dashboard, f, indent=4)
 
     return dashboard
+
+def get_masteryclasses(classes_player, region, api_key):
+    list_mastery = []
+    for player in classes_player:
+        puuid = player.puuid
+
+        resp_mastery = get_mastery(region=region, puuid=puuid, api_key=api_key)
+        with open("mastery_resp.json", "w") as f:
+            json.dump(resp_mastery, f, indent=4)
+        
+        for i in range(1, 11):
+            championmastery = resp_mastery[i-1]
+            mastery_class = Mastery(championmastery, player)
+            
+            mastery_class.translate_ids(dict_champ_id)
+            #ADD TRANSLATE CHAMP IDS
+
+            list_mastery.append(mastery_class)
+
+            
+
+    return list_mastery
+        
+
+        

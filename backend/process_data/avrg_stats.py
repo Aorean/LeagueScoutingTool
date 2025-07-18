@@ -70,7 +70,6 @@ def get_data_for_champpool(db):
         
         #sort by matches, return [[[playerA1, playerA2,...], [playerB1, playerB2,...]]...],]
         puuid_matched_stats = matching_opponents(all_puuid, no_earlyff_rank_playerstats)
-        print(seasons_by_player)
         return_dict = sort_data_by_season(seasons_by_player, puuid_matched_stats)
 
         with open("season_test.json", "w") as f:
