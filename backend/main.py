@@ -121,7 +121,7 @@ def run_main(user_input, api_key, db_connection):
 
 
 
-
+"""
 
 ###############DEBUGGING###############
 userinput = "https://op.gg/lol/multisearch/euw?summoners=Aorean%231311%2CQaQ%2300000%2CMoris%23RIVEN%2Cihatethisnerd%23euw%2Ci+is+pidgeon%23EUW"
@@ -134,3 +134,5 @@ riot_ids = api_data[1]
 test=run_main(userinput, api_key, db_connection)
 
 ###############DEBUGGING###############
+
+"""

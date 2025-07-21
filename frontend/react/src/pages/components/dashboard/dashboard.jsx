@@ -1,7 +1,8 @@
 import { useLocation, useParams, useNavigate } from "react-router-dom"; 
 import { useState } from "react";
-import DashboardTcMatches from "./components/dachboardTcMatches";
-import DashboardMatchSwitch from "./components/dashboardMatchSwitch";
+import DashboardMatchSwitch from "./dashboardMatchSwitch";
+import DashboardPlayer from "./dashboardPlayer"
+//import "./css/dashboard.css"
 
 const Dashboard = () => {
   const [player, setPlayer] = useState([]);
@@ -9,7 +10,7 @@ const Dashboard = () => {
   const { state } = useLocation();
   const rawContent = state?.returnedBody ?? [];
   const content = JSON.parse(rawContent);
-
+  console.log(content.player)
 
 
 
@@ -24,6 +25,7 @@ return (
   <div>
     <div>
       <DashboardMatchSwitch content={content} />
+      <DashboardPlayer content={content} />
     </div>
   </div>
 )

@@ -28,12 +28,12 @@
                 {
                     "champ": "LeBlanc",
                     "masterylevel": 78,
-                    "masterypoints": 828155
+                    "masterypoints": 831507
                 },
                 {
                     "champ": "Zed",
                     "masterylevel": 52,
-                    "masterypoints": 572449
+                    "masterypoints": 573332
                 },
                 {
                     "champ": "Lee Sin",
@@ -45,8 +45,9 @@
                 "puuid": "bO5blHOm9YeY2MXm15I3DiHVtQPb8PuQov9J-wJ4X3CBuhjScuFDdaEM7VMFtciIC5htsuFYT43ytw",
                 "gamertag": "Aorean",
                 "tagline": "1311",
-                "elo": "PLATINUMI",
-                "winrate": 0.5
+                "division": "PLATINUM",
+                "rank": "III",
+                "winrate": 0.53
             }
         },
         {
@@ -94,155 +95,9 @@
                 "puuid": "xN9AE0xmaCYwytheZ-FfNqdPBBDN1EUwlia3opOR1ms1KDWrJUpTPpEOjvTx4c6J_70OchHbztx-XA",
                 "gamertag": "QaQ",
                 "tagline": "00000",
-                "elo": "EMERALDIV",
-                "winrate": 0.5
-            }
-        },
-        {
-            "champpool": [
-                {
-                    "champ": "Riven",
-                    "kda": 3.59,
-                    "games_played": 238,
-                    "winrate": 0.55,
-                    "fav_role": "TOP"
-                },
-                {
-                    "champ": "Hwei",
-                    "kda": 4.34,
-                    "games_played": 98,
-                    "winrate": 0.56,
-                    "fav_role": "MIDDLE"
-                },
-                {
-                    "champ": "Aurora",
-                    "kda": 4.18,
-                    "games_played": 43,
-                    "winrate": 0.56,
-                    "fav_role": "MIDDLE"
-                }
-            ],
-            "mastery": [
-                {
-                    "champ": "Riven",
-                    "masterylevel": 40,
-                    "masterypoints": 411276
-                },
-                {
-                    "champ": "Zed",
-                    "masterylevel": 20,
-                    "masterypoints": 226158
-                },
-                {
-                    "champ": "Taliyah",
-                    "masterylevel": 17,
-                    "masterypoints": 206754
-                }
-            ],
-            "account": {
-                "puuid": "auom9H6uf9iN4yPls9QidJQWB1Mz2n4UIhfap9aQoITqA5gtRU0RE0ojafStbkIYrQzKtqxWmQr_jg",
-                "gamertag": "Moris",
-                "tagline": "RIVEN",
-                "elo": "SILVERIV",
-                "winrate": 0.5
-            }
-        },
-        {
-            "champpool": [
-                {
-                    "champ": "Sylas",
-                    "kda": 3.29,
-                    "games_played": 16,
-                    "winrate": 0.56,
-                    "fav_role": "MIDDLE"
-                },
-                {
-                    "champ": "Ambessa",
-                    "kda": 2.14,
-                    "games_played": 11,
-                    "winrate": 0.55,
-                    "fav_role": "TOP"
-                },
-                {
-                    "champ": "Zed",
-                    "kda": 3.95,
-                    "games_played": 10,
-                    "winrate": 0.4,
-                    "fav_role": "MIDDLE"
-                }
-            ],
-            "mastery": [
-                {
-                    "champ": "Zed",
-                    "masterylevel": 12,
-                    "masterypoints": 104842
-                },
-                {
-                    "champ": "Sylas",
-                    "masterylevel": 10,
-                    "masterypoints": 78279
-                },
-                {
-                    "champ": "LeBlanc",
-                    "masterylevel": 9,
-                    "masterypoints": 68671
-                }
-            ],
-            "account": {
-                "puuid": "pGSPl_CvQKjMkHq5m1j3CSrL6KEG3gMol1H8G-M_wpoK1LTT2F9Qe9aCYJyGoXf_L0rUpKzJAR6xUQ",
-                "gamertag": "ihatethisnerd",
-                "tagline": "euw",
-                "elo": "PLATINUMIV",
-                "winrate": 0.47
-            }
-        },
-        {
-            "champpool": [
-                {
-                    "champ": "Riven",
-                    "kda": 3.79,
-                    "games_played": 110,
-                    "winrate": 0.51,
-                    "fav_role": "TOP"
-                },
-                {
-                    "champ": "Hwei",
-                    "kda": 4.74,
-                    "games_played": 27,
-                    "winrate": 0.63,
-                    "fav_role": "MIDDLE"
-                },
-                {
-                    "champ": "Mel",
-                    "kda": 6.15,
-                    "games_played": 8,
-                    "winrate": 0.62,
-                    "fav_role": "MIDDLE"
-                }
-            ],
-            "mastery": [
-                {
-                    "champ": "Riven",
-                    "masterylevel": 19,
-                    "masterypoints": 174818
-                },
-                {
-                    "champ": "Hwei",
-                    "masterylevel": 6,
-                    "masterypoints": 37192
-                },
-                {
-                    "champ": "Zed",
-                    "masterylevel": 6,
-                    "masterypoints": 34615
-                }
-            ],
-            "account": {
-                "puuid": "puho54jBgun4B2VMgOV27N5Ty0JkEMDR8fdKjLGV8ip9ZmL0BSEwvaTMSIiXNDsM3Ulmlo0Yu4acow",
-                "gamertag": "i is pidgeon",
-                "tagline": "EUW",
-                "elo": "PLATINUMIV",
-                "winrate": 0.52
+                "division": "DIAMOND",
+                "rank": "IV",
+                "winrate": 0.55
             }
         }
     ],

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DashboardTcMatches from "./dachboardTcMatches";
+//import "./dashboardMatchSwitch.css"
 
 const MatchSwitch = ({ content }) => {
     const [index, setIndex] = useState(0);
@@ -12,7 +13,7 @@ const MatchSwitch = ({ content }) => {
     const prevMatch = () => {
         if (index > 0) setIndex((oldIndex) => oldIndex - 1);
     };
-    console.log("current match" , matches[index])
+
     const currentMatch = matches[index] 
 
     if (!matches || matches.length === 0){

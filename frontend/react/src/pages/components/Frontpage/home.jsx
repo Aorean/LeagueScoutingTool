@@ -1,6 +1,7 @@
-import Logo from "./components/Logo"
-import ParentSearch from './components/ParentSearch'
-import OptionCard from "./components/Frontpage/OptionCard"
+import Logo from "../Logo"
+import ParentSearch from './ParentSearch'
+import OptionCard from "./OptionCard"
+//import "./home.css"
 
 const Home = () => {
 

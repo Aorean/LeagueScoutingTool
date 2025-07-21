@@ -11689,7 +11689,6 @@ const testMap = jsonTest.tc_Matches.map((match, index) => {
         return redTeam.filter((player, index) => {return player.role === role});
     });
 
-    console.log(blueTeamSorted)
-    console.log(redTeamSorted)
+
 })
 

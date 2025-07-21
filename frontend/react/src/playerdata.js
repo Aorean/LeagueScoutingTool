@@ -19,5 +19,16 @@ const cDragonRequestIcon = async (patch, champ) => {
     return icon
 }
 
+const cDragonRequestRank = async (rank) => {
+    /*
+    Formats
+    patch: 14.22
+    champ: akali
+    */ 
+    const url = `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/ranked-emblem/emblem-${rank}.png`
+    const icon = await axios.get(url)
+    return icon
+}
 
-export default {postLink, cDragonRequestIcon};
+export default {postLink, cDragonRequestIcon, cDragonRequestRank};
+

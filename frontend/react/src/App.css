@@ -103,3 +103,13 @@
 .MatchSwitch:hover {
   filter: drop-shadow(0 0 1em #646cffaa);
 }
+
+.RankIcon {
+  display: inline;
+  text-align: right;
+  scale: 5;
+  width: 25px;
+  height: auto;
+  padding-left: 3px;
+
+}

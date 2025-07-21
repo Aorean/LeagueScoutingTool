@@ -93,7 +93,8 @@ def create_dashboard_json(puuids, db_connection):
                 row = execute_query(db_connection=db_connection, query=query)
 
                 clean_row = row[0][0][0]
-                account["elo"] = clean_row["division"] + clean_row["rank"]
+                account["division"] = clean_row["division"]
+                account["rank"] = clean_row["rank"]
 
                 try:  
                     account["winrate"] = round(clean_row["wins_total"]/(clean_row["wins_total"]+clean_row["losses_total"]), 2)

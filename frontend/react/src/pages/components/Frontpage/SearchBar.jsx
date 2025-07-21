@@ -1,3 +1,5 @@
+//import "./SearchBar.css"
+
 const SearchBar = ({value, onChange}) => {
 
     return(

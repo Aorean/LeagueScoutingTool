@@ -1,5 +1,5 @@
-import cDragonRequestIcon from "../../playerdata"
-
+import cDragonRequestIcon from "../../../playerdata"
+//import "./css/dashboardTcMatches.css"
 
 const DashboardTcMatches = (props) => {
     const blueTeam = props.participants.filter((participant, index) => {

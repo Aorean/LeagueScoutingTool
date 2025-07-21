@@ -1,3 +1,5 @@
+//import "./SearchButton.css"
+
 const SearchButton = ({onClick}) => {
     return(
         <div>
