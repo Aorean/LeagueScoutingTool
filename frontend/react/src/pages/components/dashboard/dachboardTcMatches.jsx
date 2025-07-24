@@ -34,7 +34,7 @@ const DashboardTcMatches = (props) => {
             <p>
                 {min}:{sec}
             </p>
-            <table className="table">
+            <table className="DashboardTcMatches-Table">
                 <thead>
                     <tr>
                         <th>Blueside</th>
@@ -45,11 +45,13 @@ const DashboardTcMatches = (props) => {
                         {blueTeamSorted.map((playerBlueSide, index) => {
                             const playerRedSide = redTeamSorted[index];
                             return (
-                            <tr key={index} className="tableInfo">
+                            <tr key={index} >
 
                                     <td style={{
-                                        backgroundColor: playerBlueSide.win === true ? 'rgba(0, 89, 255, 0.22)' : 'rgba(255, 68, 0, 0.2)',
-                                    }}>
+                                        backgroundColor: playerBlueSide.win === true ? 'rgba(0, 89, 255, 0.22)' : 'rgba(255, 68, 0, 0.2)'
+                                        
+                                    }}
+                                    className="DashboardBlueside">
 
                                          {playerBlueSide.gamertag}#{playerBlueSide.tagline} - | {playerBlueSide.kills} / {playerBlueSide.deaths} / {playerBlueSide.assists} | {playerBlueSide.cs} 
 
@@ -62,7 +64,8 @@ const DashboardTcMatches = (props) => {
                                     </td>
                                     <td style={{
                                         backgroundColor: playerRedSide.win === true ? 'rgba(0, 89, 255, 0.22)' : 'rgba(255, 68, 0, 0.2)'
-                                    }}>
+                                    }}
+                                    className="DashboardRedside">
                                         <img className="Icon" 
                                         crossOrigin="anonymous"
                                         referrerPolicy="no-referrer"

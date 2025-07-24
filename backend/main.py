@@ -113,8 +113,18 @@ def run_main(user_input, api_key, db_connection):
     return return_json
 
 
+def json_champpool(player, db_connection):
+    return_dict = {}
+    return_dict["champpools"] = []
+    for puuid in player:
+        query = get_query("select_json", schema="playerdata", table="champpool", selection="puuid", value=puuid)
+        data = execute_query(db_connection, query)
+        
+        return_dict["champpools"].append(data)
 
+    return_json = json.dumps(return_dict, indent=4)
 
+    return return_json
 
 
 

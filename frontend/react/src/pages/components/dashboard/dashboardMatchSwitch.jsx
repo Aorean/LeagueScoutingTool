@@ -22,6 +22,7 @@ const MatchSwitch = ({ content }) => {
 
     return(
         <section className="MatchSwitchContainer">
+            <h2>Tournamentcode Matches</h2>
             <div className="MatchSwitch">
 
                 <DashboardTcMatches {...currentMatch} />
@@ -32,6 +33,7 @@ const MatchSwitch = ({ content }) => {
                     <button onClick={nextMatch} disabled={index === matches.length - 1}>→</button>
                 </div>
             </div>
+            <button>More...</button>
         </section>
     )
 } 

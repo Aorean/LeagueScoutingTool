@@ -1,12 +1,24 @@
 import axios from "axios"
 
-const baseUrl = "http://127.0.0.1:8000/post_url";
+
 
 const postLink = async (link) => {
+    const baseUrl = "http://127.0.0.1:8000/post_url";
     console.log("POST: ", link)
     const { data } = await axios.post(baseUrl, link);
     return data
 };
+
+const postChamppool = async(player) => {
+    const baseUrl = "http://127.0.0.1:8000/post_player";
+    console.log("POST: ", player)
+    const { data } = await axios.post(baseUrl, player);
+    return data
+};
+
+
+
+
 
 const cDragonRequestIcon = async (patch, champ) => {
     /*
@@ -30,5 +42,5 @@ const cDragonRequestRank = async (rank) => {
     return icon
 }
 
-export default {postLink, cDragonRequestIcon, cDragonRequestRank};
+export default {postLink, cDragonRequestIcon, cDragonRequestRank, postChamppool};
 

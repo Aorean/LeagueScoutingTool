@@ -1,6 +1,4 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
   padding: 0;
   text-align: center;
 }
@@ -72,37 +70,8 @@
   text-align: right;
 }
 
-.tableInfo {
-  border: 1px solid rgb(107, 107, 107);
-  text-align: left;
-  border-collapse:separate;
-}
 
-.table {
-  border: 2px solid rgb(107, 107, 107);
-  color: white;
-  width: 750px;
-  
-}
 
-.MatchSwitchContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.MatchSwitch {
-    flex: 1 0 300px;
-    background-color: #303030;
-    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
-    padding: 20px;
-    border-radius: 10px;
-    transition: transform 0.3s ease-in-out;
-}
-
-.MatchSwitch:hover {
-  filter: drop-shadow(0 0 1em #646cffaa);
-}
 
 .RankIcon {
   display: inline;
@@ -113,3 +82,130 @@
   padding-left: 3px;
 
 }
+
+.MasteryIcon {
+  display: inline;
+  text-align: right;
+  scale: 1.5;
+  width: 25px;
+  height: auto;
+  padding-left: 3px;
+}
+
+.RoleIcon {
+  display: inline;
+  text-align: right;
+  scale: 1.5;
+  width: 25px;
+  height: auto;
+  padding-left: 3px;
+}
+
+
+
+
+
+
+.DashboardParent {
+  
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+
+
+}
+
+
+
+.MatchSwitchContainer {
+  padding: 20px;
+
+}
+
+.MatchSwitch {
+    background-color: #303030;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.DashboardTcMatches-Table {
+  border: 2px solid rgb(107, 107, 107);
+  color: white;
+  width: 700px;
+  table-layout: fixed;  
+}
+
+.MatchSwitch:hover {
+  filter: drop-shadow(0 0 1em #646cffaa);
+}
+
+.DashboardBlueside {
+  text-align: right;
+}
+
+.DashboardRedside{
+  text-align: left;
+}
+
+
+
+.DashboardPlayer-Container {
+  padding: 20px;
+
+
+}
+
+.DashboardPlayer {
+    background-color: #303030;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
+    padding: 20px;
+    border-radius: 10px;
+
+
+  }
+
+
+
+.DashboardMastery-Container {
+  padding: 20px;
+
+
+}
+
+.DashboardMastery {
+    background-color: #303030;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
+    padding: 20px;
+    border-radius: 10px;
+    height: 675px;
+    overflow: auto;
+
+}
+
+.DashboardMastery-Table {
+  margin-bottom: 35px;
+}
+
+
+
+.DashboardChamppool-Container {
+  padding: 20px;
+
+}
+
+.DashboardChamppool {
+    background-color: #303030;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
+    padding: 20px;
+    border-radius: 10px;
+    height: 675px;
+    overflow: auto;
+}
+
+
+.DashboardChamppool-Table {
+  margin: 35px;
+}
+

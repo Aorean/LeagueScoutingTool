@@ -1,6 +1,7 @@
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/components/Frontpage/home"; 
 import Dashboard from "./pages/components/dashboard/Dashboard"
+import Champpool from "./pages/components/detailsChamppool/detailsChamppool"
 
 import './App.css'
 
@@ -12,6 +13,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/dashboard" element={<Dashboard/>}/>
+        <Route path="/champpool" element={<Champpool/>} />
       </Routes>
 
     </Router>

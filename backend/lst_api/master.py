@@ -3,7 +3,7 @@ from backend.lst_api.models import *
 from sqlalchemy.orm import session, sessionmaker
 from backend.config import db_engine
 from backend.def_classes.sql_tables import *
-from backend.main import run_main
+from backend.main import run_main, json_champpool
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
@@ -169,3 +169,8 @@ def post_url(url: PostUrl):
 
     return{"responsecode" : 200, "message": "Response", "Body": data}
 
+@app.post("/post_player")
+def post_url(player: postPlayer):
+    #data = run_main(user_input=url.link, api_key=api_key, db_connection=db_connection)
+    data = json_champpool(player.puuids, db_connection)
+    return{"responsecode" : 200, "message": "Response", "Body": data}

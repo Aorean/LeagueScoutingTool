@@ -2,6 +2,8 @@ import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import DashboardMatchSwitch from "./dashboardMatchSwitch";
 import DashboardPlayer from "./dashboardPlayer"
+import DashboardMastery from "./dashboardMastery"
+import DashboardChamppool from "./dashboardChamppool";
 //import "./css/dashboard.css"
 
 const Dashboard = () => {
@@ -14,7 +16,6 @@ const Dashboard = () => {
 
 
 
-
   //id = dashboard for me
   //state = content
   if (!state) {
@@ -22,11 +23,12 @@ const Dashboard = () => {
   }
 
 return (
-  <div>
-    <div>
-      <DashboardMatchSwitch content={content} />
-      <DashboardPlayer content={content} />
-    </div>
+  <div className="DashboardParent">
+    <DashboardPlayer content={content} />
+    <DashboardMatchSwitch content={content} />
+    <DashboardMastery content={content} />
+    <DashboardChamppool content={content} />
+
   </div>
 )
 };
