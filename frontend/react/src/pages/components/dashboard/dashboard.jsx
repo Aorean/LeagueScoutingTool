@@ -4,6 +4,7 @@ import DashboardMatchSwitch from "./dashboardMatchSwitch";
 import DashboardPlayer from "./dashboardPlayer"
 import DashboardMastery from "./dashboardMastery"
 import DashboardChamppool from "./dashboardChamppool";
+import Navbar from "../Navbar/Navbar";
 //import "./css/dashboard.css"
 
 const Dashboard = () => {
@@ -23,13 +24,17 @@ const Dashboard = () => {
   }
 
 return (
+  <>
+  <Navbar/>
   <div className="DashboardParent">
+    
     <DashboardPlayer content={content} />
     <DashboardMatchSwitch content={content} />
     <DashboardMastery content={content} />
     <DashboardChamppool content={content} />
 
   </div>
+  </>
 )
 };
 export default Dashboard

@@ -1,9 +1,9 @@
 import LstLogo from "./assets/LstLogo.png"
 
-const Logo = () => {
+const Logo = ({className}) => {
     return(
         <div>
-        <img src={LstLogo} className="logo" alt="LeagueScoutingTool_Logo" />
+        <img src={LstLogo} alt="LeagueScoutingTool_Logo" className={className} />
         </div>
     )
 }

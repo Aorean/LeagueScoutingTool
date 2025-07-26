@@ -120,7 +120,7 @@ def json_champpool(player, db_connection):
         query = get_query("select_json", schema="playerdata", table="champpool", selection="puuid", value=puuid)
         data = execute_query(db_connection, query)
         
-        return_dict["champpools"].append(data)
+        return_dict["champpools"].append(data[0][0])
 
     return_json = json.dumps(return_dict, indent=4)
 

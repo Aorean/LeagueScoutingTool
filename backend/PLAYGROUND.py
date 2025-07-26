@@ -21,7 +21,7 @@ from backend.functions.process import process_input
 from backend.process_data.avrg_stats import *
 
 from backend.process_data.playerinfo import get_playerinfo_classes
-
+from backend.main import json_champpool
 #from backend.main import run_main
 
 from backend.def_classes.summoners_rift import Match, Objectives, Playerstats, Champpool
@@ -35,17 +35,18 @@ userinput = "https://op.gg/lol/multisearch/euw?summoners=Aorean%231311%2CQaQ%230
 
 puuids = [
         "bO5blHOm9YeY2MXm15I3DiHVtQPb8PuQov9J-wJ4X3CBuhjScuFDdaEM7VMFtciIC5htsuFYT43ytw",
-        "xN9AE0xmaCYwytheZ-FfNqdPBBDN1EUwlia3opOR1ms1KDWrJUpTPpEOjvTx4c6J_70OchHbztx-XA",
-        "auom9H6uf9iN4yPls9QidJQWB1Mz2n4UIhfap9aQoITqA5gtRU0RE0ojafStbkIYrQzKtqxWmQr_jg",
-        "pGSPl_CvQKjMkHq5m1j3CSrL6KEG3gMol1H8G-M_wpoK1LTT2F9Qe9aCYJyGoXf_L0rUpKzJAR6xUQ",
-        "puho54jBgun4B2VMgOV27N5Ty0JkEMDR8fdKjLGV8ip9ZmL0BSEwvaTMSIiXNDsM3Ulmlo0Yu4acow"
+        "xN9AE0xmaCYwytheZ-FfNqdPBBDN1EUwlia3opOR1ms1KDWrJUpTPpEOjvTx4c6J_70OchHbztx-XA"
         ]
 
 
+test=json_champpool(player=puuids, db_connection=db_connection)
+
+with open("testChamppool.json", "w") as f:
+    f.write(test)
 
 
 
-
+"""
 
 api_data = process_input(userinput)
 region = api_data[0]
@@ -171,3 +172,5 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
 
 #with open("newnewnew.json", "w") as f:
     #json.dump(dict_matches, f, indent=4)
+
+"""
