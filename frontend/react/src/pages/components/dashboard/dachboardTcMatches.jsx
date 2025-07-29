@@ -1,5 +1,6 @@
 import cDragonRequestIcon from "../../../playerdata"
-//import "./css/dashboardTcMatches.css"
+import "./css/dashboardTcMatches.css"
+import GetImage from "../getImage";
 
 const DashboardTcMatches = (props) => {
     const blueTeam = props.participants.filter((participant, index) => {
@@ -44,6 +45,9 @@ const DashboardTcMatches = (props) => {
                     <tbody>
                         {blueTeamSorted.map((playerBlueSide, index) => {
                             const playerRedSide = redTeamSorted[index];
+                            const UrlChampBlue = playerBlueSide.champ.replace(" ", "").toLowerCase()
+                            const UrlChampRed = playerRedSide.champ.replace(" ", "").toLowerCase()
+
                             return (
                             <tr key={index} >
 
@@ -54,24 +58,45 @@ const DashboardTcMatches = (props) => {
                                     className="DashboardBlueside">
 
                                          {playerBlueSide.gamertag}#{playerBlueSide.tagline} - | {playerBlueSide.kills} / {playerBlueSide.deaths} / {playerBlueSide.assists} | {playerBlueSide.cs} 
+                                          
+                                        <GetImage 
+                                            source={[
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampBlue}/skins/base/images/${UrlChampBlue}_splash_tile_0.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampBlue}/skins/base/images/${UrlChampBlue}_splash_tile_0.${UrlChampBlue}_rework.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampBlue}/skins/base/images/${UrlChampBlue}_splash_tile_0.${UrlChampBlue}vgu.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampBlue}/skins/base/images/${UrlChampBlue}_splash_tile_0.domina.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampBlue}/skins/base/images/${UrlChampBlue}_splash_tile_0.${UrlChampBlue}.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampBlue}/skins/skin0/images/${UrlChampBlue}_splash_tile_0.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampBlue}/skins/skin0/images/${UrlChampBlue}_splash_tile_0.${UrlChampBlue}_rework.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampBlue}/skins/skin0/images/${UrlChampBlue}_splash_tile_0.${UrlChampBlue}vgu.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampBlue}/skins/skin0/images/${UrlChampBlue}_splash_tile_0.domina.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampBlue}/skins/skin0/images/${UrlChampBlue}_splash_tile_0.${UrlChampBlue}.jpg`,
+                                            ]}  
+                                            alt={playerBlueSide.champ}
+                                            className="Icon"
+                                        />
 
-                                        <img className="Icon" 
-                                        crossOrigin="anonymous"
-                                        referrerPolicy="no-referrer"
-                                        src={`https://raw.communitydragon.org/${playerBlueSide.patch}/plugins/rcp-be-lol-game-data/global/default/assets/characters/${playerBlueSide.champ.toLowerCase()}/skins/base/images/${playerBlueSide.champ.toLowerCase()}_splash_tile_0.jpg`}
-                                        alt={playerBlueSide.champ}
-                                        /> 
                                     </td>
                                     <td style={{
                                         backgroundColor: playerRedSide.win === true ? 'rgba(0, 89, 255, 0.22)' : 'rgba(255, 68, 0, 0.2)'
                                     }}
                                     className="DashboardRedside">
-                                        <img className="Icon" 
-                                        crossOrigin="anonymous"
-                                        referrerPolicy="no-referrer"
-                                        src={`https://raw.communitydragon.org/${playerRedSide.patch}/plugins/rcp-be-lol-game-data/global/default/assets/characters/${playerRedSide.champ.toLowerCase()}/skins/base/images/${playerRedSide.champ.toLowerCase()}_splash_tile_0.jpg`}
-                                        alt={playerRedSide.champ}
-                                        /> 
+                                        <GetImage 
+                                            source={[
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampRed}/skins/base/images/${UrlChampRed}_splash_tile_0.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampRed}/skins/base/images/${UrlChampRed}_splash_tile_0.${UrlChampRed}_rework.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampRed}/skins/base/images/${UrlChampRed}_splash_tile_0.${UrlChampRed}vgu.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampRed}/skins/base/images/${UrlChampRed}_splash_tile_0.domina.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampRed}/skins/base/images/${UrlChampRed}_splash_tile_0.${UrlChampRed}.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampRed}/skins/skin0/images/${UrlChampRed}_splash_tile_0.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampRed}/skins/skin0/images/${UrlChampRed}_splash_tile_0.${UrlChampRed}_rework.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampRed}/skins/skin0/images/${UrlChampRed}_splash_tile_0.${UrlChampRed}vgu.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampRed}/skins/skin0/images/${UrlChampRed}_splash_tile_0.domina.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChampRed}/skins/skin0/images/${UrlChampRed}_splash_tile_0.${UrlChampRed}.jpg`,
+                                            ]}  
+                                            alt={playerRedSide.champ}
+                                            className="Icon"
+                                        />
                                          {playerRedSide.gamertag}#{playerRedSide.tagline} - | {playerRedSide.kills} / {playerRedSide.deaths} / {playerRedSide.assists} | {playerRedSide.cs}
                                     </td>
                             </tr>
@@ -80,6 +105,7 @@ const DashboardTcMatches = (props) => {
                             })}
                     </tbody>
             </table>
+
         </div>
     )
 }

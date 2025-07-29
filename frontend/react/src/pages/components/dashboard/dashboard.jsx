@@ -5,7 +5,8 @@ import DashboardPlayer from "./dashboardPlayer"
 import DashboardMastery from "./dashboardMastery"
 import DashboardChamppool from "./dashboardChamppool";
 import Navbar from "../Navbar/Navbar";
-//import "./css/dashboard.css"
+
+import "./css/dashboard.css"
 
 const Dashboard = () => {
   const [player, setPlayer] = useState([]);
@@ -25,7 +26,7 @@ const Dashboard = () => {
 
 return (
   <>
-  <Navbar/>
+  <Navbar page={"Dashboard"}/>
   <div className="DashboardParent">
     
     <DashboardPlayer content={content} />

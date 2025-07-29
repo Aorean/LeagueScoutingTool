@@ -3,7 +3,7 @@ from backend.lst_api.models import *
 from sqlalchemy.orm import session, sessionmaker
 from backend.config import db_engine
 from backend.def_classes.sql_tables import *
-from backend.main import run_main, json_champpool
+from backend.main import run_main, json_champpool, json_mastery
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
@@ -169,8 +169,33 @@ def post_url(url: PostUrl):
 
     return{"responsecode" : 200, "message": "Response", "Body": data}
 
-@app.post("/post_player")
-def post_url(player: postPlayer):
+
+
+@app.post("/post_player_champpool")
+def post_url(puuids: postPlayer):
     #data = run_main(user_input=url.link, api_key=api_key, db_connection=db_connection)
-    data = json_champpool(player.puuids, db_connection)
+    data = json_champpool(puuids.puuids, db_connection)
     return{"responsecode" : 200, "message": "Response", "Body": data}
+
+
+@app.post("/post_player_mastery")
+def post_mastery(player: postPlayer):
+    data = json_mastery(player.puuids, db_connection)
+    return{"responsecode" : 200, "message": "Response", "Body": data}
+
+
+"""
+@app.post("/post_player_tc-machtes")
+def post_masters(player: postPlayer):
+    #data = json_champpool(player.puuids, db_connection)
+    return{"responsecode" : 200, "message": "Response", "Body": data}
+
+
+
+
+
+@app.post("/post_player_player")
+def post_masters(player: postPlayer):
+    #data = json_champpool(player.puuids, db_connection)
+    return{"responsecode" : 200, "message": "Response", "Body": data}
+"""

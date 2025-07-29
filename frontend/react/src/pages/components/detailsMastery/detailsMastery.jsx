@@ -1,10 +1,11 @@
 import { useLocation, useParams, useNavigate } from "react-router-dom"; 
 import { useState } from "react";
-import ChamppoolTableStructure from "./champpoolTableStructure";
-import Navbar from "../Navbar/Navbar";
-import "./css/DetailsChamppool.css"
 
-const DetailsChamppool = () => {
+import MasteryTableStructure from "./masteryTableStructure";
+import Navbar from "../Navbar/Navbar";
+import "./css/DetailsMastery.css"
+
+const DetailsMastery = () => {
     const [player, setPlayer] = useState([]);
     const { id } = useParams();
     const { state } = useLocation();
@@ -12,21 +13,22 @@ const DetailsChamppool = () => {
     const content = JSON.parse(rawContent);
     console.log(content)
 
-    const champpool = content.champpools
+    const mastery = content.masteries
     
-
+    
      
 
 
     return (
-        <div className="Parent-DetailsChamppool">
+        <div className="Parent-DetailsMastery">
             <>
-            <Navbar page={"Details Champpool"}/>
+                <Navbar page={"Details Mastery"}/>
             </>
             <>
-            <ChamppoolTableStructure champpool={champpool}/>
+                <MasteryTableStructure mastery={mastery}/>
             </>
+
         </div>
     )
 }
-export default DetailsChamppool;
+export default DetailsMastery;

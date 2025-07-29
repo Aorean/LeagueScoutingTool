@@ -1,9 +1,27 @@
-
-//import "./css/dashboardPlayer.css"
+import "./css/dashboardPlayer.css"
+import playerdataService from "../../../playerdata"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 const DashboardPlayer = ({content}) => {
     const playerData = content.player
- 
+    const navigate = useNavigate()
+
+    const handleMore = ({path}) => {
+        // "push" to append to a list
+        let puuids = []
+        playerData.map((player, index) => {
+            puuids.push(player.account.puuid)
+        })
+        //post to api, return detailed Champpool JSON
+        playerdataService.postMore({path:path, puuids:puuids}).then((returnedData) => {
+            const returnedBody = returnedData.Body;
+        
+            
+            navigate(`/${path}`, {state: {returnedBody}})
+        })
+        console.log(puuids)
+        }
 
 
     return (
@@ -39,7 +57,7 @@ const DashboardPlayer = ({content}) => {
                     </tbody>
                 </table>
             </div>
-            <button>More...</button>
+            <button onClick={() => handleMore({path: "player"})}>More...</button>
         </section>
     );
 }

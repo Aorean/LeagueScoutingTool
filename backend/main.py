@@ -127,8 +127,18 @@ def json_champpool(player, db_connection):
     return return_json
 
 
+def json_mastery(player, db_connection):
+    return_dict = {}
+    return_dict["masteries"] = []
+    for puuid in player:
+        query = get_query("select_json", schema="playerdata", table="mastery", selection="puuid", value=puuid)
+        data = execute_query(db_connection, query)
+        
+        return_dict["masteries"].append(data[0][0])
 
+    return_json = json.dumps(return_dict, indent=4)
 
+    return return_json
 
 
 """

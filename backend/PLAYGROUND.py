@@ -21,7 +21,7 @@ from backend.functions.process import process_input
 from backend.process_data.avrg_stats import *
 
 from backend.process_data.playerinfo import get_playerinfo_classes
-from backend.main import json_champpool
+from backend.main import json_champpool, json_mastery
 #from backend.main import run_main
 
 from backend.def_classes.summoners_rift import Match, Objectives, Playerstats, Champpool
@@ -39,7 +39,7 @@ puuids = [
         ]
 
 
-test=json_champpool(player=puuids, db_connection=db_connection)
+test=json_mastery(player=puuids, db_connection=db_connection)
 
 with open("testChamppool.json", "w") as f:
     f.write(test)

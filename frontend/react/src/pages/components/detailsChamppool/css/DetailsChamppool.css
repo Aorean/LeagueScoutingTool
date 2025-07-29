@@ -1,0 +1,51 @@
+
+
+.detailsChamppool-TableHead {
+  position: sticky;
+  top: 30px;
+  background-color: rgb(19, 19, 19);
+  border:none;
+  border-collapse: collapse;
+  padding: 20px;
+  width: auto;
+  z-index: 1;
+  margin: 50px;
+}
+
+.detailChamppool-Summonername {
+  position: sticky;
+  top: 0;
+  font-weight: bolder;
+  font-size: large;
+  background-color: rgb(19, 19, 19);
+  z-index: 1;
+
+}
+
+.detailsChamppool-Table {
+    text-align: center;
+    border-collapse: separate;
+    border: none;
+    table-layout: auto;
+    align-items: center;
+    flex-direction: column;
+
+}
+
+.detailsChamppool-Container {
+  margin: 30px;
+  display: flex;
+  background-color: #303030;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
+  padding: 20px;
+  border-radius: 10px;
+  height: 75vh;
+  width: 60vw;
+  overflow:auto;
+  flex-direction: column;
+  text-align: center;
+}
+
+.Parent-DetailsChamppool {
+  top: 0;
+}

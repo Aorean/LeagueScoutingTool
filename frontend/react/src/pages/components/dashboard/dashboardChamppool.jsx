@@ -1,6 +1,9 @@
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import playerdataService from "../../../playerdata"
+import GetImage from "../getImage"
+
+import "./css/dashboardChamppool.css"
 
 const DashboardChamppool = ({content}) => {
     const [inputValue, setInputValue] = useState("")
@@ -30,21 +33,23 @@ const DashboardChamppool = ({content}) => {
   }
 
 
-    const moreChamppool = () => {
+    const handleMore = ({path}) => {
         // "push" to append to a list
         let puuids = []
         playerData.map((player, index) => {
             puuids.push(player.account.puuid)
         })
         //post to api, return detailed Champpool JSON
-        playerdataService.postChamppool({puuids:puuids}).then((returnedData) => {
+        playerdataService.postMore({path:path, puuids:puuids}).then((returnedData) => {
             const returnedBody = returnedData.Body;
         
             
-            navigate("/champpool", {state: {returnedBody}})
+            navigate(`/${path}`, {state: {returnedBody}})
         })
         console.log(puuids)
         }
+
+
   
 
     return (
@@ -64,14 +69,27 @@ const DashboardChamppool = ({content}) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {accountData.champpool.map((champpool, index) => (
+                            {accountData.champpool.map((champpool, index) => {
+                                const UrlChamp = champpool.champ.replace(" ", "").toLowerCase()
+                                return(
                                 <tr key={index}>
                                     <td>
-                                    <img className="Icon" 
-                                    crossOrigin="anonymous"
-                                    referrerPolicy="no-referrer"
-                                    src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${champpool.champ.toLowerCase()}/skins/base/images/${champpool.champ.toLowerCase()}_splash_tile_0.jpg`}
-                                    alt={champpool.champ} />
+                                        <GetImage 
+                                            source={[
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.${UrlChamp}_rework.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.${UrlChamp}vgu.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.domina.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.${UrlChamp}.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.${UrlChamp}_rework.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.${UrlChamp}vgu.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.domina.jpg`,
+                                                `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.${UrlChamp}.jpg`,
+                                            ]}  
+                                            alt={champpool.champ}
+                                            className="Icon"
+                                        />
                                     </td>
                                     <td>{champpool.kda}</td>
                                     <td>{champpool.games_played}</td>
@@ -84,13 +102,13 @@ const DashboardChamppool = ({content}) => {
                                         alt={champpool.fav_role} />
                                     </td>
                             </tr>
-                            ))}
+                            )})}
                         </tbody>
                     </table>
                 ))}
                 
             </div>
-            <button onClick={moreChamppool}>More...</button>
+            <button onClick={() => handleMore({path: "champpool"})}>More...</button>
         </section>
     );
 }

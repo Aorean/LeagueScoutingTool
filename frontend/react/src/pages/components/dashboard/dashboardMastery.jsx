@@ -1,9 +1,12 @@
-
-
+import "./css/dashboardMastery.css"
+import GetImage from "../getImage"
+import playerdataService from "../../../playerdata"
+import { useNavigate } from "react-router-dom"
 
 
 
 const DashboardMastery = ({content}) => {
+    const navigate = useNavigate()
     const playerData = content.player
  
     const masteryPng = (masteryLevel) => {
@@ -18,6 +21,23 @@ const DashboardMastery = ({content}) => {
         const baseUrl = `https://raw.communitydragon.org/latest/game/assets/ux/mastery/legendarychampionmastery/masterycrest_level${level}.cm_updates.png`
         return(baseUrl)
     }
+
+        const handleMore = ({path}) => {
+            // "push" to append to a list
+            let puuids = []
+            playerData.map((player, index) => {
+                puuids.push(player.account.puuid)
+            })
+            //post to api, return detailed Champpool JSON
+            playerdataService.postMore({path:path, puuids:puuids}).then((returnedData) => {
+                const returnedBody = returnedData.Body;
+            
+                
+                navigate(`/${path}`, {state: {returnedBody}})
+            })
+            console.log(puuids)
+            }
+    
 
     return (
         <section className="DashboardMastery-Container">
@@ -34,14 +54,28 @@ const DashboardMastery = ({content}) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {accountData.mastery.map((champMastery, index) => (
+                                {accountData.mastery.map((champMastery, index) => {
+                                    const UrlChamp = champMastery.champ.replace(" ", "").toLowerCase()
+                                    
+                                    return(
                                     <tr key={index}>
                                         <td>
-                                        <img className="Icon" 
-                                        crossOrigin="anonymous"
-                                        referrerPolicy="no-referrer"
-                                        src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${champMastery.champ.toLowerCase()}/skins/base/images/${champMastery.champ.toLowerCase()}_splash_tile_0.jpg`}
-                                        alt={champMastery.champ} />
+                                            <GetImage 
+                                                source={[
+                                                    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.jpg`,
+                                                    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.${UrlChamp}_rework.jpg`,
+                                                    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.${UrlChamp}vgu.jpg`,
+                                                    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.domina.jpg`,
+                                                    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.${UrlChamp}.jpg`,
+                                                    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.jpg`,
+                                                    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.${UrlChamp}_rework.jpg`,
+                                                    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.${UrlChamp}vgu.jpg`,
+                                                    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.domina.jpg`,
+                                                    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.${UrlChamp}.jpg`,
+                                                ]}  
+                                                alt={champMastery.champ}
+                                                className="Icon"
+                                            />
                                         </td>
                                         <td>{champMastery.masterypoints}</td>
                                         <td>
@@ -54,14 +88,14 @@ const DashboardMastery = ({content}) => {
                                             /> 
                                         </td>
                                 </tr>
-                                ))}
+                                )})}
                             </tbody>
                         </table>
                         
                     ))}
                 
             </div>
-            <button>More...</button>
+            <button onClick={() => handleMore({path: "mastery"})}>More...</button>
         </section>
     );
 }

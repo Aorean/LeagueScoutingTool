@@ -2,7 +2,7 @@ import Logo from "../Logo"
 import ParentSearch from './ParentSearch'
 import OptionCard from "./OptionCard"
 import Navbar from "../Navbar/Navbar"
-//import "./home.css"
+import "./css/home.css"
 
 const Home = () => {
 

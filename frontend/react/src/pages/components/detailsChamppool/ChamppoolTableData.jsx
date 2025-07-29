@@ -1,4 +1,4 @@
-
+import GetImage from "../getImage"
 
 
 const ChamppoolTableData = ({player}) => {
@@ -28,14 +28,42 @@ const ChamppoolTableData = ({player}) => {
     return(
         <>
         {player.map((playerChamppool, champpoolIndex)=> {
+            const UrlChamp = playerChamppool.champ.replace(" ", "").toLowerCase()
+            let summoner1 = ""
+            let summoner2 = ""
+            if (playerChamppool.summonerspell1 === "Ghost") {
+                summoner1 = "Haste"
+            }
+            else {
+                summoner1 = playerChamppool.summonerspell1
+            }
+            if (playerChamppool.summonerspell2 === "Ghost") {
+                summoner2 = "Haste"
+            }
+            else {
+                summoner2 = playerChamppool.summonerspell2
+            }
+
+
             return(
             <tr key={champpoolIndex}> 
                 <td>                                    
-                    <img className="Icon" 
-                        crossOrigin="anonymous"
-                        referrerPolicy="no-referrer"
-                        src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${playerChamppool.champ.toLowerCase()}/skins/base/images/${playerChamppool.champ.toLowerCase()}_splash_tile_0.jpg`}
-                        alt={playerChamppool.champ} />
+                    <GetImage 
+                        source={[
+                            `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.jpg`,
+                            `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.${UrlChamp}_rework.jpg`,
+                            `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.${UrlChamp}vgu.jpg`,
+                            `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.domina.jpg`,
+                            `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/base/images/${UrlChamp}_splash_tile_0.${UrlChamp}.jpg`,
+                            `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.jpg`,
+                            `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.${UrlChamp}_rework.jpg`,
+                            `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.${UrlChamp}vgu.jpg`,
+                            `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.domina.jpg`,
+                            `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/${UrlChamp}/skins/skin0/images/${UrlChamp}_splash_tile_0.${UrlChamp}.jpg`,
+                        ]}  
+                        alt={playerChamppool.champ}
+                        className="Icon"
+                    />
                 </td>
                 <td>{playerChamppool.games_played}</td>
                 <td>{playerChamppool.winrate}</td>
@@ -49,16 +77,25 @@ const ChamppoolTableData = ({player}) => {
                 <td>{playerChamppool.level_diff}</td>
                 <td>{playerChamppool.gold_diff}</td>
                 <td>
-                    <img className="Icon" 
-                        crossOrigin="anonymous"
-                        referrerPolicy="no-referrer"
-                        src={`https://raw.communitydragon.org/latest/game/data/spells/icons2d/summoner_${playerChamppool.summonerspell1.toLowerCase()}.png`}
-                        alt={playerChamppool.summonerspell1} />
-                    <img className="Icon" 
-                        crossOrigin="anonymous"
-                        referrerPolicy="no-referrer"
-                        src={`https://raw.communitydragon.org/latest/game/data/spells/icons2d/summoner_${playerChamppool.summonerspell2.toLowerCase()}.png`}
-                        alt={playerChamppool.summonerspell2} />
+                    <GetImage 
+                        source={[
+                            `https://raw.communitydragon.org/latest/game/data/spells/icons2d/summoner_${summoner1.toLowerCase()}.png`,
+                            `https://raw.communitydragon.org/latest/game/data/spells/icons2d/summoner${summoner1.toLowerCase()}.png`
+
+                        ]}
+                        alt={summoner1}
+                        className="Icon"
+                    />
+                    <GetImage 
+                        source={[
+                            `https://raw.communitydragon.org/latest/game/data/spells/icons2d/summoner_${summoner2.toLowerCase()}.png`,
+                            `https://raw.communitydragon.org/latest/game/data/spells/icons2d/summoner${summoner2.toLowerCase()}.png`
+
+                        ]}
+                        alt={summoner2}
+                        className="Icon"
+                    />
+
                 </td>
                 <td>                                        
                     <img className="RoleIcon" 

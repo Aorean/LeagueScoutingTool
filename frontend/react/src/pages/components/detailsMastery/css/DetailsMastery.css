@@ -1,0 +1,48 @@
+.Parent-DetailsMastery {
+    top: 0;
+
+}
+
+
+
+.detailsMastery-Container {
+    margin: 30px;
+    display: flex;
+    background-color: #303030;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
+    padding: 20px;
+    border-radius: 10px;
+    height: 50vh;
+    width: 15vw;
+    overflow:auto;
+    flex-direction:row;
+    text-align: center;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.detailsMastery-Table {
+    text-align: center;
+    border-collapse: seperate;
+    border: none;
+    table-layout: auto;
+    align-items: center;
+    flex-direction: row;
+
+
+}
+
+.detailMastery-Summonername {
+  font-weight: bolder;
+  font-size: large;
+  z-index: 1;
+}
+
+.detailsMastery-TableHead {
+    text-align: center;
+    border-collapse: seperate;
+    border: none;
+    table-layout: auto;
+    align-items: center;
+    flex-direction: row;
+}

@@ -8,6 +8,7 @@ const ChamppoolTableStructure = ({champpool}) => {
             {champpool.map((player, index) => {
                 const Name = player[0].name + "#" + player[0].tagline
                 console.log(player)
+                const sortedChamppool = player.sort((a,b) => b.games_played - a.games_played).sort((c,d) => d.season - c.season)
                     return(
                         <section className="detailsChamppool-Container">
                         <table key={index} className="detailsChamppool-Table">
@@ -34,7 +35,7 @@ const ChamppoolTableStructure = ({champpool}) => {
                                 </thead>
                             
                             <tbody>
-                                <ChamppoolTableData player={player}/>
+                                <ChamppoolTableData player={sortedChamppool}/>
                             </tbody>
                         </table>
                         </section>

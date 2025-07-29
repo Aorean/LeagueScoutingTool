@@ -1,11 +1,17 @@
-
-.DashboardPlayer-Container {
+.DashboardMastery-Container {
   padding: 20px;
 }
 
-.DashboardPlayer {
+.DashboardMastery {
     background-color: #303030;
     box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
     padding: 20px;
     border-radius: 10px;
-  }
+    height: 675px;
+    overflow: auto;
+
+}
+
+.DashboardMastery-Table {
+  margin-bottom: 35px;
+}

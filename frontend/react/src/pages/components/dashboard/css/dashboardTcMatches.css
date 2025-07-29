@@ -1,0 +1,30 @@
+.MatchSwitchContainer {
+  padding: 20px;
+  scale: 1;
+}
+
+.MatchSwitch {
+    background-color: #303030;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.DashboardTcMatches-Table {
+  border: 2px solid rgb(107, 107, 107);
+  color: white;
+  width: 700px;
+  table-layout: fixed;  
+}
+
+.MatchSwitch:hover {
+  filter: drop-shadow(0 0 1em #646cffaa);
+}
+
+.DashboardBlueside {
+  text-align: right;
+}
+
+.DashboardRedside{
+  text-align: left;
+}

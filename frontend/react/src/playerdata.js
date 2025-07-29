@@ -9,10 +9,10 @@ const postLink = async (link) => {
     return data
 };
 
-const postChamppool = async(player) => {
-    const baseUrl = "http://127.0.0.1:8000/post_player";
-    console.log("POST: ", player)
-    const { data } = await axios.post(baseUrl, player);
+const postMore = async({path, puuids}) => {
+    const baseUrl = `http://127.0.0.1:8000/post_player_${path}`;
+    console.log("POST: ", puuids)
+    const { data } = await axios.post(baseUrl, {puuids});
     return data
 };
 
@@ -42,5 +42,5 @@ const cDragonRequestRank = async (rank) => {
     return icon
 }
 
-export default {postLink, cDragonRequestIcon, cDragonRequestRank, postChamppool};
+export default {postLink, cDragonRequestIcon, cDragonRequestRank, postMore};
 
