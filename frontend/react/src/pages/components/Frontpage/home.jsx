@@ -9,7 +9,7 @@ const Home = () => {
   return(
 
     <div>
-      <Navbar/>
+      <Navbar page={"Home"}/>
       <section className="Home-Container">
       
       <Logo className="logo"/>

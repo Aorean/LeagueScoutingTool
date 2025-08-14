@@ -2,8 +2,8 @@
 
 .detailsChamppool-TableHead {
   position: sticky;
-  top: 30px;
-  background-color: rgb(19, 19, 19);
+  top: 27px;
+  background-color: rgb(44, 44, 44);
   border:none;
   border-collapse: collapse;
   padding: 20px;
@@ -17,14 +17,21 @@
   top: 0;
   font-weight: bolder;
   font-size: large;
-  background-color: rgb(19, 19, 19);
+  background-color: rgb(44, 44, 44);
   z-index: 1;
+  caption-side: top;
+  margin-bottom: 0;
+  padding: 0;
+
+  color: white;
+
+  text-align: center;
 
 }
 
 .detailsChamppool-Table {
     text-align: center;
-    border-collapse: separate;
+    border-collapse: collapse;
     border: none;
     table-layout: auto;
     align-items: center;
@@ -39,7 +46,7 @@
   box-shadow: 0 2px 4px rgba(255, 255, 255, 0.438);
   padding: 20px;
   border-radius: 10px;
-  height: 75vh;
+  height: 50vh;
   width: 60vw;
   overflow:auto;
   flex-direction: column;

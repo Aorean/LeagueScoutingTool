@@ -4,7 +4,7 @@ from backend.def_classes.arena import arena_Match, arena_Playerstats
 from backend.process_data.c_dragon import *
 from backend.functions.psql import get_query,execute_query, filter_matchhistory
 from backend.functions.api import *
-import time
+
 
 
 def get_playerclass(riot_ids, region, api_key):
@@ -31,7 +31,6 @@ def get_matchhistoriesclass(classes_player, region, api_key):
             startindex+=100
             
             if not matchhistory:
-                time.sleep(121)
                 break
 
             for match in matchhistory:
@@ -122,24 +121,14 @@ def create_dashboard_json(puuids, db_connection):
 
 
             if table == "match":
-                query = f"""SELECT json_agg(row_to_json(ps))::text
-                            FROM playerdata.playerstats ps
-                            JOIN playerdata.match m 
-                            ON m.matchid = ps.matchid
-                            WHERE ps.puuid = '{puuid}'
-                            AND m.tournamentcode IS NOT NULL
-                            AND m.tournamentcode != 'None';"""
+                query = get_query(querytype="select_json", 
+                                  schema="playerdata", 
+                                  table=table, 
+                                  selection="tournamentcode!", 
+                                  value="NULL")
                 row = execute_query(db_connection=db_connection, query=query)
-                print(row)
-
-
-                with open("row.json", "w") as f:
-                    json.dump(row, f, indent=4)
-
                 clean_row = row[0][0]
                 
-
-
                 match_json = {
                     
                 }

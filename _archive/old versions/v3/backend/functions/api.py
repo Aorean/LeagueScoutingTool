@@ -148,24 +148,3 @@ def get_timeline(region, matchId, api_key):
         response_rank = response_timeline.json()
 
         return response_rank
-    
-
-def get_gamertag_tagline(region, puuid, api_key):
-    root_url = f"https://{region}.api.riotgames.com/"
-    rank_url = f"riot/account/v1/accounts/by-puuid/{puuid}?api_key={api_key}"
-    while True:
-        response_rank = requests.get(root_url + rank_url)
-        if (response_rank.status_code == 429) or (response_rank.status_code == 502) or (response_rank.status_code == 504):
-            if response_rank.status_code == 429:
-                print("API limit reached, please wait!")
-            if response_rank.status_code == 502:
-                print("Bad Gateaway")
-            if response_rank.status_code == 504:
-                print("Gateaway Timeout")
-            time.sleep(120)
-
-            continue
-
-        response_rank = response_rank.json()
-
-        return response_rank

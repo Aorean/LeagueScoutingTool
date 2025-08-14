@@ -7,7 +7,7 @@ const DashboardTcMatches = (props) => {
         return participant.team === 100});
     const redTeam = props.participants.filter((participant, index) => {
         return participant.team === 200});
-
+    console.log(props)
     const min = Math.floor(props.gameDuration / 60)
     const sec = Math.floor(props.gameDuration % 60)
 
@@ -79,6 +79,7 @@ const DashboardTcMatches = (props) => {
                                     </td>
                                     <td style={{
                                         backgroundColor: playerRedSide.win === true ? 'rgba(0, 89, 255, 0.22)' : 'rgba(255, 68, 0, 0.2)'
+
                                     }}
                                     className="DashboardRedside">
                                         <GetImage 

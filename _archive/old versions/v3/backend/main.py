@@ -27,8 +27,6 @@ from backend.process_data.avrg_stats import *
 
 from backend.process_data.playerinfo import get_playerinfo_classes
 
-from backend.functions.api import get_gamertag_tagline
-
 load_dotenv()
 api_key = os.environ.get("api_key")
 
@@ -38,36 +36,9 @@ api_key = os.environ.get("api_key")
 
 def run_main(user_input, api_key, db_connection):
     #use function to get data for API
-
-    #DEBUGGING#
-    riot_ids = []
-    region = "europe"
-    for puuid in user_input:
-        response = get_gamertag_tagline(region, puuid, api_key)
-        gamertag = response["gameName"]
-        tagline = response["tagLine"]
-        riot_id = [gamertag, tagline]
-
-        riot_ids.append(riot_id)
-
-
-
-    #DEBUGGING#
-
-
-
-
-
-
-
-    #MAIN#
-    """
     api_data = process_input(user_input)
     region = api_data[0]
     riot_ids = api_data[1]
-    """
-
-
 
     #def session
     SessionLocal = sessionmaker(bind=db_engine, autocommit=False, autoflush=False)
