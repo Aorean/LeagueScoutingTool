@@ -71,19 +71,28 @@ def run_main(user_input, api_key, db_connection):
     #function to insert or update player
     insert_or_update_player("player" ,db_connection, classes_player=classes_player)
 
+    session.close()
+
+    session = SessionLocal()
+
     #call riot api for matchhistories for each player and saving it in "classes_matchhistory"
     classes_matchhistory = get_matchhistoriesclass(classes_player, region, api_key)
 
     #call riot api for single matches and saving it in a dict
     dict_matches = process_matches(classes_matchhistory, region, api_key, db_connection)
     
-
-
-    print(dict_matches)
     #function to insert or update matchdatas
-    insert_or_update_player("match" ,db_connection, dict_matches=dict_matches)
-    insert_or_update_player("playerstats" ,db_connection, dict_matches=dict_matches)
-    insert_or_update_player("objectives" ,db_connection, dict_matches=dict_matches)
+    insert_or_update_player("match" ,db_connection, dict_matches=dict_matches[0])
+    insert_or_update_player("playerstats" ,db_connection, dict_matches=dict_matches[0])
+    insert_or_update_player("objectives" ,db_connection, dict_matches=dict_matches[0])
+    insert_or_update_player("player" ,db_connection, classes_player=dict_matches[1])
+
+
+
+    session.close()
+
+    session = SessionLocal()
+
 
     #process matchdata from playerstats to get important data for champpools
     champpool_data = get_data_for_champpool(db_connection)
@@ -93,10 +102,21 @@ def run_main(user_input, api_key, db_connection):
     #function to insert or update champool
     insert_or_update_player("champpool" ,db_connection, classes_champpool=classes_champpool)
 
+
+    session.close()
+
+    session = SessionLocal()
+
+
     #getting list of classes playerinfo
-    classes_playerinfo = get_playerinfo_classes(db_connection, api_key)
+    classes_playerinfo = get_playerinfo_classes(classes_player, api_key)
     #function to insert or update playerinfo
     insert_or_update_player("playerinfo", db_connection, classes_playerinfo=classes_playerinfo)
+
+
+    session.close()
+
+    session = SessionLocal()
 
 
     classes_mastery = get_masteryclasses(classes_player=classes_player, region=region, api_key=api_key)
@@ -104,7 +124,9 @@ def run_main(user_input, api_key, db_connection):
     insert_or_update_player("mastery", db_connection, mastery_classes=classes_mastery)
 
 
+    session.close()
 
+    session = SessionLocal()
 
 
 
@@ -113,14 +135,15 @@ def run_main(user_input, api_key, db_connection):
         puuids.append(player.puuid)
     
 
-    try:
-        dashboard = create_dashboard_json(puuids, db_connection)
+    #try:
+    dashboard = create_dashboard_json(puuids, db_connection)
 
-        return_json = json.dumps(dashboard)
-
+    return_json = json.dumps(dashboard)
+    """
     except TypeError as e:
+        print("ERROR in MAIN!\n Errorcode: \n", e)
         return_json = None
-
+    """
     session.close()
 
 

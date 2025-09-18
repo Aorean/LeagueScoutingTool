@@ -302,7 +302,7 @@ def insert_or_update_player(input_type,
             # UPDATE the SQL Table with new content
             if new_player.puuid in list_select_player:
                 # variables for get query
-                columns_and_values = f'"gamertag" = \'{new_player.gamertag}\', "tagline" = \'{new_player.tagline}\''
+                columns_and_values = f'"gamertag" = \'{new_player.gamertag}\', "tagline" = \'{new_player.tagline}\', "searched" = {new_player.searched}'
                 # get query
                 query_update = get_query("update",
                                          table='"playerdata"."player"',
@@ -316,8 +316,8 @@ def insert_or_update_player(input_type,
             # INSERT the new data
             elif new_player.puuid not in list_select_player:
                 # variables for get query
-                tablename = '"playerdata"."player"("puuid", "gamertag", "tagline")'
-                values = f"'{new_player.puuid}', '{new_player.gamertag}', '{new_player.tagline}'"
+                tablename = '"playerdata"."player"("puuid", "gamertag", "tagline", "searched")'
+                values = f"'{new_player.puuid}', '{new_player.gamertag}', '{new_player.tagline}', {new_player.searched}"
                 # get query
                 query_insert = get_query("insert",
                                          tablename=tablename,
@@ -342,7 +342,7 @@ def insert_or_update_player(input_type,
             queue_type = class_match.gamemode
 
             #DEBUG#
-            print("Processing Matchid: ", class_match.matchid)
+            #print("Processing Matchid: ", class_match.matchid)
 
 
             # create sql class

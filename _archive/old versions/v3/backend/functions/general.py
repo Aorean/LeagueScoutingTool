@@ -11,7 +11,7 @@ def get_playerclass(riot_ids, region, api_key):
     classes_player = []
     for riot_id in riot_ids:
         puuid = get_puuid(riot_id[0], riot_id[1], region, api_key)
-        class_player = Player( puuid, riot_id[0], riot_id[1])
+        class_player = Player( puuid, riot_id[0], riot_id[1], searched=True)
         classes_player.append(class_player)
 
     return classes_player

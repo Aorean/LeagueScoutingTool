@@ -11,6 +11,7 @@ class PLAYER(Base):
     puuid = Column(String, primary_key=True, index=True)
     gamertag = Column(String, nullable=False)
     tagline = Column(String, nullable=False)
+    searched = Column(Boolean, nullable=False)
 
     @classmethod
     def from_player(cls, player):
@@ -20,7 +21,8 @@ class PLAYER(Base):
 
             puuid=player.puuid,
             gamertag=player.gamertag,
-            tagline=player.tagline
+            tagline=player.tagline,
+            searched=player.searched
         )
 
 

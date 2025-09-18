@@ -30,11 +30,12 @@ from backend.functions.psql import *
 
 def get_data_for_champpool(db):
     #get matches from "playerstats" table
+    
     query_playerstats = get_query(querytype="select", selection="*", schema="playerdata", table="playerstats")
     select_playerstats = execute_query(db_connection=db_connection, query=query_playerstats)
     
     #get "player" table
-    query_player = get_query(querytype="select", selection="puuid", schema="playerdata", table="player")
+    query_player = "SELECT * FROM playerdata.player \n WHERE searched=true"
     select_player = execute_query(db_connection=db_connection, query=query_player)
     
     #get "match" table
@@ -68,6 +69,7 @@ def get_data_for_champpool(db):
         #output is a dict with {puuid1: [season1, season2, ...], puuid2: [season1, season2, ...]}
         seasons_by_player = get_seasons_by_player(all_puuid, all_playerstats)
         
+        
         #sort by matches, return [[[playerA1, playerA2,...], [playerB1, playerB2,...]]...],]
         puuid_matched_stats = matching_opponents(all_puuid, no_earlyff_rank_playerstats)
         return_dict = sort_data_by_season(seasons_by_player, puuid_matched_stats)
@@ -82,16 +84,16 @@ def get_data_for_champpool(db):
 
 def get_champpool(to_process):
 
-    unique_champs_puuid = get_unique_champs(to_process)
 
-    
+    unique_champs_puuid = get_unique_champs(to_process)
+  
+
 
     append_diff_stats(to_process)
 
     
 
     all_champpools = create_champpool_classes(unique_champs_puuid, to_process)
-
 
 
     return all_champpools

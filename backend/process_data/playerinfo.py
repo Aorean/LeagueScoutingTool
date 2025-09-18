@@ -11,17 +11,20 @@ from backend.config import db_connection
 load_dotenv()
 api_key = os.environ.get("api_key")
 
-def get_playerinfo_classes(db_connection, api_key):
+def get_playerinfo_classes(playerclasses, api_key):
 
-    query_puuids = get_query(querytype="select", selection="puuid", schema="playerdata", table="player")
+    #query_puuids = get_query(querytype="select", selection="puuid", schema="playerdata", table="player")
 
-    puuids = execute_query(db_connection, query_puuids)
+    #puuids = execute_query(db_connection, query_puuids)
 
+    puuids = []
+    for playerclass in playerclasses:
+        puuids.append(playerclass.puuid)
 
     json_playerinfos = []
     for puuid in puuids:
         puuid[0]
-        json_summonerid = get_summoner_id(region="EUW1", puuid=puuid[0], api_key=api_key)
+        json_summonerid = get_summoner_id(region="EUW1", puuid=puuid, api_key=api_key)
 
         #summonerid = json_summonerid["id"]
         json_rank = get_rank(region="EUW1", summoner_id=puuid, api_key=api_key)

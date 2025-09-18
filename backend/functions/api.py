@@ -4,6 +4,7 @@ import json
 import os
 
 def get_puuid(summoner_name: str, tag_line, region, api_key):
+    print("get_puuid")
     # request Riot API to get puuid for further use
     root_url = f"https://{region}.api.riotgames.com/"
     puuid_url = f"riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag_line}?api_key={api_key}"
@@ -27,6 +28,7 @@ def get_puuid(summoner_name: str, tag_line, region, api_key):
         return puuid
 
 def get_matchhistory(region, puuid, api_key, startindex):
+    print("get_matchhistory")
     root_url = f"https://{region}.api.riotgames.com/"
     history_url = f"lol/match/v5/matches/by-puuid/{puuid}/ids?startTime=20250108&start={startindex}&count=100&api_key={api_key}"
     while True:
@@ -43,6 +45,7 @@ def get_matchhistory(region, puuid, api_key, startindex):
 #/ids?start=1000&count=100&
 
 def get_match(region, matchId, api_key):
+    print("get_match")
     root_url = f"https://{region}.api.riotgames.com/"
     match_url = f"/lol/match/v5/matches/{matchId}?api_key={api_key}"
 
@@ -66,6 +69,7 @@ def get_match(region, matchId, api_key):
 
 #seems like riot changed stuff and i dont need this anymore
 def get_summoner_id(region, puuid, api_key):
+    print("get_summoner_id")
     root_url = f"https://{region}.api.riotgames.com/"
     summoner_id_url = f"/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={api_key}"
     while True:
@@ -87,6 +91,7 @@ def get_summoner_id(region, puuid, api_key):
         return response_summoner_id
 
 def get_rank(region, summoner_id, api_key):
+    print("get_rank")
     root_url = f"https://{region}.api.riotgames.com/"
     rank_url = f"/lol/league/v4/entries/by-puuid/{summoner_id}?api_key={api_key}"
     while True:
@@ -107,6 +112,7 @@ def get_rank(region, summoner_id, api_key):
         return response_rank
 
 def get_mastery(region, puuid, api_key):
+    print("get_mastery")
     if region == "europe":
         region = "euw1"
     root_url = f"https://{region}.api.riotgames.com/"
@@ -130,6 +136,7 @@ def get_mastery(region, puuid, api_key):
     
 
 def get_timeline(region, matchId, api_key):
+    print("get_timeline")
     root_url = f"https://{region}.api.riotgames.com/"
     rank_url = f"lol/match/v5/matches/{matchId}/timeline?api_key={api_key}"
     while True:
@@ -151,6 +158,7 @@ def get_timeline(region, matchId, api_key):
     
 
 def get_gamertag_tagline(region, puuid, api_key):
+    print("get_gamertag_tagline")
     root_url = f"https://{region}.api.riotgames.com/"
     rank_url = f"riot/account/v1/accounts/by-puuid/{puuid}?api_key={api_key}"
     while True:

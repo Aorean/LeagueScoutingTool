@@ -1,6 +1,6 @@
 from backend.def_classes.arena import arena_Match, arena_Playerstats
 from backend.def_classes.howling_abyss import aram_Match, aram_Playerstats
-from backend.def_classes.summoners_rift import Match, Objectives, Playerstats, Champpool
+from backend.def_classes.summoners_rift import Match, Objectives, Playerstats, Champpool, Player
 from backend.process_data.c_dragon import *
 from backend.functions.psql import get_query,execute_query, filter_matchhistory
 from backend.functions.general import get_match
@@ -35,14 +35,14 @@ def process_input(userinput):
         return False
 
 def process_matches(classes_matchhistory, region, api_key, db_connection):
-
+    match_leftover_participants = []
     full_matchinfo = {}
+
+    
     for class_matchhistory in classes_matchhistory:
         matchids = class_matchhistory.matchhistory
-        filtered_matchhistory = filter_matchhistory(db_connection, matchids)
 
-        #DEBUG#
-        #print("FILTERED MATCHHISTORY: ", filtered_matchhistory)
+        filtered_matchhistory = filter_matchhistory(db_connection, matchids)
 
         #tracking to process
         index = 0
@@ -59,9 +59,6 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
             print(f"Processed {index} from {total}\n To process: {total - index}")
 
 
-            #DEBUG#
-            print(matchid)
-            #DEBUG
 
 
             single_match = get_match(region, matchid, api_key)
@@ -88,6 +85,8 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
                 print("MATCH FOUND")
                 #DEGBUG'
 
+                
+
                 class_match = Match(matchid, single_match)
                 
                 cdragon_items = cdragon_request(class_match.patch, "items")
@@ -108,6 +107,7 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
                     class_match.gamemode == 420 or
                     class_match.gamemode == 440
                 ): 
+
                     for participant in participants:
                         
                         class_playerstats = Playerstats(participant, matchid, participant["puuid"], single_match)
@@ -116,10 +116,28 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
                         class_playerstats.translate_ids(cdragon_items, cdragon_summonerspells, cdragon_perks)
                         all_participants.append(class_playerstats)
 
+                        search_puuids = []
+                        for player in classes_matchhistory:
+                            search_puuid = player.PUUID
+                            search_puuids.append(search_puuid)
+
+                        #add leftover participants to player
+
+                        puuid = participant["puuid"]
+                        gamertag = participant["riotIdGameName"]
+                        tagline = participant["riotIdTagline"]
+                        if puuid in search_puuids:
+                            continue
+                        elif puuid not in search_puuids:
+                            
+                            leftover_participant = Player(puuid, gamertag, tagline, searched=False)
+
+                            match_leftover_participants.append(leftover_participant)
+
                     #objectives matchdata
                     teams = single_match["info"]["teams"]
                     
-
+                    
 
                     
                     for team in teams:
@@ -135,7 +153,8 @@ def process_matches(classes_matchhistory, region, api_key, db_connection):
 
 
 
-    return full_matchinfo
+
+    return [full_matchinfo, match_leftover_participants]
 
 ########           FUNCTION         ########
 ########   get_data_for_champpool   ########
@@ -160,7 +179,7 @@ def filter_earlyffs(all_matches, all_playerstats):
                     gamemode = playerstats[26]
                     
                     #gamemode 440 = SOLODUO, gamemode 420 = FLEX
-                    if gamemode == 440 or gamemode == 420:
+                    if gamemode in (440, 420, 0):
                         no_earlyff_rank_matches.append(match)
                         no_earlyff_rank_playerstats.append(playerstats)
 
@@ -177,9 +196,9 @@ def get_seasons_by_player(all_puuid, all_playerstats):
         for playerstats in all_playerstats:
             
             if playerstats[1] == puuid:
-
-                season = playerstats[25]
                 
+                season = playerstats[23]
+
                 if season not in seasons_played:
                     seasons_played.append(season)
                 elif season in seasons_played:
@@ -243,7 +262,7 @@ def sort_data_by_season(seasons_by_player, puuid_matched_stats):
 
                 for matched_match in matched_playerstats:
                     
-                    season_match = matched_match[0][25]
+                    season_match = matched_match[0][23]
                     puuid_match = matched_match[0][1]
                     
                     
@@ -278,9 +297,10 @@ def get_unique_champs(to_process):
 
                 #access the player and opponent matchdata
                 player = matched_data[0]
-                opponent = matched_data[1]
+                #opponent = matched_data[1]
 
                 champ_player = player[3]
+
                 if champ_player in unique_champs:
                     continue
                 if champ_player not in unique_champs:
@@ -389,3 +409,4 @@ def create_champpool_classes(unique_champs_puuid, to_process):
                 all_champpools.append(class_champpool)
 
     return all_champpools
+

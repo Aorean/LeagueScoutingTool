@@ -11,7 +11,7 @@ def get_playerclass(riot_ids, region, api_key):
     classes_player = []
     for riot_id in riot_ids:
         puuid = get_puuid(riot_id[0], riot_id[1], region, api_key)
-        class_player = Player( puuid, riot_id[0], riot_id[1])
+        class_player = Player( puuid, riot_id[0], riot_id[1], True)
         classes_player.append(class_player)
 
     return classes_player
@@ -62,23 +62,23 @@ def create_dashboard_json(puuids, db_connection):
         "tc_Matches": []
         }
 
-    
+    tc_matches = []
     for puuid in puuids:
-        tc_matches = []
+        
         account = {}
         player = {}
         for table in tables:
             if table == "player":
 
-                query = get_query(querytype="select_json",
+                query_player = get_query(querytype="select_json",
                         selection="puuid",
                         schema="playerdata", 
                         table=table,
                         column="puuid",
                         value=puuid
                             )
-                row = execute_query(db_connection=db_connection, query=query)
-                clean_row = row[0][0][0]
+                row_player = execute_query(db_connection=db_connection, query=query_player)
+                clean_row = row_player[0][0][0]
 
                 for key,value in clean_row.items():
                     account[key] = value
@@ -122,53 +122,61 @@ def create_dashboard_json(puuids, db_connection):
 
 
             if table == "match":
-                query = f"""SELECT json_agg(row_to_json(ps))::text
-                            FROM playerdata.playerstats ps
-                            JOIN playerdata.match m 
-                            ON m.matchid = ps.matchid
-                            WHERE ps.puuid = '{puuid}'
-                            AND m.tournamentcode IS NOT NULL
-                            AND m.tournamentcode != 'None';"""
+                query = f"""SELECT json_agg(row_to_json(m))
+                            FROM playerdata.match m
+                            WHERE m.tournamentcode IS NOT NULL
+                            AND m.tournamentcode != 'NULL'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM playerdata.playerstats ps
+                                WHERE ps.matchid = m.matchid
+                                    AND ps.puuid = '{puuid}');"""
                 row = execute_query(db_connection=db_connection, query=query)
-                print(row)
 
 
-                with open("row.json", "w") as f:
-                    json.dump(row, f, indent=4)
+
+
 
                 clean_row = row[0][0]
                 
-
+                with open("row.json", "w") as f:
+                    json.dump(row, f, indent=4)
 
                 match_json = {
                     
                 }
  
                 for data in clean_row:
-                    data["matchid"]
-                    participants_string = data["participants"]
+                    m_id = data["matchid"]
                     
-                    participants_list = participants_string.split(",")
-                    participants = []
-                    for participant_puuid in participants_list:
-                        cleanup = participant_puuid.strip('"')
-                        prep = {"puuid" : cleanup}
-                        participants.append(prep)
+                    
 
 
                     match_json = {
                         "matchId" : data["matchid"],
-                        "participants" : participants,
+                        "participants" : [],
                         "gameDuration" : data["gameduration"],
                         "tournamentcode" : data["tournamentcode"],
                     }
 
-                    tc_matches.append(match_json)
+                    existing_matches = []
+                    for matchdata in dashboard["tc_Matches"]:
+
+                        existing_matches.append(matchdata["matchId"])
+                    if match_json["matchId"] in existing_matches:
+                        
+                        continue
+                    elif match_json["matchId"] not in existing_matches:
+                        
+                        tc_matches.append(match_json)
+
 
 
 
             if table == "playerstats":
+
                 for matchdata in tc_matches:
+                    
                     matchid = matchdata["matchId"]
                     
                     
@@ -182,13 +190,42 @@ def create_dashboard_json(puuids, db_connection):
                     
                     clean_playerstat_rows = rows_playerstats[0][0]
                     
+
+
+
+
+
+
+
+                    participants_list = []
                     for playerstat in clean_playerstat_rows:
-                        for participants_dict in matchdata["participants"]:
-                            matchdata_puuid = participants_dict["puuid"]
-                            playerstats_puuid = playerstat["puuid"]
-                            if matchdata_puuid == playerstats_puuid:
-                                for k, v in playerstat.items():
-                                    participants_dict[k]=v
+
+                        participants_dict = {}
+
+                        
+                        for k, v in playerstat.items():
+                            if k != "matchid":
+                                participants_dict[k]=v
+                        
+                        
+                        query_tc_player = get_query(querytype="select_json", 
+                                schema="playerdata",
+                                table="player",
+                                selection="puuid",
+                                value=participants_dict["puuid"]
+                                )
+                        
+                        tc_player = execute_query(db_connection=db_connection, query=query_tc_player)
+
+                        
+
+                        participants_dict["gamertag"] = tc_player[0][0][0]["gamertag"]
+                        participants_dict["tagline"] = tc_player[0][0][0]["tagline"]
+
+                        participants_list.append(participants_dict)
+
+                    matchdata["participants"] = participants_list
+
 
             if table == "mastery":
                 query = get_query(querytype="top_json",
@@ -209,6 +246,11 @@ def create_dashboard_json(puuids, db_connection):
         player["account"] = account
         dashboard["player"].append(player)
         dashboard["tc_Matches"] = tc_matches
+
+    #add_leftoverplayers
+
+
+
 
     with open("dashboard_json.json", "w") as f:
         json.dump(dashboard, f, indent=4)

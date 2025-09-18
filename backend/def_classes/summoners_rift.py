@@ -1,8 +1,9 @@
 class Player:
-    def __init__(self, puuid, gamertag, tagline):
+    def __init__(self, puuid, gamertag, tagline, searched):
         self.puuid = puuid
         self.gamertag = gamertag
         self.tagline = tagline
+        self.searched = searched
 
 
 class Playerinfo:
@@ -13,11 +14,18 @@ class Playerinfo:
         self.puuid = summonerid_data["puuid"]
         self.summonerlevel = summonerid_data["summonerLevel"]
         self.profile_icon = summonerid_data["profileIconId"]
-        self.division = rank_data[0]["tier"]
-        self.rank = rank_data[0]["rank"]
-        self.wins_total = rank_data[0]["wins"]
-        self.losses_total = rank_data[0]["losses"]
-        self.stuck = rank_data[0]["veteran"]
+        try:
+            self.division = rank_data[0]["tier"]
+            self.rank = rank_data[0]["rank"]
+            self.wins_total = rank_data[0]["wins"]
+            self.losses_total = rank_data[0]["losses"]
+            self.stuck = rank_data[0]["veteran"]
+        except IndexError:
+            self.division = "NULL"
+            self.rank = "NULL"
+            self.wins_total = "NULL"
+            self.losses_total = "NULL"
+            self.stuck = "NULL"
 
 
 class Matchhistory:
